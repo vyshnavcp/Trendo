@@ -163,7 +163,7 @@
                                         </div>
                                         <h2 class="ls-minus-2px alt-font text-dark-gray mb-20px">Discover the newest look.</h2>
                                         <p class="w-80 mb-30px xl-w-100">Step into a world where design meets innovation. Our latest collection redefines modern aesthetics blending style.</p>
-                                        <a href="{% url 'product' %}" class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow">
+                                        <a href="{% url 'product' %}?latest=1" class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow">
                                             <span> 
                                                 <span class="btn-text">Shop under</span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
@@ -215,13 +215,13 @@
                                         </div>
                                         <h2 class="ls-minus-2px alt-font text-dark-gray mb-20px">Men's spring collection.</h2>
                                         <p class="w-80 mb-30px xl-w-100">Step into a world where design meets innovation. Our latest collection redefines modern aesthetics blending style.</p>
-                                        <a href="{% url 'product' %}" class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow">
+                                        <!-- <a href="{% url 'product' %}"  class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow" >
                                             <span> 
                                                 <span class="btn-text">Shop</span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                             </span>
-                                        </a>
+                                        </a> -->
                                     </div>
                                 </div>
                             </div>
@@ -241,7 +241,7 @@
                                         </div>
                                         <h2 class="ls-minus-2px alt-font text-dark-gray mb-20px">Refined style, Tiny elements.</h2>
                                         <p class="w-80 mb-30px xl-w-100">Step into a world where design meets innovation. Our latest collection redefines modern aesthetics blending style.</p>
-                                        <a href="{% url 'product' %}" class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow">
+                                        <a href="{% url 'filter_by_category' accessories_category.slug %}" class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow">
                                             <span> 
                                                 <span class="btn-text">Shop under</span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>

@@ -39,12 +39,25 @@ from django.db.models import F
 from .decorators import role_required
 
 def home(request):
-   blogs = Article.objects.order_by('-posted_on')[:4]
-   best_seller_products = Product.objects.filter(is_best_seller=True)[:5]
-   featured_product= Product.objects.filter(is_featured=True)[:5]
-   signature_products = Product.objects.filter( is_signature_collection=True,status=True)[:8]
-   categories = Category.objects.prefetch_related("subcategories").all()
-   return render(request, "home.html", {'blogs': blogs,'best_seller_products': best_seller_products,'featured_product':featured_product,'signature_products': signature_products,"categories": categories})
+    blogs = Article.objects.order_by('-posted_on')[:4]
+    best_seller_products = Product.objects.filter(is_best_seller=True)[:5]
+    featured_product= Product.objects.filter(is_featured=True)[:5]
+    signature_products = Product.objects.filter(is_signature_collection=True, status=True)[:8]
+    categories = Category.objects.prefetch_related("subcategories").all()
+
+    # ✅ get Women category
+    women_category = Category.objects.filter(name__iexact="Women").first()
+    accessories_category = Category.objects.filter(name__iexact="Accessories").first()
+
+    return render(request, "home.html", {
+        'blogs': blogs,
+        'best_seller_products': best_seller_products,
+        'featured_product': featured_product,
+        'signature_products': signature_products,
+        "categories": categories,
+        "women_category": women_category,  # ✅ pass to template
+        "accessories_category": accessories_category,
+    })
 
 def about(request):
     return render(request, "about.html")
@@ -100,31 +113,21 @@ def contact(request):
 
 
 def product(request, slug=None):
-
-    # ✅ base queryset
     products = Product.objects.filter(status=True).distinct()
-
-    # ✅ search
+    if request.GET.get('latest') == '1':
+        products = products.order_by('-created_at')
     query = request.GET.get('q')
     if query:
         products = products.filter(name__icontains=query)
-
-    # ✅ category filter (GET)
     category_filter = request.GET.get('category')
     if category_filter:
         products = products.filter(subcategory__category__slug=category_filter)
-
-    # ✅ subcategory counts
     subcategory_counts = SubCategory.objects.annotate(
         product_count=Count('products', distinct=True)
     )
-
-    # ✅ size counts (FIXED LINE ERROR)
     size_counts = Size.objects.annotate(
         product_count=Count('productvariant__product', distinct=True)
     )
-
-    # ✅ slug filter (URL based)
     if slug:
         if Category.objects.filter(slug=slug).exists():
             products = products.filter(subcategory__category__slug=slug)
@@ -132,55 +135,40 @@ def product(request, slug=None):
         else:
             products = products.filter(subcategory__slug=slug)
             pagination_base = reverse('filter_by_subcategory', args=[slug])
-
         active_slug = slug
     else:
         pagination_base = reverse('product')
         active_slug = None
-
-    # ✅ size filter
     size_filter = request.GET.get('size')
     if size_filter:
         products = products.filter(
             variants__size__name=size_filter
         ).distinct()
-
-    # ✅ price filter
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
 
     if min_price:
         products = products.filter(price__gte=min_price)
-
     if max_price:
         products = products.filter(price__lte=max_price)
-
-    # ✅ signature filter
     if request.GET.get('signature') == '1':
         products = products.filter(is_signature_collection=True)
 
-    # ✅ pagination
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    # ✅ FINAL RETURN (IMPORTANT FIXES ADDED)
     return render(request, 'product.html', {
         'page_obj': page_obj,
-        'products': page_obj,  # optional (for your HTML loop)
-
+        'products': page_obj, 
         'subcategory_counts': subcategory_counts,
         'size_counts': size_counts,
         'pagination_base': pagination_base,
         'active_slug': active_slug,
         'active_size': size_filter,
         'search_query': query,
-
-        # ✅ REQUIRED FOR SIDEBAR
         'categories': Category.objects.all(),
         'sizes': Size.objects.all(),
-
-        # ✅ ACTIVE FILTER VALUES
         'selected_category': category_filter,
         'selected_size': size_filter,
         'query': query,
