@@ -22,57 +22,61 @@
         <link rel="stylesheet" href="/static/css/responsive.css"/>
         <link rel="stylesheet" href="/static/demos/fashion-store/fashion-store.css" />
         <style>
-/* ===== GLOBAL PREMIUM LOOK ===== */
+
+/* ===== GLOBAL ===== */
 body {
-    background: #f8f9fb;
+    background: #fff6f8;
     font-family: 'Poppins', sans-serif;
 }
 
-/* ===== SECTION TITLE ===== */
+/* ===== PAGE TITLE (MATCH CART BANNER) ===== */
+.top-space-margin {
+    background: linear-gradient(135deg, #f8c6cc, #eaa1ab);
+    color: white;
+}
+
 .page-title-extra-large h1 {
+    color: #fff;
     font-size: 42px;
     letter-spacing: 1px;
 }
 
-/* ===== CARD STYLE ===== */
-.your-order-box {
+/* ===== LEFT FORM CARD ===== */
+.col-lg-7 {
     background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-    transition: 0.3s;
-}
-
-.your-order-box:hover {
-    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(234, 161, 171, 0.2);
 }
 
 /* ===== INPUT FIELDS ===== */
 input, select {
     border-radius: 10px !important;
-    border: 1px solid #ddd !important;
+    border: 1px solid #f1c4cb !important;
     padding: 12px 14px !important;
-    transition: 0.3s;
+    background: #fff;
 }
 
 input:focus, select:focus {
-    border-color: #000 !important;
-    box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
+    border-color: #eaa1ab !important;
+    box-shadow: 0 0 0 2px rgba(234, 161, 171, 0.2);
 }
 
-/* ===== LABELS ===== */
+/* ===== LABEL ===== */
 label {
     font-weight: 500;
-    color: #333;
+    color: #444;
+}
+
+/* ===== RIGHT ORDER BOX ===== */
+.your-order-box {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(234, 161, 171, 0.25);
 }
 
 /* ===== ORDER TABLE ===== */
-.your-order-table {
-    border-collapse: separate;
-    border-spacing: 0 10px;
-}
-
 .your-order-table tr {
-    background: #fafafa;
+    background: #fff6f8;
     border-radius: 10px;
 }
 
@@ -81,48 +85,42 @@ label {
     padding: 12px;
 }
 
-/* ===== TOTAL SECTION ===== */
+/* ===== TOTAL ===== */
 .total-amount h6 {
     font-size: 22px;
-    color: #000;
+    color: #e05c6e;
 }
 
-/* ===== BUTTON ===== */
+/* ===== BUTTON (MATCH CART CHECKOUT BUTTON) ===== */
 .btn-dark-gray {
-    background: linear-gradient(135deg, #000, #333);
+    background: linear-gradient(135deg, #e05c6e, #d94b5c);
     border: none;
     border-radius: 50px;
     padding: 14px;
     font-size: 16px;
-    transition: 0.3s;
+    color: #fff;
 }
 
 .btn-dark-gray:hover {
-    background: linear-gradient(135deg, #333, #000);
-    transform: scale(1.02);
+    background: linear-gradient(135deg, #d94b5c, #e05c6e);
+    transform: scale(1.03);
 }
 
 /* ===== RADIO BOX ===== */
-.checkout-accordion {
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.checkout-accordion .heading {
-    padding: 12px;
-    border-radius: 10px;
-    transition: 0.3s;
-}
-
 .checkout-accordion .heading:hover {
-    background: #f1f1f1;
+    background: #fff0f3;
 }
 
-/* ===== TERMS CHECKBOX ===== */
-.terms-condition-box {
-    margin-top: 10px;
+/* ===== LINKS ===== */
+a {
+    color: #d94b5c;
 }
 
+a:hover {
+    color: #e05c6e;
+}
+
+/* ===== TERMS ===== */
 .terms-condition-box .box {
     margin-left: 8px;
 }
@@ -132,10 +130,11 @@ small {
     font-size: 13px;
 }
 
-/* ===== SMOOTH ANIMATION ===== */
+/* ===== SMOOTH UI ===== */
 * {
     transition: all 0.2s ease-in-out;
 }
+
 </style>
     </head>
     <body data-mobile-nav-style="classic">
