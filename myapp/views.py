@@ -41,11 +41,9 @@ from .decorators import role_required
 def home(request):
     blogs = Article.objects.order_by('-posted_on')[:4]
     best_seller_products = Product.objects.filter(is_best_seller=True)[:5]
-    featured_product= Product.objects.filter(is_featured=True)[:5]
+    featured_product= Product.objects.filter(is_featured=True)[:6]
     signature_products = Product.objects.filter(is_signature_collection=True, status=True)[:8]
     categories = Category.objects.prefetch_related("subcategories").all()
-
-    # ✅ get Women category
     women_category = Category.objects.filter(name__iexact="Women").first()
     accessories_category = Category.objects.filter(name__iexact="Accessories").first()
 
@@ -55,7 +53,7 @@ def home(request):
         'featured_product': featured_product,
         'signature_products': signature_products,
         "categories": categories,
-        "women_category": women_category,  # ✅ pass to template
+        "women_category": women_category,
         "accessories_category": accessories_category,
     })
 

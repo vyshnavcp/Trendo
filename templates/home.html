@@ -508,12 +508,16 @@
                         <ul class="shop-modern shop-wrapper grid-loading grid grid-2col lg-grid-2col md-grid-1col sm-grid-1col xs-grid-1col gutter-extra-large text-center" data-anime='{ "el": "childs", "translateY": [-15, 0], "opacity": [0,1], "duration": 300, "delay": 0, "staggervalue": 150, "easing": "easeOutQuad" }'>
                             <li class="grid-sizer"></li>
                             
-                            {%  for product in featured_products %}
+                            {% for product in featured_product %}
                             <li class="grid-item">
                                 <div class="shop-box">
                                     <div class="shop-image mb-25px">
                                         <a href="{% url 'product_detail' product.slug %}">
-                                            <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}"> 
+                                            {% if product.image1 %}
+                                                <img src="{{ product.image1.url }}" alt="{{ product.name }}">
+                                            {% else %}
+                                                <img src="https://placehold.co/600x740" alt="{{ product.name }}">
+                                            {% endif %}
                                             <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
                                         </a>
                                         <div class="shop-buttons-wrap">
