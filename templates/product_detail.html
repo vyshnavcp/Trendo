@@ -572,6 +572,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("add-to-cart-form");
     const messageBox = document.getElementById("cartMessage");
 
+    // ✅ Detect if product has variants
+    const hasVariants = Object.keys(variantMap).length > 1 || !variantMap["default"];
+
+    // ✅ CSRF FIX
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
     function checkAvailability() {
 
         const colorId = document.querySelector('input[name="color"]:checked')?.value || null;
@@ -579,13 +587,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
         let key = "";
 
+        // ✅ CASE 1: No selection
         if (!colorId && !sizeId) {
-            statusBox.innerHTML = "⚠️ Select size and color";
-            stockBox.innerHTML = "";
-            addBtn.disabled = true;
+
+            // If product has variants → force selection
+            if (hasVariants) {
+                statusBox.innerHTML = "⚠️ Please select color and size";
+                stockBox.innerHTML = "";
+                addBtn.disabled = true;
+                return;
+            }
+
+            // Simple product
+            key = "default";
+
+            if (!variantMap[key]) {
+                stockBox.innerHTML = "❌ Out of stock";
+                addBtn.disabled = true;
+                return;
+            }
+
+            const stock = variantStock[key] ?? 0;
+
+            if (stock > 0) {
+                stockBox.innerHTML = `✅ In stock (${stock} available)`;
+                stockBox.className = "fw-500 text-success mb-10px";
+                addBtn.disabled = false;
+            } else {
+                stockBox.innerHTML = "❌ Out of stock";
+                stockBox.className = "fw-500 text-danger mb-10px";
+                addBtn.disabled = true;
+            }
+
+            statusBox.innerHTML = "";
             return;
         }
 
+        // ✅ Build key
         if (colorId && sizeId) {
             key = `${colorId}-${sizeId}`;
         } else if (colorId) {
@@ -594,8 +632,9 @@ document.addEventListener("DOMContentLoaded", function () {
             key = `size-${sizeId}`;
         }
 
+        // ❌ Invalid combination
         if (!variantMap[key]) {
-            statusBox.innerHTML = "❌ This combination is not available";
+            statusBox.innerHTML = "⚠️ Please select valid color and size";
             stockBox.innerHTML = "";
             addBtn.disabled = true;
             return;
@@ -616,6 +655,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // ✅ Event listeners
     document.querySelectorAll('input[name="color"]').forEach(el => {
         el.addEventListener("change", checkAvailability);
     });
@@ -626,7 +666,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     checkAvailability();
 
-    // 🛒 SUBMIT FIX
+    // 🛒 ADD TO CART
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -641,12 +681,19 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(form.action, {
             method: "POST",
             headers: {
-                "X-CSRFToken": "{{ csrf_token }}"
+                "X-CSRFToken": getCSRFToken()
             },
             body: formData
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Server error");
+            }
+            return res.json();
+        })
         .then(data => {
+            console.log(data);
+
             if (data.success) {
                 messageBox.className = "text-success fw-500";
                 messageBox.innerHTML = data.message;
@@ -654,14 +701,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 messageBox.className = "text-danger fw-500";
                 messageBox.innerHTML = data.message;
             }
+        })
+        .catch(err => {
+            console.error(err);
+            messageBox.className = "text-danger fw-500";
+            messageBox.innerHTML = "❌ Something went wrong!";
         });
     });
 
 });
 </script>
-
-
-     
 
 
 
