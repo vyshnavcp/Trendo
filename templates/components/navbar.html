@@ -102,7 +102,7 @@
                         {% if user.is_authenticated %}
                         <a href="{% url 'profile' %}">
                             <i class="feather icon-feather-user d-inline-block align-middle me-5px"></i>
-                            <span class="d-none d-xxl-inline-block">{{ user.username }}</span>
+                            <!-- <span class="d-none d-xxl-inline-block">{{ user.username }}</span> -->
                         </a>
                         <a href="{% url 'user_logout' %}">
                             <i class="feather icon-feather-log-out d-inline-block align-middle me-5px"></i>

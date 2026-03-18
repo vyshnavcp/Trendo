@@ -21,6 +21,122 @@
         <link rel="stylesheet" href="/static/css/style.css"/>
         <link rel="stylesheet" href="/static/css/responsive.css"/>
         <link rel="stylesheet" href="/static/demos/fashion-store/fashion-store.css" />
+        <style>
+/* ===== GLOBAL PREMIUM LOOK ===== */
+body {
+    background: #f8f9fb;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ===== SECTION TITLE ===== */
+.page-title-extra-large h1 {
+    font-size: 42px;
+    letter-spacing: 1px;
+}
+
+/* ===== CARD STYLE ===== */
+.your-order-box {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.your-order-box:hover {
+    transform: translateY(-5px);
+}
+
+/* ===== INPUT FIELDS ===== */
+input, select {
+    border-radius: 10px !important;
+    border: 1px solid #ddd !important;
+    padding: 12px 14px !important;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: #000 !important;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
+}
+
+/* ===== LABELS ===== */
+label {
+    font-weight: 500;
+    color: #333;
+}
+
+/* ===== ORDER TABLE ===== */
+.your-order-table {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.your-order-table tr {
+    background: #fafafa;
+    border-radius: 10px;
+}
+
+.your-order-table td,
+.your-order-table th {
+    padding: 12px;
+}
+
+/* ===== TOTAL SECTION ===== */
+.total-amount h6 {
+    font-size: 22px;
+    color: #000;
+}
+
+/* ===== BUTTON ===== */
+.btn-dark-gray {
+    background: linear-gradient(135deg, #000, #333);
+    border: none;
+    border-radius: 50px;
+    padding: 14px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.btn-dark-gray:hover {
+    background: linear-gradient(135deg, #333, #000);
+    transform: scale(1.02);
+}
+
+/* ===== RADIO BOX ===== */
+.checkout-accordion {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.checkout-accordion .heading {
+    padding: 12px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.checkout-accordion .heading:hover {
+    background: #f1f1f1;
+}
+
+/* ===== TERMS CHECKBOX ===== */
+.terms-condition-box {
+    margin-top: 10px;
+}
+
+.terms-condition-box .box {
+    margin-left: 8px;
+}
+
+/* ===== ERROR TEXT ===== */
+small {
+    font-size: 13px;
+}
+
+/* ===== SMOOTH ANIMATION ===== */
+* {
+    transition: all 0.2s ease-in-out;
+}
+</style>
     </head>
     <body data-mobile-nav-style="classic">
        {% include "components/navbar.html" %}
@@ -70,18 +186,18 @@
                     </div>
                 </div> 
                 <div class="row align-items-start">
-                    <div class="col-lg-7 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
+                    <div class="col-lg-7 pe-50px md-pe-15px md-mb-50px xs-mb-35px bg-white p-30px border-radius-10px box-shadow-medium">
                         <span class="fs-26 alt-font fw-600 text-dark-gray mb-20px d-block">Billing details</span>
                         
                         <form id="checkoutForm" action="{% url 'checkout_post' %}" method="post">
                             {% csrf_token %}
                             <div class="row">
-                                <div class="col-12 mb-20px">
+                                <div class="col-12 mb-25px">
                                     <label class="mb-10px">First name <span class="text-red">*</span></label>
                                     <input class="border-radius-4px input-small" type="text"  value="{{ user.first_name }}" aria-label="first-name"   name="first_name" required>
                                 </div>
                                 
-                                <div class="col-12 mb-20px">
+                                <div class="col-12 mb-25px">
                                     <label class="mb-10px">Email address <span class="text-red">*</span></label>
                                     <input class="border-radius-4px input-small" type="email" value="{{ user.email }}" aria-label="email" name="email" readonly>
                                 </div>
@@ -96,7 +212,7 @@
                                         required>
                                     <small class="text-danger" id="phone_error"></small>
                                 </div>
-                                <div class="col-12 mb-20px">
+                                <div class="col-12 mb-25px">
                                     <label class="mb-10px" for="state1">State <span class="text-red">*</span></label>
                                     <select name="state" id="state1" class="form-select select-small border-radius-4px">
                                         <option>Select a state</option>
@@ -143,17 +259,17 @@
                                 </div>
 
 
-                                <div class="col-12 mb-20px">
+                                <div class="col-12 mb-25px">
                                     <label class="mb-10px">Town / City <span class="text-red">*</span></label>
                                     <input class="border-radius-4px input-small" type="text" aria-label="town"  placeholder="Enter your town or city" name="town" value="{{ profile_town }}" required>
                                     <small class="text-red" id="town_error"></small>
                                 </div>
-                                <div class="col-12 mb-20px">
+                                <div class="col-12 mb-25px">
                                     <label class="mb-10px">Pincode <span class="text-red">*</span></label>
                                     <input class="border-radius-4px input-small" type="text" aria-label="zip" name="pincode" placeholder="Enter your pincode" value="{{ profile_pincode }}" required>
                                     <small class="text-red" id="pincode_error"></small>
                                 </div>
-                                <div class="col-12 mb-20px">
+                                <div class="col-12 mb-25px">
                                     <label class="mb-10px">Address <span class="text-red">*</span></label>
                                     <input class="border-radius-4px input-small mb-20px" 
                                         type="text" 
@@ -164,7 +280,7 @@
                                         value="{{ profile_address }}">
                                     <small class="text-red" id="address_error"></small>
                                 </div>
-                                <div class="col-12 mb-20px">
+                                <div class="col-12 mb-25px">
                                     <label class="mb-10px">Land Mark <span class="text-red">*</span></label>
                                     <input class="border-radius-4px input-small mb-20px" type="text" aria-label="text" name="land_mark" placeholder="Nearby Famous Place/Shop/School,etc." value="{{ profile_land_mark }}" required>
                                     <small class="text-red" id="land_mark_error"></small>
