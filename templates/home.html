@@ -139,7 +139,7 @@
                     <div class="col-xl-3 col-lg-4 col-md-12 tab-style-05 md-mb-30px sm-mb-20px">
                         <!-- start tab navigation -->
                         <ul class="nav nav-tabs border-0 flex-column align-items-start justify-content-start fs-34 xl-fs-26 sm-fs-22 ls-minus-1px alt-font sm-mb-5px">
-                            <li class="nav-item"><a data-bs-toggle="tab" href="#tab_four1" class="nav-link active"><span class="me-10px fs-20">01</span>New arrival</a></li>
+                            <li class="nav-item"><a data-bs-toggle="tab" href="#tab_four1" class="nav-link active"><span class="me-10px fs-20">01</span>New Arival</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_four2"><span class="me-10px fs-20">02</span>Women's wear</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_four3"><span class="me-10px fs-20">03</span>Men's wear</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_four4"><span class="me-10px fs-20">04</span>Accessories</a></li>
@@ -165,7 +165,7 @@
                                         <p class="w-80 mb-30px xl-w-100">Step into a world where design meets innovation. Our latest collection redefines modern aesthetics blending style.</p>
                                         <a href="{% url 'product' %}" class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow">
                                             <span> 
-                                                <span class="btn-text">Shop under $49</span>
+                                                <span class="btn-text">Shop under</span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                             </span>
@@ -191,7 +191,7 @@
                                         <p class="w-80 mb-30px xl-w-100">Step into a world where design meets innovation. Our latest collection redefines modern aesthetics blending style.</p>
                                         <a href="{% url 'product' %}" class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow">
                                             <span> 
-                                                <span class="btn-text">Shop under $49</span>
+                                                <span class="btn-text">Shop </span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                             </span>
@@ -217,7 +217,7 @@
                                         <p class="w-80 mb-30px xl-w-100">Step into a world where design meets innovation. Our latest collection redefines modern aesthetics blending style.</p>
                                         <a href="{% url 'product' %}" class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow">
                                             <span> 
-                                                <span class="btn-text">Shop under $49</span>
+                                                <span class="btn-text">Shop</span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                             </span>
@@ -243,7 +243,7 @@
                                         <p class="w-80 mb-30px xl-w-100">Step into a world where design meets innovation. Our latest collection redefines modern aesthetics blending style.</p>
                                         <a href="{% url 'product' %}" class="btn btn-medium btn-dark-gray btn-hover-animation-switch btn-box-shadow">
                                             <span> 
-                                                <span class="btn-text">Shop under $49</span>
+                                                <span class="btn-text">Shop under</span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                                 <span class="btn-icon"><i class="feather icon-feather-arrow-right"></i></span>
                                             </span>
@@ -264,8 +264,8 @@
             <div class="container-fluid">
                 <div class="row justify-content-center mb-55px md-mb-50px">
                     <div class="col-lg-6 col-md-8 text-center">
-                        <h2 class="alt-font ls-minus-3px text-dark-gray mb-10px">Trending products</h2>
-                        <p class="mb-0">Explore trending products chosen by our customers.</p>
+                        <h2 class="alt-font ls-minus-3px text-dark-gray mb-10px">Best Seller Products</h2>
+                        <p class="mb-0">“Top Picks Loved by Our Customers”</p>
                     </div>
                 </div>
                 <div class="row shop-modern">
@@ -274,12 +274,12 @@
                             <div class="swiper overflow-visible" data-slider-options='{ "slidesPerView": 1, "spaceBetween": 20, "loop": true, "autoplay": { "delay": 3000, "disableOnInteraction": false }, "pagination": { "el": ".swiper-pagination-bullets-01", "clickable": true, "dynamicBullets": false }, "keyboard": { "enabled": true, "onlyInViewport": true }, "breakpoints": { "992": { "slidesPerView": 5 }, "768": { "slidesPerView": 4 }, "320": { "slidesPerView": 3 } }, "effect": "slide" }'>
                                 <div class="swiper-wrapper align-items-center">
                                     
-                                    {% for product in trending_products %}
+                                    {% for product in best_seller_products %}
                                     <div class="swiper-slide grid-item">
                                         <div class="shop-box mb-25px sm-mb-0">
                                             <div class="shop-image mb-25px">
                                                 <a href="{% url 'product_detail' product.slug %}">
-                                                    <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}"> 
+                                                    <img src="{{ product.image1.url }}" alt="{{ product.name }}"> 
                                                     <span class="lable new">New</span>
                                                     <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
                                                 </a>
