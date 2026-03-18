@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add Size</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Bootstrap + Icons + Font -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    background:linear-gradient(135deg,#f4f6fb,#eef1f8);
+    font-family:'Poppins', sans-serif;
+    margin:0;
+}
+
+/* ================= NAVBAR ================= */
+
+.header-with-topbar{
+    background:linear-gradient(135deg,#000,#1b1b1b);
+    box-shadow:0 6px 25px rgba(0,0,0,0.35);
+}
+
+.dashboard-header{
+    padding:18px 30px;
+}
+
+.dashboard-header h4,
+.dashboard-header small,
+.dashboard-header i{
+    color:#fff;
+}
+
+.dashboard-header .nav-link{
+    color:#fff !important;
+    font-weight:500;
+    transition:.3s;
+}
+
+.dashboard-header .nav-link:hover{
+    color:#d6d6d6 !important;
+}
+
+.navbar-toggler{
+    border:0;
+}
+
+.navbar-toggler-icon{
+    filter:invert(1);
+}
+
+/* ================= PAGE CONTENT ================= */
+
+.page-wrapper{
+    min-height:calc(100vh - 110px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px 20px;
+}
+
+/* ================= CARD ================= */
+
+.card{
+    border:none;
+    border-radius:20px;
+    background:#fff;
+    box-shadow:0 20px 60px rgba(0,0,0,.08);
+    width:100%;
+    max-width:460px;
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 25px 70px rgba(0,0,0,.12);
+}
+
+/* ================= FORM ================= */
+
+.form-label{
+    font-weight:500;
+}
+
+.form-control{
+    border-radius:12px;
+    padding:12px 14px;
+    border:1px solid #e2e6ea;
+    transition:.2s;
+}
+
+.form-control:focus{
+    border-color:#000;
+    box-shadow:0 0 0 2px rgba(0,0,0,0.08);
+}
+
+/* ================= BUTTON ================= */
+
+.btn-black{
+    background:linear-gradient(135deg,#000,#222);
+    color:#fff;
+    border-radius:12px;
+    padding:12px;
+    font-weight:600;
+    width:100%;
+    border:none;
+    transition:.3s;
+}
+
+.btn-black:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+
+/* ================= TITLE ================= */
+
+.page-title{
+    font-weight:600;
+    text-align:center;
+    margin-bottom:25px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="header-with-topbar">
+<nav class="navbar dashboard-header navbar-expand-lg">
+
+<div class="container-fluid">
+
+<div class="d-flex align-items-center gap-3">
+<i class="bi bi-speedometer2 fs-2"></i>
+<div>
+<h4 class="mb-0">Size</h4>
+<small>Overview of store performance</small>
+</div>
+</div>
+
+<button class="navbar-toggler" type="button"
+data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse justify-content-end" id="adminNavbar">
+
+<ul class="navbar-nav align-items-lg-center gap-lg-3 mt-3 mt-lg-0">
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'dashboard' %}">Home</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'order_list' %}">Orders</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'size_list' %}">Sizes</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'paid_orders' %}">Paid</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'pending_orders' %}">Pending</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'customer_list' %}">Customers</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link text-danger" href="{% url 'user_logout' %}">
+Logout
+</a>
+</li>
+
+</ul>
+
+</div>
+</div>
+</nav>
+</header>
+
+<!-- ================= PAGE CONTENT ================= -->
+
+<div class="page-wrapper">
+
+<div class="card p-4">
+
+<h4 class="page-title">Add Size</h4>
+
+<form method="post">
+{% csrf_token %}
+
+<div class="mb-3">
+<label class="form-label">Size Name</label>
+<input type="text" name="name"
+class="form-control"
+placeholder="Example: S / M / L"
+required>
+</div>
+
+<div class="mb-4">
+<label class="form-label">Display Order</label>
+<input type="number" name="order"
+class="form-control"
+placeholder="Example: 1,2,3..."
+required>
+</div>
+
+<button type="submit" class="btn-black">
+<i class="bi bi-check-circle"></i> Save Size
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

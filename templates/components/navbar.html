@@ -1,0 +1,121 @@
+{% load static %}
+
+<header>
+    <!-- start navigation -->
+    <nav class="navbar navbar-expand-lg header-light bg-white disable-fixed border-radius-6px md-border-radius-0px">
+        <div class="container-fluid">
+            <div class="col-auto col-lg-2 me-lg-0 me-auto">
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <img src="{% static 'images/logo/trendo-logo.png' %}" data-at2x="{% static 'images/logo/trendo-logo.png' %}" alt="trendo" class="default-logo">
+                    <img src="{% static 'images/logo/trendo-logo.png' %}" data-at2x="{% static 'images/logo/trendo-logo.png' %}" alt="trendo" class="alt-logo">
+                    <img src="{% static 'images/logo/trendo-logo.png' %}" data-at2x="{% static 'images/logo/trendo-logo.png' %}" alt="trendo" class="mobile-logo"> 
+                </a>
+            </div>
+            <div class="col-auto col-xxl-6 col-lg-8 menu-order">
+                <button class="navbar-toggler float-end" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-line"></span>
+                    <span class="navbar-toggler-line"></span>
+                    <span class="navbar-toggler-line"></span>
+                    <span class="navbar-toggler-line"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav"> 
+                    <ul class="navbar-nav navbar-left justify-content-end">
+                        <li class="nav-item">
+                            <a href="{% url 'home' %}" class="nav-link">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'about' %}" class="nav-link">About</a>
+                        </li>
+
+                        <li class="nav-item dropdown submenu">
+                            <a href="{% url 'product' %}" class="nav-link">Shop</a>
+
+                            <i class="fa-solid fa-angle-down dropdown-toggle"
+                            data-bs-toggle="dropdown"></i>
+
+                            <div class="dropdown-menu submenu-content">
+                                <div class="d-lg-flex mega-menu m-auto flex-column">
+
+                                    <div class="row row-cols-1 row-cols-lg-5 row-cols-md-3 row-cols-sm-3 mb-40px">
+
+                                        {% for category in menu_categories %}
+                                        <div class="col">
+                                            <ul>
+                                                <li class="sub-title">{{ category.name }}</li>
+
+                                                {% for sub in category.subcategories.all %}
+                                                <li>
+                                                    <a href="{% url 'product' %}?category={{ category.slug }}&subcategory={{ sub.slug }}">
+                                                        {{ sub.name }}
+                                                    </a>
+                                                </li>
+                                                {% empty %}
+                                                <li>
+                                                    <a href="#">
+                                                        Coming soon
+                                                    </a>
+                                                </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        {% endfor %}
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </li>
+                        
+
+
+                        <li class="nav-item">
+                            <a href="{% url 'blog' %}" class="nav-link">Blogs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'contact' %}" class="nav-link">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </div> 
+            <div class="col-auto text-end">
+                <div class="header-icon">
+                    <div class="header-search-icon icon">
+                        <a href="javascript:void(0)" class="search-form-icon header-search-form"><i class="feather icon-feather-search align-middle me-5px"></i><span class="d-none d-xxl-inline-block">Search</span></a>
+                        <div class="search-form-wrapper">
+                            <button title="Close" type="button" class="search-close">x</button>
+                            <form id="search-form" role="search" method="get" class="search-form text-left" action="{% url 'product' %}">
+                                <div class="search-form-box">
+                                    <h2 class="text-dark-gray text-center mb-4 fw-600 ls-minus-1px">What are you looking for?</h2>
+                                    <input class="search-input" placeholder="Enter your keywords..." name="q" value="{{ request.GET.q }}" type="text" autocomplete="off">
+                                    <button type="submit" class="search-button"><i class="feather icon-feather-search"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="widget-text icon">
+                        <a href="{% url 'cart_page' %}">
+                            <i class="feather icon-feather-shopping-bag d-inline-block align-middle me-5px"></i>
+                            <span class="d-none d-xxl-inline-block">Cart</span>
+                        </a>
+                    </div>
+                    <div class="widget-text icon">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'profile' %}">
+                            <i class="feather icon-feather-user d-inline-block align-middle me-5px"></i>
+                            <span class="d-none d-xxl-inline-block">{{ user.username }}</span>
+                        </a>
+                        <a href="{% url 'user_logout' %}">
+                            <i class="feather icon-feather-log-out d-inline-block align-middle me-5px"></i>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'user_login' %}">
+                            <i class="feather icon-feather-user d-inline-block align-middle me-5px"></i>
+                            <span class="d-none d-xxl-inline-block">Login</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div> 
+            </div>
+        </div>
+    </nav>
+</header>

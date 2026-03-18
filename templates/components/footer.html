@@ -1,0 +1,198 @@
+{% load static %}
+
+<!-- start footer -->
+<footer class="footer-dark bg-black pt-0 pb-35px">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col swiper swiper-width-auto text-cente" data-slider-options='{ "slidesPerView": "auto", "spaceBetween":0, "centeredSlides": true, "speed": 18000, "loop": true, "pagination": { "el": ".slider-four-slide-pagination-2", "clickable": false }, "allowTouchMove": false, "autoplay": { "delay":1, "disableOnInteraction": false }, "navigation": { "nextEl": ".slider-four-slide-next-2", "prevEl": ".slider-four-slide-prev-2" }, "keyboard": { "enabled": true, "onlyInViewport": true }, "effect": "slide" }'>
+                <div class="swiper-wrapper marquee-slide">
+                    
+                    <div class="swiper-slide">
+                        <div class="fs-180 lg-fs-160 md-fs-120 sm-fs-80 lh-300 alt-font fw-300 ls-minus-2px text-white-transparent-medium">
+                            <span class="d-inline-block ms-50px me-50px sm-ms-30px sm-me-30px">
+                                <img src="{% static 'images/footer-elements.svg' %}" alt="img">
+                            </span>
+                            Get offer today!
+                        </div>
+                    </div>
+                    
+                    <div class="swiper-slide">
+                        <div class="fs-180 lg-fs-160 md-fs-120 sm-fs-80 lh-300 alt-font fw-300 ls-minus-2px text-white-transparent-medium">
+                            <span class="d-inline-block ms-50px me-50px sm-ms-30px sm-me-30px">
+                                <img src="{% static 'images/footer-elements.svg' %}" alt="img">
+                            </span>
+                            Get offer today!
+                        </div>
+                    </div>
+                    
+                    <div class="swiper-slide">
+                        <div class="fs-180 lg-fs-160 md-fs-120 sm-fs-80 lh-300 alt-font fw-300 ls-minus-2px text-white-transparent-medium">
+                            <span class="d-inline-block ms-50px me-50px sm-ms-30px sm-me-30px">
+                                <img src="{% static 'images/footer-elements.svg' %}" alt="img">
+                            </span>
+                            Get offer today!
+                        </div>
+                    </div>
+                    
+                    <div class="swiper-slide">
+                        <div class="fs-180 lg-fs-160 md-fs-120 sm-fs-80 lh-300 alt-font fw-300 ls-minus-2px text-white-transparent-medium">
+                            <span class="d-inline-block ms-50px me-50px sm-ms-30px sm-me-30px">
+                                <img src="{% static 'images/footer-elements.svg' %}" alt="img">
+                            </span>
+                            Get offer today!
+                        </div>
+                    </div>
+                                               
+                </div> 
+            </div>
+        </div>
+    </div> 
+    <div class="container">                
+        <div class="row justify-content-center pt-15px sm-pt-0 pb-55px md-pb-30px text-center text-xl-start">                     
+            <!-- start footer column -->
+            <div class="col-6 col-xl-2 col-md-3 sm-mb-30px">
+                <span class="fs-16 fw-500 text-white d-block mb-5px">Our company</span>
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'about' %}">About Us</a></li>
+                    <li><a href="{% url 'terms_page' %}">Terms & Conditions</a></li>
+                    <li><a href="{% url 'contact' %}">Contact Us</a></li>
+                </ul>
+            </div>
+            <!-- end footer column -->
+            <!-- start footer column -->
+            <div class="col-6 col-xl-2 col-md-3 sm-mb-30px">
+                <span class="fs-16 fw-500 text-white d-block mb-5px">Categories</span>
+                <ul>
+                    {% for category in footer_categories %}
+                        <li>
+                            <a href="{% url 'product' %}">
+                                {{ category.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <!-- end footer column -->
+            <!-- start footer column -->
+            <div class="col-6 col-xl-2 col-md-3 sm-mb-30px">
+                <span class="fs-16 fw-500 text-white d-block mb-5px">Quick links</span>
+                <ul>
+                    <li><a href="{% url 'profile' %}">My account</a></li>
+                    <li><a href="{% url 'product' %}">Our store</a></li>
+                    <li><a href="{% url 'contact' %}">Support</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQs</a></li>
+                </ul>
+            </div>
+            <!-- end footer column --> 
+            <!-- start footer column -->
+            <div class="col-6 col-xl-2 col-md-3">
+                <span class="fs-16 fw-500 text-white d-block mb-5px">Say hello!</span>
+                <ul>
+                    <li><a href="https://www.facebook.com/" target="_blank">Instagram</a></li>
+                    <li><a href="https://www.facebook.com/" target="_blank">Facebook</a></li>
+                    <li><a href="https://www.facebook.com/" target="_blank">Whatsapp</a></li>
+                    <li><a href="https://www.youtube.com/" target="_blank">YouTube</a></li>
+                </ul>
+            </div>
+            <!-- end footer column -->
+            <!-- start footer column -->
+            <!-- <div class="col-xl-4 col-lg-6 col-md-7 ps-55px xl-ps-15px lg-mt-50px md-mt-30px sm-mt-0">
+                <h5 class="alt-font ls-0px text-white mb-20px sm-mb-10px">Join our newsletter for exclusive offers!</h5>
+                <div class="d-inline-block w-100 newsletter-style-02 position-relative">
+                    <form action="" method="post" class="position-relative w-100" id="newsletter-form">
+                        {% csrf_token %}
+                        <div class="position-relative w-100">
+                            <input class="bg-transparent text-white border-0 border-bottom border-1 border-color-transparent-white-light border-radius-0px w-100 form-control ps-0 required" type="email" name="email" placeholder="Enter your email" required>
+
+                            <button type="submit" class="btn fs-13 ls-0px fw-500 border-0 text-white p-0">
+                                <i class="bi bi-send me-5px"></i>Subscribe
+                            </button>
+
+                            <div id="newsletter-result" class="form-results border-radius-4px pt-5px pb-5px fs-14 lh-22 mt-10px w-100 position-absolute d-none"></div>
+                        </div>
+                    </form>
+                </div>
+            </div> -->
+            <!-- end footer column -->                        
+        </div>
+        <div class="row align-items-center fs-16">
+            <div class="col-12 pb-35px sm-pb-35px">
+                <div class="divider-style-03 divider-style-03-01 border-color-transparent-white-light"></div>
+            </div>
+            <div class="col-lg-4 text-center text-lg-start">
+                <span class="fs-15">&copy; Copyright 2026, All Rights Reserved. Powered By <a href="https://www.trendotheuniquefashion.com/" class="text-white text-decoration-line-bottom" target="_blank">Trendo</a></span>
+            </div>
+            <div class="col-lg-4 text-center md-mt-15px md-mb-15px">
+                <a href="{% url 'home' %}" class="footer-logo d-inline-block" aria-label="logo">
+                    <img src="{% static 'images/demo-clothing-store-logo-white.png' %}" data-at2x="{% static 'images/demo-clothing-store-logo-white@2x.png' %}" alt="">
+                </a>
+            </div>
+            <div class="col-lg-4 text-center text-lg-end">
+                <span><a href="{% url 'privacy_page' %}">Privacy Policy</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="{% url 'terms_page' %}">Terms & Conditions</a></span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- start cookie message -->
+<div id="cookies-model" class="cookie-message bg-dark-gray border-radius-8px"> 
+    <div class="cookie-description fs-14 text-white mb-20px lh-22">We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Allow cookies" you consent to our use of cookies. </div>   
+    <div class="cookie-btn">
+        <a href="#" class="btn btn-transparent-white border-1 border-color-transparent-white-light btn-very-small btn-switch-text btn-rounded w-100 mb-15px" aria-label="btn">
+            <span>
+                <span class="btn-double-text" data-text="Cookie policy">Cookie policy</span> 
+            </span>
+        </a> 
+        <a href="#" class="btn btn-white btn-very-small btn-switch-text btn-box-shadow accept_cookies_btn btn-rounded w-100" data-accept-btn aria-label="text">
+            <span>
+                <span class="btn-double-text" data-text="Allow cookies">Allow cookies</span> 
+            </span>
+        </a>
+    </div> 
+</div>
+
+<!-- start scroll progress -->
+<div class="scroll-progress d-none d-xxl-block">
+    <a href="#" class="scroll-top" aria-label="scroll">
+        <span class="scroll-text">Scroll</span><span class="scroll-line"><span class="scroll-point"></span></span>
+    </a>
+</div>
+
+<!-- subscribe email  -->
+<script>
+document.getElementById("newsletter-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const form = this;
+    const formData = new FormData(form);
+    const resultBox = document.getElementById("newsletter-result");
+
+    fetch(form.action, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": form.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        resultBox.classList.remove("d-none");
+        resultBox.innerText = data.message;
+
+        if (data.success) {
+            resultBox.classList.add("text-success");
+            resultBox.classList.remove("text-danger");
+            form.reset();
+        } else {
+            resultBox.classList.add("text-danger");
+            resultBox.classList.remove("text-success");
+        }
+    })
+    .catch(() => {
+        resultBox.classList.remove("d-none");
+        resultBox.innerText = "Something went wrong. Please try again.";
+        resultBox.classList.add("text-danger");
+    });
+});
+</script>

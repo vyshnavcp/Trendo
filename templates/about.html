@@ -1,0 +1,564 @@
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        {% load static %}
+        <title>Trendo - The Unique Fashion</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="author" content="Trendo">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+        <meta name="description" content="">
+        <!-- favicon icon -->
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo/favicon.ico' %}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo/apple-touch-icon.png' %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo/favicon-32x32.png' %}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo/favicon-16x16.png' %}">
+        <link rel="manifest" href="{% static 'images/logo/site.webmanifest' %}">
+        <!-- google fonts preconnect -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <!-- style sheets and font icons  -->
+        <link rel="stylesheet" href="{% static 'css/vendors.min.css' %}"/>
+        <link rel="stylesheet" href="{% static 'css/icon.min.css' %}"/>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+        <link rel="stylesheet" href="{% static 'css/responsive.css' %}"/>
+        <link rel="stylesheet" href="{% static 'demos/clothing-store/clothing-store.css' %}" />
+    </head>
+    <body data-mobile-nav-style="classic">
+        
+        {% include 'components/navbar.html' %}
+
+        <!-- start page title -->
+        <section class="page-title-center-alignment ipad-top-space-margin cover-background position-relative py-0" style="background-image: url({% static 'images/banners/about-banner.png' %})">
+            <div class="container">
+                <div class="row flex-column align-items-center justify-content-center h-500px md-h-400px sm-h-300px">
+                    <div class="col-12 text-center position-relative page-title-extra-large">
+                        <h1 class="alt-font ls-minus-1px text-white d-inline-block mb-10px mt-3 md-mt-50px">About @Valmoñ</h1>
+                    </div>
+                    <div class="col-12 breadcrumb breadcrumb-style-01 text-white d-flex justify-content-center">
+                        <ul>
+                            <li><a href="demo-clothing-store.html" class="text-white">Home</a></li> 
+                            <li>About</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- end page title -->
+        <!-- start section -->
+        <section class="pb-30px sm-pb-0">
+            <div class="container">
+                <div class="row justify-content-center mb-7 sm-mb-30px">
+                    <div class="col-xl-8 col-lg-10 text-center position-relative">
+                        <img src="https://placehold.co/226x233" class="position-absolute left-minus-150px top-0 d-none d-xl-block" data-bottom-top="transform: rotate(0deg) translateX(0px); filter: blur(-6px)" data-top-bottom="transform:rotate(20deg) translateX(100px); filter: blur(15px)" alt="">
+                        <img src="https://placehold.co/212x223" class="position-absolute right-minus-150px bottom-minus-50px d-none d-xl-block" data-bottom-top="transform: rotate(0deg) translateX(0px); filter: blur(-6px)" data-top-bottom="transform:rotate(-20deg) translateX(-50px); filter: blur(15px)" alt="">
+                        <span class="fs-14 lh-20 fw-500 text-uppercase text-dark-gray text-decoration-line-bottom d-inline-block mb-20px" data-anime='{ "translateY": [15, 0], "opacity": [0,1], "duration": 300, "delay": 0, "staggervalue": 100, "easing": "easeOutQuad" }'>Brand established in 1991</span>
+                        <h2 class="alt-font ls-minus-2px text-dark-gray mb-0 z-index-1 position-relative" data-anime='{ "translateY": [15, 0], "opacity": [0,1], "duration": 600, "delay": 0, "staggervalue": 100, "easing": "easeOutQuad" }'>We are a creative fashion studio designing unique apparel that speaks to strength and personal flair.</h2>
+                        <div class="position-absolute right-minus-150px top-minus-30px z-index-2 d-none d-xl-flex flex-column align-items-center justify-content-center">
+                            <img src="{% static 'images/demo-clothing-store-about-04.png' %}" class="position-absolute">
+                            <img src="{% static 'images/demo-clothing-store-about-03.png' %}" class="animation-rotation">
+                        </div>
+                    </div>
+                </div>
+                <div class="row row-cols-1 row-cols-xl-4 row-cols-lg-2 justify-content-center" data-anime='{ "el": "childs", "translateY": [30, 0], "translateX": [30, 0], "opacity": [0,1], "duration": 800, "delay": 200, "staggervalue": 300, "easing": "easeOutQuad" }'>
+                    <!-- start features box item -->
+                    <div class="col icon-with-text-style-01 pe-4 xxl-pe-15px lg-mb-30px">
+                        <div class="separator-line-1px bg-extra-medium-gray w-100 mb-25px d-none d-lg-block"></div>
+                        <div class="feature-box feature-box-left-icon last-paragraph-no-margin">
+                            <div class="feature-box-content">
+                                <span class="w-85 sm-w-95 d-block fs-18 text-dark-gray"><span class="fw-700">200+</span> Awesome award winning fashion collection brand.</span>
+                            </div>
+                            <div class="feature-box-icon me-0">
+                                <span class="fs-15 fw-500 text-base-color">01</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end features box item -->
+                    <!-- start features box item -->
+                    <div class="col icon-with-text-style-01 pe-4 xxl-pe-15px lg-mb-30px">
+                        <div class="separator-line-1px bg-extra-medium-gray w-100 mb-25px d-none d-lg-block"></div>
+                        <div class="feature-box feature-box-left-icon last-paragraph-no-margin">
+                            <div class="feature-box-content">
+                                <span class="w-85 sm-w-95 d-block fs-18 text-dark-gray"><span class="fw-700">70k+</span> Products delivered worldwide with confidence.</span>
+                            </div>
+                            <div class="feature-box-icon me-0">
+                                <span class="fs-15 fw-500 text-base-color">02</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end features box item -->
+                    <!-- start features box item -->
+                    <div class="col icon-with-text-style-01 pe-4 xxl-pe-15px md-mb-30px">
+                        <div class="separator-line-1px bg-extra-medium-gray w-100 mb-25px d-none d-lg-block"></div>
+                        <div class="feature-box feature-box-left-icon last-paragraph-no-margin">
+                            <div class="feature-box-content">
+                                <span class="w-85 sm-w-95 d-block fs-18 text-dark-gray"><span class="fw-700">45+</span> Fashion events each year celebrating together.</span>
+                            </div>
+                            <div class="feature-box-icon me-0">
+                                <span class="fs-15 fw-500 text-base-color">03</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end features box item -->
+                    <!-- start features box item -->
+                    <div class="col icon-with-text-style-01 pe-4 xxl-pe-15px">
+                        <div class="separator-line-1px bg-extra-medium-gray w-100 mb-25px d-none d-lg-block"></div>
+                        <div class="feature-box feature-box-left-icon last-paragraph-no-margin">
+                            <div class="feature-box-content">
+                                <span class="w-85 sm-w-95 d-block fs-18 text-dark-gray"><span class="fw-700">4.8/5</span> Average rating from thousands of happy clients.</span>
+                            </div>
+                            <div class="feature-box-icon me-0">
+                                <span class="fs-15 fw-500 text-base-color">04</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end features box item -->
+                </div>
+            </div>
+        </section>
+        <!-- end section -->
+        <!-- start section -->
+        <section class="position-relative overflow-hidden">
+            <div class="container-fluid p-0">
+                <div class="row g-0 position-relative">
+                    <div class="col-12 marquee-rotate-down">
+                        <div class="swiper swiper-width-auto text-center bg-extra-medium-gray pt-20px pb-20px outside-box-right-1 outside-box-left-1" data-slider-options='{ "slidesPerView": "auto", "spaceBetween":0, "centeredSlides": true, "speed": 4000, "loop": true, "pagination": { "el": ".slider-four-slide-pagination-2", "clickable": false }, "allowTouchMove": false, "autoplay": { "delay":1, "disableOnInteraction": false }, "navigation": { "nextEl": ".slider-four-slide-next-2", "prevEl": ".slider-four-slide-prev-2" }, "keyboard": { "enabled": true, "onlyInViewport": true }, "effect": "slide" }'>
+                            <div class="swiper-wrapper marquee-slide">
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                 <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-dark-gray"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                            </div> 
+                        </div>
+                    </div>                    
+                    <div class="col-12 marquee-rotate-up z-index-minus-1">
+                        <div class="swiper swiper-width-auto text-center bg-base-color pt-20px pb-20px outside-box-right-1 outside-box-left-1" data-slider-options='{ "slidesPerView": "auto", "spaceBetween":0, "centeredSlides": true, "speed": 4000, "loop": true, "pagination": { "el": ".slider-four-slide-pagination-2", "clickable": false }, "allowTouchMove": false, "autoplay": { "delay":1, "disableOnInteraction": false, "reverseDirection": true }, "navigation": { "nextEl": ".slider-four-slide-next-2", "prevEl": ".slider-four-slide-prev-2" }, "keyboard": { "enabled": true, "onlyInViewport": true }, "effect": "slide" }'>
+                            <div class="swiper-wrapper marquee-slide">
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                 <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                                <!-- start slider item -->
+                                <div class="swiper-slide">
+                                    <div class="fs-30 alt-font text-white"><span class="d-inline-block align-middle ms-20px me-20px">&#42;</span>Big discounts on fashion!</div>
+                                </div>
+                                <!-- end slider item -->
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- end section -->
+        <!-- start section -->
+        <section class="position-relative overflow-hidden pt-0">
+            <div class="container">
+                <div class="row justify-content-center mb-55px sm-mb-50px">
+                    <div class="col-12 text-center" data-anime='{ "el": "childs", "translateY": [15, 0], "opacity": [0,1], "duration": 300, "delay": 0, "staggervalue": 100, "easing": "easeOutQuad" }'>
+                        <h2 class="alt-font ls-minus-3px text-dark-gray mb-10px">Why choose us</h2>
+                        <p class="mb-0">Step into a world where design meets innovation.</p>
+                    </div>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-md-12 position-relative" data-anime='{ "translateX": [150, 0], "opacity": [0,1], "duration": 1200, "delay": 100, "staggervalue": 150, "easing": "easeOutQuad" }'>
+                        <div class="outside-box-right-20 sm-outside-box-right-50">
+                            <div class="swiper slider-three-slide magic-cursor drag-cursor" data-slider-options='{ "slidesPerView": 1, "spaceBetween": 35, "loop": true, "autoplay": { "delay": 6000, "disableOnInteraction": false }, "pagination": { "el": ".slider-four-slide-pagination-1", "clickable": true, "dynamicBullets": false }, "keyboard": { "enabled": true, "onlyInViewport": true }, "breakpoints": { "1200": { "slidesPerView": 4 }, "992": { "slidesPerView": 3 }, "768": { "slidesPerView": 2}, "320": { "slidesPerView":2 } }, "effect": "slide" }'>
+                                <div class="swiper-wrapper">
+                                    <!-- start content carousal item --> 
+                                    <div class="swiper-slide"> 
+                                        <div class="interactive-banner-style-06">                                    
+                                            <div class="interactive-banners-image">
+                                                <img src="https://placehold.co/455x560" alt="" />
+                                                <div class="overlay-bg bg-gradient-gray-light-dark-transparent opacity-medium"></div>
+                                                <span class="banners-icon text-white icon-hover-base-color position-absolute top-40px left-40px lg-top-30px lg-left-30px">
+                                                    <img src="{% static 'images/demo-clothing-store-about-icon-01.png' %}" alt="">
+                                                </span>
+                                            </div>
+                                            <div class="interactive-banners-content p-50px lg-p-30px"> 
+                                                <div class="h-100 w-100 last-paragraph-no-margin"> 
+                                                    <span class="fs-20 d-block text-white mb-10px">Simplicity in design</span>
+                                                    <p class="interactive-banners-content-text w-80 lg-w-100">Our latest collection redefines modern aesthetics blending style.</p>
+                                                </div> 
+                                            </div>
+                                            <div class="box-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                        </div>
+                                    </div>
+                                    <!-- end content carousal item -->
+                                    <!-- start content carousal item --> 
+                                    <div class="swiper-slide">
+                                        <div class="interactive-banner-style-06">                                    
+                                            <div class="interactive-banners-image">
+                                                <img src="https://placehold.co/455x560" alt="" />
+                                                <div class="overlay-bg bg-gradient-gray-light-dark-transparent opacity-medium"></div>
+                                                <span class="banners-icon text-white icon-hover-base-color position-absolute top-40px left-40px lg-top-30px lg-left-30px">
+                                                    <img src="{% static 'images/demo-clothing-store-about-icon-02.png' %}" alt="">
+                                                </span>
+                                            </div>
+                                            <div class="interactive-banners-content p-50px lg-p-30px"> 
+                                                <div class="h-100 w-100 last-paragraph-no-margin"> 
+                                                    <span class="fs-20 d-block text-white mb-10px">Premium quality materials</span>
+                                                    <p class="interactive-banners-content-text w-80 lg-w-100">Our latest collection redefines modern aesthetics blending style.</p>
+                                                </div> 
+                                            </div>
+                                            <div class="box-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                        </div>
+                                    </div>
+                                    <!-- end content carousal item -->
+                                    <!-- start content carousal item --> 
+                                    <div class="swiper-slide">
+                                        <div class="interactive-banner-style-06">                                    
+                                            <div class="interactive-banners-image">
+                                                <img src="https://placehold.co/455x560" alt="" />
+                                                <div class="overlay-bg bg-gradient-gray-light-dark-transparent opacity-medium"></div>
+                                                <span class="banners-icon icon-hover-base-color text-white position-absolute top-40px left-40px lg-top-30px lg-left-30px">
+                                                    <img src="{% static 'images/demo-clothing-store-about-icon-03.png' %}" alt="">
+                                                </span>
+                                            </div>
+                                            <div class="interactive-banners-content p-50px lg-p-30px"> 
+                                                <div class="h-100 w-100 last-paragraph-no-margin"> 
+                                                    <span class="fs-20 d-block text-white mb-10px">Confidence in comfort</span>
+                                                    <p class="interactive-banners-content-text w-80 lg-w-100">Our latest collection redefines modern aesthetics blending style.</p>
+                                                </div> 
+                                            </div>
+                                            <div class="box-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                        </div>
+                                    </div>
+                                    <!-- end content carousal item -->
+                                    <!-- start content carousal item --> 
+                                    <div class="swiper-slide">
+                                        <div class="interactive-banner-style-06">                                    
+                                            <div class="interactive-banners-image">
+                                                <img src="https://placehold.co/455x560" alt="" />
+                                                <div class="overlay-bg bg-gradient-gray-light-dark-transparent opacity-medium"></div>
+                                                <span class="banners-icon icon-hover-base-color text-white position-absolute top-40px left-40px lg-top-30px lg-left-30px">
+                                                    <img src="{% static 'images/demo-clothing-store-about-icon-04.png' %}" alt="">
+                                                </span>
+                                            </div>
+                                            <div class="interactive-banners-content p-50px lg-p-30px"> 
+                                                <div class="h-100 w-100 last-paragraph-no-margin"> 
+                                                    <span class="fs-20 d-block text-white mb-10px">Make from natural</span>
+                                                    <p class="interactive-banners-content-text w-80 lg-w-100">Our latest collection redefines modern aesthetics blending style.</p>
+                                                </div> 
+                                            </div>
+                                            <div class="box-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                        </div>
+                                    </div>
+                                    <!-- end content carousal item -->
+                                    <!-- start content carousal item --> 
+                                    <div class="swiper-slide"> 
+                                        <div class="interactive-banner-style-06">                                    
+                                            <div class="interactive-banners-image">
+                                                <img src="https://placehold.co/455x560" alt="" />
+                                                <div class="overlay-bg bg-gradient-gray-light-dark-transparent opacity-medium"></div>
+                                                <span class="banners-icon text-white icon-hover-base-color position-absolute top-40px left-40px lg-top-30px lg-left-30px">
+                                                    <img src="{% static 'images/demo-clothing-store-about-icon-01.png' %}" alt="">
+                                                </span>
+                                            </div>
+                                            <div class="interactive-banners-content p-50px lg-p-30px"> 
+                                                <div class="h-100 w-100 last-paragraph-no-margin"> 
+                                                    <span class="fs-20 d-block text-white mb-10px">Simplicity in design</span>
+                                                    <p class="interactive-banners-content-text w-80 lg-w-100">Our latest collection redefines modern aesthetics blending style.</p>
+                                                </div> 
+                                            </div>
+                                            <div class="box-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                        </div>
+                                    </div>
+                                    <!-- end content carousal item -->
+                                    <!-- start content carousal item --> 
+                                    <div class="swiper-slide">
+                                        <div class="interactive-banner-style-06">                                    
+                                            <div class="interactive-banners-image">
+                                                <img src="https://placehold.co/455x560" alt="" />
+                                                <div class="overlay-bg bg-gradient-gray-light-dark-transparent opacity-medium"></div>
+                                                <span class="banners-icon text-white icon-hover-base-color position-absolute top-40px left-40px lg-top-30px lg-left-30px">
+                                                    <img src="{% static 'images/demo-clothing-store-about-icon-02.png' %}" alt="">
+                                                </span>
+                                            </div>
+                                            <div class="interactive-banners-content p-50px lg-p-30px"> 
+                                                <div class="h-100 w-100 last-paragraph-no-margin"> 
+                                                    <span class="fs-20 d-block text-white mb-10px">Premium quality materials</span>
+                                                    <p class="interactive-banners-content-text w-80 lg-w-100">Our latest collection redefines modern aesthetics blending style.</p>
+                                                </div> 
+                                            </div>
+                                            <div class="box-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                        </div>
+                                    </div>
+                                    <!-- end content carousal item -->
+                                    <!-- start content carousal item --> 
+                                    <div class="swiper-slide">
+                                        <div class="interactive-banner-style-06">                                    
+                                            <div class="interactive-banners-image">
+                                                <img src="https://placehold.co/455x560" alt="" />
+                                                <div class="overlay-bg bg-gradient-gray-light-dark-transparent opacity-medium"></div>
+                                                <span class="banners-icon icon-hover-base-color text-white position-absolute top-40px left-40px lg-top-30px lg-left-30px">
+                                                    <img src="{% static 'images/demo-clothing-store-about-icon-03.png' %}" alt="">
+                                                </span>
+                                            </div>
+                                            <div class="interactive-banners-content p-50px lg-p-30px"> 
+                                                <div class="h-100 w-100 last-paragraph-no-margin"> 
+                                                    <span class="fs-20 d-block text-white mb-10px">Confidence in comfort</span>
+                                                    <p class="interactive-banners-content-text w-80 lg-w-100">Our latest collection redefines modern aesthetics blending style.</p>
+                                                </div> 
+                                            </div>
+                                            <div class="box-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                        </div>
+                                    </div>
+                                    <!-- end content carousal item -->
+                                    <!-- start content carousal item --> 
+                                    <div class="swiper-slide">
+                                        <div class="interactive-banner-style-06">                                    
+                                            <div class="interactive-banners-image">
+                                                <img src="https://placehold.co/455x560" alt="" />
+                                                <div class="overlay-bg bg-gradient-gray-light-dark-transparent opacity-medium"></div>
+                                                <span class="banners-icon icon-hover-base-color text-white position-absolute top-40px left-40px lg-top-30px lg-left-30px">
+                                                    <img src="{% static 'images/demo-clothing-store-about-icon-04.png' %}" alt="">
+                                                </span>
+                                            </div>
+                                            <div class="interactive-banners-content p-50px lg-p-30px"> 
+                                                <div class="h-100 w-100 last-paragraph-no-margin"> 
+                                                    <span class="fs-20 d-block text-white mb-10px">Make from natural</span>
+                                                    <p class="interactive-banners-content-text w-80 lg-w-100">Our latest collection redefines modern aesthetics blending style.</p>
+                                                </div> 
+                                            </div>
+                                            <div class="box-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                        </div>
+                                    </div>
+                                    <!-- end content carousal item -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- start slider pagination -->
+                        <!--<div class="swiper-pagination slider-four-slide-pagination-1 swiper-pagination-style-2 swiper-pagination-clickable swiper-pagination-bullets"></div>-->
+                        <!-- end slider pagination --> 
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- end section -->
+        <!-- start section -->
+        <section class="pt-0">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xxl-4 col-lg-5 md-mb-30px" data-anime='{ "el": "childs", "translateY": [15, 0], "opacity": [0,1], "duration": 300, "delay": 0, "staggervalue": 100, "easing": "easeOutQuad" }'>
+                        <span class="fs-14 lh-20 fw-500 text-uppercase text-dark-gray text-decoration-line-bottom d-inline-block mb-20px">Brand overview</span>
+                        <h3 class="ls-minus-1px alt-font text-dark-gray mb-20px sm-mb-0">Shaping the future of fashion with purpose and style.</h3>
+                    </div>
+                    <div class="col-lg-7 offset-xxl-1" data-anime='{ "el": "childs", "translateY": [15, 0], "opacity": [0,1], "duration": 300, "delay": 0, "staggervalue": 100, "easing": "easeOutQuad" }'>
+                        <div class="row">
+                            <div class="col-md-3 sm-mb-15px">
+                                <div class="fs-18 fw-500 text-dark-gray">Future vision</div>
+                            </div>
+                            <div class="col-md-9 ps-50px last-paragraph-no-margin sm-ps-15px">
+                                <p class="w-90 lg-w-100">We envision a world where fashion is more than seasonal trends it's a reflection of values, identity, and positive impact.</p>
+                            </div>
+                        </div>
+                        <div class="separator-line-1px bg-extra-medium-gray mt-30px mb-30px"></div>
+                        <div class="row">
+                            <div class="col-md-3 sm-mb-15px">
+                                <div class="fs-18 fw-500 text-dark-gray">Our mission</div>
+                            </div>
+                            <div class="col-md-9 ps-50px last-paragraph-no-margin sm-ps-15px">
+                                <p class="w-90 lg-w-100">Simple make fashion that matters. We create with meaning, focusing on sustainability, individuality, and timeless appeal.</p>
+                            </div>
+                        </div>
+                        <div class="separator-line-1px bg-extra-medium-gray mt-30px mb-30px"></div>
+                        <div class="row">
+                            <div class="col-md-3 sm-mb-15px">
+                                <div class="fs-18 fw-500 text-dark-gray">Core values</div>
+                            </div>
+                            <div class="col-md-9 ps-50px last-paragraph-no-margin sm-ps-15px">
+                                <p class="w-90 lg-w-100">We believe in timeless design, transparent practices, and a deep respect for people and the planet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- end section -->
+        <!-- start section --> 
+        <section class="pt-0">            
+            <div class="container">
+                <div class="row row-cols-1 row-cols-xl-4 row-cols-lg-2 row-cols-sm-2 transition-inner-all justify-content-center" data-anime='{ "el": "childs", "translateY": [30, 0], "opacity": [0,1], "duration": 600, "delay":0, "staggervalue": 300, "easing": "easeOutQuad" }'>
+                    <!-- start team member item --> 
+                    <div class="col team-style-08 lg-mb-30px" data-bottom-top="transform: translateY(-40px)" data-top-bottom="transform: translateY(40px)">
+                        <figure class="mb-0 position-relative overflow-hidden">
+                            <img src="https://placehold.co/600x740" alt="" />
+                            <figcaption class="w-100 h-100 d-flex align-items-end p-13 lg-p-8 md-p-13 sm-p-9 bg-gradient-dark-transparent">
+                                <div class="w-100">
+                                    <span class="team-member-name fs-19 fw-500 text-white d-block">Jeremy dupont</span>
+                                    <span class="member-designation fs-16 lh-26 text-white d-block">Designer</span>
+                                </div>
+                                <div class="social-icon d-flex flex-column flex-shrink-1">
+                                    <a href="https://www.instagram.com/" target="_blank" class="text-black w-55px h-55px bg-white"><i class="fa-brands fa-linkedin-in icon-small"></i></a>
+                                </div>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <!-- end team member item -->
+                    <!-- start team member item --> 
+                    <div class="col team-style-08 lg-mb-30px mt-2 lg-mt-0" data-bottom-top="transform: translateY(40px)" data-top-bottom="transform: translateY(-40px)">
+                        <figure class="mb-0 position-relative overflow-hidden">
+                            <img src="https://placehold.co/600x740" alt="" />
+                            <figcaption class="w-100 h-100 d-flex align-items-end p-13 lg-p-8 md-p-13 sm-p-9 bg-gradient-dark-transparent">
+                                <div class="w-100">
+                                    <span class="team-member-name fs-19 fw-500 text-white d-block">Jessica dover</span>
+                                    <span class="member-designation fs-16 lh-26 text-white d-block">Director</span>
+                                </div>
+                                <div class="social-icon d-flex flex-column flex-shrink-1">
+                                    <a href="https://www.twitter.com/" target="_blank" class="text-black w-55px h-55px bg-white"><i class="fa-brands fa-twitter icon-small"></i></a>
+                                </div>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <!-- end team member item -->
+                    <!-- start team member item --> 
+                    <div class="col team-style-08 sm-mb-30px" data-bottom-top="transform: translateY(-40px)" data-top-bottom="transform: translateY(40px)">
+                        <figure class="mb-0 position-relative overflow-hidden">
+                            <img src="https://placehold.co/600x740" alt="" />
+                            <figcaption class="w-100 h-100 d-flex align-items-end p-13 lg-p-8 md-p-13 sm-p-9 bg-gradient-dark-transparent">
+                                <div class="w-100">
+                                    <span class="team-member-name fs-19 fw-500 text-white d-block">Matthew taylor</span>
+                                    <span class="member-designation fs-16 lh-26 text-white d-block">Manager</span>
+                                </div>
+                                <div class="social-icon d-flex flex-column flex-shrink-1">
+                                    <a href="https://www.facebook.com/" target="_blank" class="text-black w-55px h-55px bg-white"><i class="fa-brands fa-facebook-f icon-small"></i></a>
+                                </div>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <!-- end team member item -->  
+                    <!-- start team member item --> 
+                    <div class="col team-style-08 mt-2 lg-mt-0" data-bottom-top="transform: translateY(40px)" data-top-bottom="transform: translateY(-40px)">
+                        <figure class="mb-0 position-relative overflow-hidden">
+                            <img src="https://placehold.co/600x740" alt="" />
+                            <figcaption class="w-100 h-100 d-flex align-items-end p-13 lg-p-8 md-p-13 sm-p-9 bg-gradient-dark-transparent">
+                                <div class="w-100">
+                                    <span class="team-member-name fs-19 fw-500 text-white d-block">Daniel james</span>
+                                    <span class="member-designation fs-16 lh-26 text-white d-block">Manager</span>
+                                </div>
+                                <div class="social-icon d-flex flex-column flex-shrink-1">
+                                    <a href="https://www.twitter.com/" target="_blank" class="text-black w-55px h-55px bg-white"><i class="fa-brands fa-twitter icon-small"></i></a>
+                                </div>
+                            </figcaption>
+                        </figure>
+                    </div>
+                    <!-- end team member item -->
+                </div>
+            </div>
+        </section>
+        
+        {% include 'components/footer.html' %}
+
+        <!-- javascript libraries -->
+        <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/vendors.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+    </body>
+</html>

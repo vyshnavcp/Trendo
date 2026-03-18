@@ -1,0 +1,153 @@
+from django.urls import path, reverse_lazy
+from . import views
+from django.conf import settings
+from django.contrib.auth import views as auth_views
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('about/', views.about, name='about'),
+    path('contact/', views.contact, name='contact'),
+    path('product/',views.product,name='product'),
+    path('product/<slug:slug>/', views.product_detail, name='product_detail'),
+    path('product/category/<slug:slug>/',views.product,name='filter_by_category'),
+    path('product/subcategory/<slug:slug>/',views.product,name='filter_by_subcategory'),
+    path('product/<slug:slug>/review/',views.review_post,name='submit_review'),
+    path('delete-review/<int:id>/', views.delete_review, name='delete_review'),
+    path('blog/',views.blog,name='blog'),
+    path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
+    path('register/',views.register,name='register'),
+    path('reg_post/',views.reg_post,name='reg_post'),
+    path('user_login/', views.user_login, name='user_login'),
+    path('login_post/',views.login_post,name='login_post'),
+    path('logout/', views.user_logout, name='user_logout'),
+    path('ajax/validate-register/', views.ajax_validate_register, name='ajax_validate_register'),  
+    # Send reset link
+    path(
+        'password-reset/',
+        auth_views.PasswordResetView.as_view(
+            template_name='password_reset.html'
+        ),
+        name='password_reset'
+    ),
+
+    # Email sent confirmation
+    path(
+        'password-reset/done/',
+        auth_views.PasswordResetDoneView.as_view(
+            template_name='password_reset_done.html'
+        ),
+        name='password_reset_done'
+    ),
+
+    # Reset link (token + uid)
+    path(
+    'reset/<uidb64>/<token>/',
+    auth_views.PasswordResetConfirmView.as_view(
+        template_name='password_reset_confirm.html',
+        success_url=reverse_lazy('password_reset_complete')
+    ),
+    name='password_reset_confirm'
+),
+
+    # Password successfully changed
+    path(
+        'reset/done/',
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name='password_reset_complete.html'
+        ),
+        name='password_reset_complete'
+    ),
+    path("add-to-cart/<int:product_id>/",views.add_to_cart, name="add_to_cart"),
+    path("cart/",views. cart_page, name="cart_page"),
+    path("cart/update/<int:item_id>/",views. update_cart, name="update_cart"),
+    path("cart/remove/<int:item_id>/",views. remove_cart_item, name="remove_cart_item"),
+    path("cart/empty/", views.empty_cart, name="empty_cart"),
+    path('checkout/',views.checkout,name='checkout'),
+    path("cart/change-quantity/<int:item_id>/",views.change_cart_quantity,name="change_cart_quantity"),
+    path('checkout/', views.checkout, name='checkout'),  # Page with billing form
+    path('checkout/post/', views.checkout_post, name='checkout_post'),  # Handle form, create order, Razorpay
+    path('payment/success/', views.payment_success_post, name='payment_success_post'),  # Razorpay callback  
+    path('order/success/', views.order_success, name='order_success'),
+    path("order/cash-on-delivery/<int:order_id>/",views.cash_on_delivery_success,name="cash_on_delivery_success"),
+    path("ajax/validate-checkout/", views.ajax_validate_checkout, name="ajax_validate_checkout"),
+    path("profile/", views.profile, name="profile"),
+    path("my-orders/", views.my_orders, name="my_orders"),
+    path("ajax/shipping-charge/", views.ajax_shipping_charge, name="ajax_shipping_charge"),
+    path("dashboard/", views.dashboard, name="dashboard"),
+    path('report/', views.report_page, name='report_page'),
+    path('order/complete/<int:order_id>/', views.mark_order_completed, name='mark_order_completed'),
+    path('orders/', views.order_list, name='order_list'),
+    path('orders/paid/', views.paid_orders, name='paid_orders'),
+    path('orders/pending/', views.pending_orders, name='pending_orders'),
+    path("order/<int:order_id>/",views.order_detail, name="order_detail"),
+    path("order/<int:order_id>/complete/", views.mark_order_completed, name="mark_order_completed"),
+    path("cancel-order/<int:order_id>/", views.cancel_order, name="cancel_order"),
+    path('shipping-address/', views.shipping_address_list, name='shipping_address_list'),
+    path('customers/', views.customer_list, name='customer_list'),
+    path("dashboard/category/add/", views.add_category, name="add_category"),
+    path("dashboard/categories/", views.category_list, name="category_list"),
+    path("dashboard/category/edit/<int:id>/", views.edit_category, name="edit_category"),
+    path("dashboard/category/delete/<int:id>/", views.delete_category, name="delete_category"),
+    path("dashboard/subcategory/add/", views.add_subcategory, name="add_subcategory"),
+    path("dashboard/subcategories/", views.subcategory_list, name="subcategory_list"),
+    path("dashboard/subcategory/edit/<int:id>/", views.edit_subcategory, name="edit_subcategory"),
+    path("dashboard/subcategory/delete/<int:id>/", views.delete_subcategory, name="delete_subcategory"),
+    path("dashboard/product/add/", views.add_product, name="add_product"),
+    path("dashboard/product/edit/<slug:slug>/", views.edit_product, name="edit_product"),
+    path("dashboard/products/", views.product_list, name="product_list"),
+    path("dashboard/terms/", views.terms_list, name="terms_list"),
+    path("dashboard/terms/add/", views.add_terms, name="add_terms"),
+    path("dashboard/terms/edit/<int:pk>/", views.edit_terms, name="edit_terms"),
+    path("dashboard/terms/delete/<int:pk>/", views.delete_terms, name="delete_terms"),
+    path("terms-and-conditions/", views.terms_page, name="terms_page"),
+    path("dashboard/privacy/", views.privacy_list, name="privacy_list"),
+    path("dashboard/privacy/add/", views.add_privacy, name="add_privacy"),
+    path("dashboard/privacy/edit/<int:pk>/", views.edit_privacy, name="edit_privacy"),
+    path("dashboard/privacy/delete/<int:pk>/", views.delete_privacy, name="delete_privacy"),
+    path("privacy-policy/", views.privacy_page, name="privacy_page"),
+    path("dashboard/product/edit/<slug:slug>/",views.edit_product,name="edit_product"),
+    path("dashboard/product/delete/<slug:slug>/",views.delete_product,name="delete_product"),
+    path('dashboard/articles/',views.article_list, name='article_list'),
+    path('dashboard/article/add/',views.add_article, name='add_article'),
+    path('dashboard/article/edit/<slug:slug>/', views.edit_article, name='edit_article'),
+    path('dashboard/article/delete/<slug:slug>/', views.delete_article, name='delete_article'),
+    path("dashboard/size/add/", views.add_size, name="add_size"),
+    path("dashboard/size/", views.size_list, name="size_list"),
+    path("dashboard/size/edit/<int:id>/", views.edit_size, name="edit_size"),
+    path("dashboard/size/delete/<int:id>/", views.delete_size, name="delete_size"),
+    path("dashboard/coupon/add/", views.add_coupon, name="add_coupon"),
+    path("dashboard/coupon/", views.coupon_list, name="coupon_list"),
+    path("dashboard/coupon/edit/<int:id>/", views.edit_coupon, name="edit_coupon"),
+    path("dashboard/coupon/delete/<int:id>/", views.delete_coupon, name="delete_coupon"),
+    path('dashboard/reviews/', views.review_list, name='review_list'),
+    path('dashboard/review/delete/<int:id>/', views.delete_review, name='delete_review'),
+    path('dashboard/faq/', views.faq_list, name='faq_list'),
+    path('dashboard/faq/add/', views.add_faq, name='add_faq'),
+    path('dashboard/faq/edit/<int:pk>/', views.edit_faq, name='edit_faq'),
+    path('dashboard/faq/delete/<int:pk>/', views.delete_faq, name='delete_faq'),
+    path('faq/', views.faq_page, name='faq_page'),
+    path("dashboard/pos/", views.pos_page, name="pos_page"),
+    path("dashboard/pos/create/", views.pos_create_order, name="pos_create_order"),
+    path("total-income/", views.total_income_page, name="total_income"),
+    path("order/<int:order_id>/pos-complete/", views.pos_payment_complete, name="pos_payment_complete"),
+    path("pos/edit/<int:order_id>/", views.pos_edit_page, name="pos_edit_page"),
+    path("pos/update/<int:order_id>/", views.pos_update_order, name="pos_update_order"),
+    path("dashboard/employee/create/",views.create_user, name="create_user"),
+    path("dashboard/employee/list/", views.employee_list, name="employee_list"),
+    path("dashboard/employee/delete/<int:user_id>/", views.delete_employee, name="delete_employee"),
+    path("reference/<str:name>/", views.reference_detail, name="reference_detail"),
+    path("cancel-policy/<int:order_id>/", views.cancel_policy, name="cancel_policy"),
+    path("confirm-cancel/<int:order_id>/", views.confirm_cancel_request, name="confirm_cancel_request"),
+    path("admin-refund-requests/", views.refund_requests, name="refund_requests"),
+    path("process-refund/<int:order_id>/", views.process_refund, name="process_refund"),
+    path("refund-report/", views.refund_report, name="refund_report"),
+    
+    
+    
+
+    
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

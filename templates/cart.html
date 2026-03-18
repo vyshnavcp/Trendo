@@ -1,0 +1,243 @@
+﻿<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        {% load static %}
+        <title>Trendo - The Unique Fashion</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="author" content="ThemeZaa">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+        <meta name="description" content="Elevate your online presence with Crafto - a modern, versatile, multipurpose Bootstrap 5 responsive HTML5, SCSS template using highly creative 56+ ready demos.">
+        <!-- favicon icon -->
+        <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo/favicon.ico' %}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/logo/apple-touch-icon.png' %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/logo/favicon-32x32.png' %}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/logo/favicon-16x16.png' %}">
+        <link rel="manifest" href="{% static 'images/logo/site.webmanifest' %}">
+        <!-- google fonts preconnect -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <!-- style sheets and font icons  -->
+        <link rel="stylesheet" href="{% static 'css/vendors.min.css' %}"/>
+        <link rel="stylesheet" href="{% static 'css/icon.min.css' %}"/>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+        <link rel="stylesheet" href="{% static 'css/responsive.css' %}"/>
+        <link rel="stylesheet" href="{% static 'demos/clothing-store/clothing-store.css' %}" />
+        <style>
+            /* Quantity pulse animation */
+            .qty-animate {
+                animation: qtyPulse 0.25s ease-in-out;
+            }
+
+            @keyframes qtyPulse {
+                0%   { transform: scale(1); }
+                50%  { transform: scale(1.15); }
+                100% { transform: scale(1); }
+            }
+
+            /* Row highlight when updated */
+            .row-highlight {
+                animation: rowFlash 0.6s ease;
+            }
+
+            @keyframes rowFlash {
+                0%   { background-color: #e8f5e9; }
+                100% { background-color: transparent; }
+            }
+        </style>
+    </head>
+    <body data-mobile-nav-style="classic">
+        
+        {% include 'components/navbar.html' %}
+
+        <!-- start page title -->
+        <section class="page-title-center-alignment ipad-top-space-margin cover-background position-relative py-0" style="background-image: url({% static 'images/banners/contact-banner.png' %})">
+            <div class="container">
+                <div class="row flex-column align-items-center justify-content-center h-500px md-h-400px sm-h-300px">
+                    <div class="col-12 text-center position-relative page-title-extra-large">
+                        <h1 class="alt-font ls-minus-1px text-white d-inline-block mb-10px mt-3 md-mt-50px">Shopping cart</h1>
+                    </div>
+                    <div class="col-12 breadcrumb breadcrumb-style-01 text-white d-flex justify-content-center">
+                        <ul>
+                            <li><a href="{% url 'home' %}" class="text-white">Home</a></li> 
+                            <li>Shopping cart</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- start section -->
+        <section>
+            <div class="container">
+                <div class="row align-items-start">
+                    <div class="col-lg-8 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
+                        <div class="row align-items-center">
+                            <div class="col-12">
+                                <table class="table cart-products">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col" class="fw-500">Product</th>
+                                            <th scope="col"></th>
+                                            <th scope="col" class="fw-500">Price</th>
+                                            <th scope="col" class="fw-500">Quantity</th>
+                                            <th scope="col" class="fw-500">Total</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% if items %}
+                                        {% for item in items %}
+                                        <tr> 
+                                            <td class="product-remove">
+                                                <form method="POST" action="{% url 'remove_cart_item' item.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" style="background:none;border:none;">x</button>
+                                                </form>
+                                            </td>
+
+                                            <td class="product-thumbnail">
+                                                <a href="{% url 'product_detail' item.product.slug %}">
+                                                    
+                                                    {% if item.product.image1 %}
+                                                        <img class="cart-product-image" src="{{ item.product.image1.url }}" alt="">
+                                                    {% else %}
+                                                        <img class="cart-product-image" src="https://placehold.co/600x740" alt="">
+                                                    {% endif %}
+                                                    
+                                                </a>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <a href="{% url 'product_detail' item.variant.product.slug %}" 
+                                                class="text-dark-gray fw-500 d-block lh-initial">
+                                                {{ item.variant.product.name }}
+                                                </a> 
+                                                <span class="fs-14">
+                                                    Color: {{ item.variant.color.name }} |
+                                                    Size: {{ item.variant.size.name }}
+                                                </span>
+                                            </td>
+
+                                            <td class="product-price">₹{{ item.variant.product.price }}</td>
+
+                                            <td class="product-quantity">
+                                                <div class="quantity d-flex align-items-center">
+
+                                                    <!-- MINUS -->
+                                                    <form method="POST" action="{% url 'change_cart_quantity' item.id %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="minus">
+                                                        <button type="submit" class="qty-minus">-</button>
+                                                    </form>
+
+                                                    <!-- VALUE -->
+                                                    <input class="qty-text mx-2" type="text" value="{{ item.quantity }}" readonly>
+
+                                                    <!-- PLUS -->
+                                                    <form method="POST" action="{% url 'change_cart_quantity' item.id %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="plus">
+                                                        <button type="submit" class="qty-plus">+</button>
+                                                    </form>
+
+                                                </div>
+                                            </td>
+
+                                            <td class="product-subtotal">
+                                                ₹{{ item.total_price }}
+                                            </td> 
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="6" class="text-center">Your cart is empty</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row mt-20px">
+                            <div class="col-xl-6 col-xxl-7 col-md-6"> 
+                                <div class="coupon-code-panel">
+
+                                    {% if coupon_code %}
+                                        <!-- REMOVE COUPON -->
+                                        <form method="POST" action="{% url 'cart_page' %}" class="coupon-container">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="remove_coupon" value="1">
+
+                                            <div class="d-flex">
+                                                <input type="text" class="form-control me-2" value="{{ coupon_code }}" disabled>
+                                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                            </div>
+                                        </form>
+
+                                        <p class="text-success mt-2">
+                                            Coupon applied: ₹{{ coupon_discount }}
+                                        </p>
+
+                                    {% else %}
+                                        <!-- APPLY COUPON -->
+                                        <form method="POST" action="{% url 'cart_page' %}" class="d-flex">
+                                            {% csrf_token %}
+                                            <input type="text" name="coupon_code" class="form-control me-2" placeholder="Coupon code">
+                                            <button type="submit" class="btn btn-dark">Apply</button>
+                                        </form>
+
+                                        {% if message %}
+                                            <p class="text-danger mt-2">{{ message }}</p>
+                                        {% endif %}
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-xxl-5 col-md-6 text-center text-md-end sm-mt-15px">
+                                <form method="POST" action="{% url 'empty_cart' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-small">Empty cart</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="bg-light-medium-gray border-radius-8px p-50px xl-p-30px lg-p-25px">
+                            <span class="fs-26 alt-font fw-500 text-dark-gray mb-5px d-block">Cart totals</span>
+                            <table class="w-100 total-price-table">
+                                <tbody>
+                                    <tr>
+                                        <th class="w-45 fw-500 text-dark-gray">Subtotal</th>
+                                        <td class="text-dark-gray fw-600">₹{{ total }}</td>
+                                    </tr>
+                                    <tr class="total-amount">
+                                        <th class="fw-500 text-dark-gray pb-0">Total</th>
+                                        <td class="pb-0">
+                                            <h6 class="fw-500 mb-0 text-dark-gray">₹{{ total }}</h6>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="{% url 'checkout' %}" class="btn btn-dark-gray btn-large btn-switch-text btn-round-edge btn-box-shadow w-100 mt-25px">
+                                <span>
+                                    <span class="btn-double-text" data-text="Finalize Order">
+                                        Checkout
+                                    </span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        {% include 'components/footer.html' %}
+
+        <!-- javascript libraries -->
+        <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/vendors.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+    </body>
+</html>
