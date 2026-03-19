@@ -2062,6 +2062,7 @@ def refund_requests(request):
 def process_refund(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     try:
+        # 1️⃣ Refund via Razorpay
         client = razorpay.Client(auth=(
             settings.RAZORPAY_KEY_ID,
             settings.RAZORPAY_KEY_SECRET
@@ -2069,18 +2070,28 @@ def process_refund(request, order_id):
         refund_amount = int(order.total * 100)
         refund = client.payment.refund(
             order.razorpay_payment_id,
-            {
-                "amount": refund_amount,
-                "speed": "normal"
-            }
+            {"amount": refund_amount, "speed": "normal"}
         )
         order.refund_id = refund["id"]
+
+        # 2️⃣ Update order status
         order.refund_processed = True
         order.is_cancelled = True
         order.refund_status = True
         order.save()
+
+        # 3️⃣ Restore stock for each ordered item
+        for item in order.items.all():  # 'items' is the related_name on OrderItem
+            if item.variant:  # if product has variant
+                item.variant.stock += item.quantity
+                item.variant.save()
+            else:  # fallback for non-variant products
+                item.product.stock += item.quantity
+                item.product.save()
+
     except Exception as e:
         print("Refund Error:", e)
+
     return redirect("refund_requests")
 
 @role_required(["Admin","Accountant"])
