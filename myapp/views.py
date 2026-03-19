@@ -37,6 +37,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.db.models import F
 from .decorators import role_required
+from datetime import timedelta 
 
 def home(request):
     blogs = Article.objects.order_by('-posted_on')[:4]
@@ -995,8 +996,6 @@ def my_orders(request):
     lambda u: u.is_authenticated and u.is_staff,
     login_url='user_login'
 )
-# Dashbord all options 
-
 def dashboard(request):
     today = now().date()
     if request.user.is_superuser or request.user.groups.filter(name="Accountant").exists():
@@ -1005,31 +1004,23 @@ def dashboard(request):
         orders = Order.objects.filter(is_pos_order=True).order_by('-created_at')
     paid_orders = orders.filter(payment_status=True, is_cancelled=False)
     total_revenue = paid_orders.aggregate(total=Sum("total"))["total"] or 0
-    today_revenue = paid_orders.filter(
-        created_at__date=today
-    ).aggregate(total=Sum("total"))["total"] or 0
+    today_revenue = paid_orders.filter(created_at__date=today).aggregate(total=Sum("total"))["total"] or 0
     total_orders = orders.count()
     total_paid_orders = paid_orders.count()
-    pending_orders = orders.filter(
-        payment_status=False,
-        is_cancelled=False
-    ).count()
-    pos_pending_payment = orders.filter(
-        is_pos_order=True,
-        payment_status=False,
-        is_cancelled=False
-    ).count()
+    pending_orders = orders.filter(payment_status=False, is_cancelled=False).count()
+    pos_pending_payment = orders.filter(is_pos_order=True, payment_status=False, is_cancelled=False).count()
     total_customers = Registration.objects.count()
     total_products = Product.objects.count()
     total_income = Decimal("0.00")
-    order_items = OrderItem.objects.filter(
-        order__payment_status=True,
-        order__is_cancelled=False
-    ).select_related("product")
+    order_items = OrderItem.objects.filter(order__payment_status=True, order__is_cancelled=False).select_related("product")
     for item in order_items:
         if item.product and item.product.cost_price:
             profit = (item.price - item.product.cost_price) * item.quantity
             total_income += profit
+    pending_refunds = Order.objects.filter(cancel_requested=True, refund_processed=False)
+    refund_count = pending_refunds.count()
+    new_refunds_count = pending_refunds.filter(created_at__gte=now()-timedelta(days=1)).count()
+
     context = {
         "total_revenue": total_revenue,
         "today_revenue": today_revenue,
@@ -1041,6 +1032,8 @@ def dashboard(request):
         "total_customers": total_customers,
         "total_products": total_products,
         "orders": orders,
+        "refund_count": refund_count if refund_count > 0 else None,
+        "new_refunds_count": new_refunds_count if new_refunds_count > 0 else None,
     }
 
     return render(request, "dashboard.html", context)

@@ -266,6 +266,7 @@ width:fit-content;
 </div>
 </div>
 
+
 <div class="col-md-3">
 <div class="stat-card">
 <div class="stat-title">Pending Orders</div>
@@ -276,6 +277,24 @@ width:fit-content;
 </div>
 </div>
 </div>
+
+{% if refund_count %}
+<div class="col-md-3">
+<a href="{% url 'refund_requests' %}" class="text-decoration-none">
+<div class="stat-card position-relative">
+<div class="stat-title">Refund Requests</div>
+<div class="stat-value">
+{{ refund_count }}
+</div>
+{% if new_refunds_count %}
+<span class="badge bg-danger position-absolute top-0 end-0 m-2">
+{{ new_refunds_count }} New
+</span>
+{% endif %}
+</div>
+</a>
+</div>
+{% endif %}
 
 </div>
 
@@ -451,11 +470,11 @@ Quick Actions
 
 {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
 <a href="{% url 'refund_requests' %}" class="quick-btn"><i class="bi bi-arrow-counterclockwise"></i> Refund Requests</a>
+<a href="{% url 'refund_report' %}" class="quick-btn"><i class="bi bi-cash-coin"></i> Refund Report</a>
 <a href="{% url 'contact_list' %}" class="quick-btn"><i class="bi bi-envelope"></i> Contact Messages</a>
 <a href="{% url 'newsletter_list' %}" class="quick-btn"><i class="bi bi-envelope-paper"></i> Newsletter Subscribers</a>
 <a href="{% url 'add_testimonial' %}" class="quick-btn"><i class="bi bi-plus-circle"></i> Add Testimonial</a>
 <a href="{% url 'testimonial_list' %}" class="quick-btn"><i class="bi bi-chat-left-text"></i> Testimonials</a>
-<a href="{% url 'refund_report' %}" class="quick-btn"><i class="bi bi-cash-coin"></i> Refund Report</a>
 <a href="{% url 'create_user' %}" class="quick-btn"><i class="bi bi-person-plus"></i> Create Employee</a>
 <a href="{% url 'employee_list' %}" class="quick-btn"><i class="bi bi-people"></i> Employee List</a>
 <a href="{% url 'review_list' %}" class="quick-btn"><i class="bi bi-chat-square-text"></i> View Reviews</a>
