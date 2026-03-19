@@ -1,82 +1,135 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-
-<title>Cancel Order</title>
-
-<style>
-
-body{
-font-family:Arial;
-background:#f7f7f7;
-}
-
-.box{
-width:500px;
-margin:80px auto;
-background:white;
-padding:40px;
-border-radius:8px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
-text-align:center;
-}
-
-.policy{
-background:#f9f9f9;
-padding:20px;
-margin-top:20px;
-border-radius:6px;
-text-align:left;
-}
-
-.confirm-btn{
-background:#e53935;
-color:white;
-border:none;
-padding:10px 20px;
-margin-top:20px;
-border-radius:5px;
-cursor:pointer;
-}
-
-.confirm-btn:hover{
-background:#c62828;
-}
-
-</style>
-
+    {% load static %}
+    <title>Cancel Order #{{ order.id }} - Trendo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="stylesheet" href="{% static 'css/vendors.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/icon.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+    <link rel="stylesheet" href="{% static 'demos/clothing-store/clothing-store.css' %}">
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: 'Poppins', sans-serif;
+        }
+        .cancel-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 700px;
+            margin: 60px auto;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+        .cancel-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+        }
+        .policy-rule {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 18px;
+            background: #f9f9f9;
+            padding: 15px 20px;
+            border-radius: 12px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .policy-rule:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .policy-rule i {
+            font-size: 20px;
+            color: #ff6f61;
+            margin-top: 3px;
+        }
+        .policy-rule p {
+            margin: 0;
+            font-size: 15px;
+            color: #555;
+        }
+        .confirm-btn {
+            display: block;
+            width: 100%;
+            background: #ff6f61;
+            color: #fff;
+            border: none;
+            padding: 14px 0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 25px;
+        }
+        .confirm-btn:hover {
+            background: #e0483e;
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #222;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="box">
+{% include 'components/navbar.html' %}
 
-<h2>Cancel Order #{{order.id}}</h2>
+<section>
+    <div class="cancel-card">
+        <h2>Cancel Order #{{ order.id }}</h2>
+        <div class="card-title">Refund & Cancellation Policy</div>
 
-<div class="policy">
+        <div class="policy-rule">
+            <i class="bi bi-clock-history"></i>
+            <p>Refund will be processed within <strong>1–7 business days</strong>.</p>
+        </div>
 
-<h4>Refund Policy</h4>
+        <div class="policy-rule">
+            <i class="bi bi-exclamation-circle"></i>
+            <p>Orders can only be cancelled within <strong>24 hours</strong> of placing the order.</p>
+        </div>
 
-<ul>
-<li>Refund will be processed within 3-5 business days.</li>
-<li>The refund will be credited to the original payment method.</li>
-<li>Processing time depends on your bank.</li>
-<li>Once cancelled, the order cannot be restored.</li>
-</ul>
+        <div class="policy-rule">
+            <i class="bi bi-bank2"></i>
+            <p>Processing time depends on your bank.</p>
+        </div>
 
-</div>
+        <div class="policy-rule">
+            <i class="bi bi-x-circle"></i>
+            <p>Once cancelled, the order cannot be restored.</p>
+        </div>
 
-<form method="POST" action="{% url 'confirm_cancel_request' order.id %}">
+        <div class="policy-rule">
+            <i class="bi bi-box-seam"></i>
+            <p>Products must be unused and in original packaging to be eligible for refund (if applicable).</p>
+        </div>
 
-{% csrf_token %}
+        <div class="policy-rule">
+            <i class="bi bi-truck"></i>
+            <p>Any shipping charges are non-refundable.</p>
+        </div>
 
-<button class="confirm-btn">
-Yes, Cancel My Order
-</button>
+        <form method="POST" action="{% url 'confirm_cancel_request' order.id %}">
+            {% csrf_token %}
+            <button class="confirm-btn">Yes, Cancel My Order</button>
+        </form>
+    </div>
+</section>
 
-</form>
+{% include 'components/footer.html' %}
 
-</div>
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/vendors.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 
 </body>
 </html>
