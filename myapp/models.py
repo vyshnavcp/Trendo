@@ -11,6 +11,13 @@ class Contact(models.Model):
     email=models.CharField(max_length=200)
     phone=models.CharField(max_length=20)
     message=models.CharField(max_length=200)
+
+class Newsletter(models.Model):
+    email = models.EmailField(unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
     
 class Registration(models.Model):
     user_name=models.CharField(max_length=200)

@@ -57,6 +57,31 @@ def home(request):
         "accessories_category": accessories_category,
     })
 
+def newsletter_subscribe(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            email = request.user.email
+        else:
+            email = request.POST.get("email")
+
+        if email:
+            if Newsletter.objects.filter(email=email).exists():
+                messages.warning(request, "Already subscribed!")
+            else:
+                Newsletter.objects.create(email=email)
+                messages.success(request, "Subscribed successfully!")
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@role_required(["Admin"])
+def newsletter_list(request):
+    subscribers = Newsletter.objects.all().order_by('-created_at')
+    total_count = subscribers.count()
+
+    return render(request, "newsletter_list.html", {
+        "subscribers": subscribers,
+        "total_count": total_count
+    })
 
 def about(request):
     products = Product.objects.filter(status=True).order_by('?')[:4]

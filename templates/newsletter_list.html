@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Newsletter Subscribers</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#eef2f7,#e4ebf5);
+    min-height:100vh;
+}
+
+/* NAVBAR */
+
+.header-with-topbar{
+    background:#000;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+}
+
+.dashboard-header{
+    padding:16px 24px;
+}
+
+.dashboard-header .nav-link{
+    color:#fff !important;
+    font-weight:500;
+    transition:0.3s;
+}
+
+.dashboard-header .nav-link:hover{
+    color:#ccc !important;
+}
+
+/* PAGE */
+
+.page-wrapper{
+    padding:60px 20px;
+}
+
+.container-box{
+    max-width:1100px;
+    margin:auto;
+}
+
+/* TOP SECTION */
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.top h2{
+    font-weight:600;
+}
+
+/* COUNT CARD */
+
+.stats-card{
+    background:#000;
+    color:#fff;
+    padding:18px 25px;
+    border-radius:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.stats-card i{
+    font-size:28px;
+}
+
+.stats-card h4{
+    margin:0;
+    font-size:22px;
+}
+
+.stats-card small{
+    opacity:.8;
+}
+
+/* TABLE CARD */
+
+.table-card{
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.08);
+    overflow:hidden;
+}
+
+/* TABLE */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    padding:16px;
+    font-size:14px;
+}
+
+th{
+    background:#f3f4f6;
+    font-weight:600;
+}
+
+tbody tr{
+    border-bottom:1px solid #eee;
+    transition:0.25s;
+}
+
+tbody tr:hover{
+    background:#fafafa;
+    transform:scale(1.002);
+}
+
+/* BADGE EMAIL */
+
+.email-badge{
+    background:#f1f3f6;
+    padding:6px 10px;
+    border-radius:8px;
+    font-size:13px;
+}
+
+/* EMPTY */
+
+.empty{
+    text-align:center;
+    padding:50px;
+    color:#888;
+}
+
+.empty i{
+    font-size:40px;
+    margin-bottom:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<header class="header-with-topbar">
+<nav class="navbar dashboard-header navbar-expand-lg">
+<div class="container-fluid px-0">
+
+<div class="d-flex align-items-center gap-3">
+<i class="bi bi-speedometer2 fs-2 text-white"></i>
+<div class="text-white">
+<h4 class="mb-0">Admin Dashboard</h4>
+<small>Manage Newsletter</small>
+</div>
+</div>
+
+<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse justify-content-end" id="adminNavbar">
+
+<ul class="navbar-nav gap-lg-3 mt-3 mt-lg-0">
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'dashboard' %}">Home</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'order_list' %}">Orders</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="{% url 'customer_list' %}">Customers</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link text-danger" href="{% url 'user_logout' %}">Logout</a>
+</li>
+
+</ul>
+
+</div>
+</div>
+</nav>
+</header>
+
+<!-- PAGE -->
+
+<div class="page-wrapper">
+<div class="container-box">
+
+<!-- TOP -->
+
+<div class="top">
+
+<h2>Newsletter Subscribers</h2>
+
+<!-- COUNT CARD -->
+<div class="stats-card">
+<i class="bi bi-envelope-paper"></i>
+<div>
+<h4>{{ total_count }}</h4>
+<small>Total Subscribers</small>
+</div>
+</div>
+
+</div>
+
+<!-- TABLE -->
+
+<div class="table-card">
+
+<table>
+
+<thead>
+<tr>
+<th>#</th>
+<th>Email</th>
+<th>Subscribed Date</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for sub in subscribers %}
+<tr>
+<td>{{ forloop.counter }}</td>
+<td>
+    <span class="email-badge">{{ sub.email }}</span>
+</td>
+<td>{{ sub.created_at|date:"M d, Y - H:i" }}</td>
+</tr>
+
+{% empty %}
+<tr>
+<td colspan="3">
+<div class="empty">
+<i class="bi bi-envelope"></i><br>
+No subscribers yet
+</div>
+</td>
+</tr>
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

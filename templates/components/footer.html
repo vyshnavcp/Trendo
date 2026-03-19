@@ -97,23 +97,64 @@
             </div>
             <!-- end footer column -->
             <!-- start footer column -->
-            <!-- <div class="col-xl-4 col-lg-6 col-md-7 ps-55px xl-ps-15px lg-mt-50px md-mt-30px sm-mt-0">
-                <h5 class="alt-font ls-0px text-white mb-20px sm-mb-10px">Join our newsletter for exclusive offers!</h5>
-                <div class="d-inline-block w-100 newsletter-style-02 position-relative">
-                    <form action="" method="post" class="position-relative w-100" id="newsletter-form">
-                        {% csrf_token %}
-                        <div class="position-relative w-100">
-                            <input class="bg-transparent text-white border-0 border-bottom border-1 border-color-transparent-white-light border-radius-0px w-100 form-control ps-0 required" type="email" name="email" placeholder="Enter your email" required>
+           <div class="col-xl-4 col-lg-6 col-md-7 ps-55px xl-ps-15px lg-mt-50px md-mt-30px sm-mt-0">
+                <h5 class="alt-font ls-0px text-white mb-20px sm-mb-10px">
+                    Join our newsletter for exclusive offers!
+                </h5>
 
-                            <button type="submit" class="btn fs-13 ls-0px fw-500 border-0 text-white p-0">
-                                <i class="bi bi-send me-5px"></i>Subscribe
+                <div class="d-inline-block w-100 newsletter-style-02 position-relative">
+
+                    <form action="{% url 'newsletter_subscribe' %}" method="post">
+                        {% csrf_token %}
+
+                        <div class="position-relative w-100">
+
+                            <!-- EMAIL INPUT -->
+                            <input class="bg-transparent text-white border-0 border-bottom border-1 border-color-transparent-white-light border-radius-0px w-100 form-control ps-0 required" type="email" name="email" placeholder="Enter your email"
+
+                                {% if request.user.is_authenticated %}
+                                    value="{{ request.user.email }}"
+                                {% endif %}
+
+                                {% if is_subscribed %}
+                                    readonly
+                                {% endif %}
+
+                                required
+                            >
+
+                            <!-- BUTTON -->
+                            <button 
+                                type="submit" 
+                                class="btn fs-13 ls-0px fw-500 border-0 text-white p-0"
+                                {% if is_subscribed %}disabled{% endif %}
+                            >
+                                <i class="bi bi-send me-5px"></i>
+
+                                {% if is_subscribed %}
+                                    Already Subscribed
+                                {% else %}
+                                    Subscribe
+                                {% endif %}
                             </button>
 
-                            <div id="newsletter-result" class="form-results border-radius-4px pt-5px pb-5px fs-14 lh-22 mt-10px w-100 position-absolute d-none"></div>
+                            <!-- RESULT MESSAGE -->
+                            <div id="newsletter-result" 
+                                class="form-results border-radius-4px pt-5px pb-5px fs-14 lh-22 mt-10px w-100 position-absolute">
+
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="text-white">{{ message }}</div>
+                                    {% endfor %}
+                                {% endif %}
+
+                            </div>
+
                         </div>
                     </form>
+
                 </div>
-            </div> -->
+            </div>
             <!-- end footer column -->                        
         </div>
         <div class="row align-items-center fs-16">

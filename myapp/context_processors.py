@@ -1,4 +1,4 @@
-from .models import Cart, Category,SubCategory
+from .models import Cart, Category,SubCategory,Newsletter
 
 
 def cart_count(request):
@@ -19,11 +19,20 @@ def cart_count(request):
     }
 def footer_categories(request):
     """
-    Adds categories to all templates for the footer
+    Adds categories + newsletter status to all templates
     """
     categories = SubCategory.objects.all()
+
+    is_subscribed = False
+
+    if request.user.is_authenticated:
+        is_subscribed = Newsletter.objects.filter(
+            email=request.user.email
+        ).exists()
+
     return {
-        'footer_categories': categories
+        'footer_categories': categories,
+        'is_subscribed': is_subscribed
     }
 def navbar_categories(request):
     """
