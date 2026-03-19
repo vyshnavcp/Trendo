@@ -1,40 +1,150 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html class="no-js" lang="en">
 <head>
-    <title>FAQ</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <title>FAQ - Trendo</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+
+    <!-- favicon -->
+    <link rel="shortcut icon" href="{% static 'images/logo/favicon.ico' %}">
+
+    <!-- styles -->
+    <link rel="stylesheet" href="{% static 'css/vendors.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/icon.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}"/>
+    <link rel="stylesheet" href="{% static 'demos/clothing-store/clothing-store.css' %}" />
+
+    <!-- PREMIUM TERMS STYLE -->
+    <style>
+        .pink-header {
+            background: linear-gradient(135deg, #ffe4ec, #ffd6e6);
+        }
+
+        .faq-item {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+
+        .faq-question {
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            padding-right: 30px;
+            font-size: 18px;
+            color: #111;
+        }
+
+        .faq-question::after {
+            content: "+";
+            position: absolute;
+            right: 0;
+            font-size: 22px;
+            transition: 0.3s;
+        }
+
+        .faq-question.active::after {
+            content: "−";
+            color: #000;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            color: #666;
+            line-height: 28px;
+            font-size: 15px;
+            padding-top: 0;
+        }
+
+        .faq-answer.open {
+            max-height: 500px;
+            padding-top: 12px;
+        }
+    </style>
 </head>
-<body class="bg-light">
 
-<div class="container py-5">
-    <h2 class="text-center mb-5">Frequently Asked Questions</h2>
+<body data-mobile-nav-style="classic">
 
-    <div class="accordion" id="faqAccordion">
+{% include 'components/navbar.html' %}
 
-        {% for faq in faqs %}
-        <div class="accordion-item mb-3 border-0 shadow-sm">
-            <h2 class="accordion-header" id="heading{{ faq.id }}">
-                <button class="accordion-button collapsed"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#collapse{{ faq.id }}">
-                    {{ faq.question }}
-                </button>
-            </h2>
-            <div id="collapse{{ faq.id }}"
-                 class="accordion-collapse collapse"
-                 data-bs-parent="#faqAccordion">
-                <div class="accordion-body">
-                    {{ faq.answer|safe }}
-                </div>
+<!-- ✅ PINK HEADER (IMAGE REMOVED) -->
+<section class="page-title-center-alignment ipad-top-space-margin position-relative py-0 pink-header">
+    <div class="container">
+        <div class="row flex-column align-items-center justify-content-center h-300px">
+
+            <div class="col-12 text-center page-title-extra-large">
+                <h1 class="alt-font ls-minus-1px text-dark-gray mb-10px mt-3">
+                    FAQ
+                </h1>
             </div>
+
+            <div class="col-12 breadcrumb breadcrumb-style-01 d-flex justify-content-center">
+                <ul>
+                    <li><a href="{% url 'home' %}" class="text-dark-gray">Home</a></li>
+                    <li class="text-dark-gray">FAQ</li>
+                </ul>
+            </div>
+
         </div>
-        {% endfor %}
-
     </div>
-</div>
+</section>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- FAQ SECTION -->
+<section class="pt-60px pb-80px bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-xl-8 col-lg-10">
+
+                {% for faq in faqs %}
+                <div class="faq-item">
+                    <div class="faq-question">
+                        {{ faq.question }}
+                    </div>
+                    <div class="faq-answer">
+                        {{ faq.answer|safe }}
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% include 'components/footer.html' %}
+
+<!-- JS -->
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/vendors.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+
+<!-- SMOOTH TOGGLE -->
+<script>
+    const questions = document.querySelectorAll(".faq-question");
+
+    questions.forEach(q => {
+        q.addEventListener("click", () => {
+            const answer = q.nextElementSibling;
+
+            q.classList.toggle("active");
+            answer.classList.toggle("open");
+        });
+    });
+</script>
+
 </body>
 </html>

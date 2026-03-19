@@ -57,8 +57,12 @@ def home(request):
         "accessories_category": accessories_category,
     })
 
+
 def about(request):
-    return render(request, "about.html")
+    products = Product.objects.filter(status=True).order_by('?')[:4]
+    return render(request, "about.html", {
+        "products": products
+    })
 
 def blog(request):
     blogs_list = Article.objects.all().order_by('-posted_on')
@@ -108,6 +112,17 @@ def contact(request):
         })
     return render(request, "contact.html")
 
+@role_required(["Admin"])
+def contact_list(request):
+    contacts = Contact.objects.all().order_by('-id')
+    return render(request, 'contact_list.html', {'contacts': contacts})
+
+@role_required(["Admin"])
+def delete_contact(request, contact_id):
+    contact = get_object_or_404(Contact, id=contact_id)
+    contact.delete()
+    messages.success(request, "Contact message deleted successfully!")
+    return redirect('contact_list')
 
 
 def product(request, slug=None):

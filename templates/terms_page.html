@@ -1,84 +1,109 @@
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
-    <title>Terms & Conditions</title>
+    {% load static %}
+    <title>Terms & Conditions - Trendo</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 
-    <!-- Crafto CSS -->
-    <link rel="stylesheet" href="/static/css/vendors.min.css"/>
-    <link rel="stylesheet" href="/static/css/icon.min.css"/>
-    <link rel="stylesheet" href="/static/css/style.css"/>
-    <link rel="stylesheet" href="/static/css/responsive.css"/>
-    <link rel="stylesheet" href="/static/demos/fashion-store/fashion-store.css" />
+    <!-- favicon -->
+    <link rel="shortcut icon" href="{% static 'images/logo/favicon.ico' %}">
+
+    <!-- styles -->
+    <link rel="stylesheet" href="{% static 'css/vendors.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/icon.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}"/>
+    <link rel="stylesheet" href="{% static 'demos/clothing-store/clothing-store.css' %}" />
+
+    <!-- PREMIUM STYLE -->
+    <style>
+        .pink-header {
+            background: linear-gradient(135deg, #ffe4ec, #ffd6e6);
+        }
+
+        .terms-content h5 {
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            color: #111;
+        }
+
+        .terms-content p {
+            color: #555;
+            line-height: 28px;
+        }
+    </style>
 </head>
 
 <body data-mobile-nav-style="classic">
 
-{% include "components/navbar.html" %}
+{% include 'components/navbar.html' %}
 
-<!-- HERO / TITLE -->
-<section class="top-space-margin half-section bg-gradient-very-light-gray">
+<!-- PINK HEADER -->
+<section class="page-title-center-alignment ipad-top-space-margin position-relative py-0 pink-header">
     <div class="container">
-        <div class="row align-items-center justify-content-center text-center">
-            <div class="col-xl-8 col-lg-10">
-                <h1 class="alt-font fw-600 text-dark-gray mb-10px">
+        <div class="row flex-column align-items-center justify-content-center h-300px">
+
+            <div class="col-12 text-center page-title-extra-large">
+                <h1 class="alt-font ls-minus-1px text-dark-gray mb-10px mt-3">
                     Terms & Conditions
                 </h1>
-                <p class="text-medium-gray">
-                    Please read these terms carefully before using our services
-                </p>
-
-                <div class="breadcrumb breadcrumb-style-01 d-flex justify-content-center mt-3">
-                    <ul>
-                        <li><a href="/">Home</a></li>
-                        <li>Terms</li>
-                    </ul>
-                </div>
             </div>
+
+            <div class="col-12 breadcrumb breadcrumb-style-01 d-flex justify-content-center">
+                <ul>
+                    <li><a href="{% url 'home' %}" class="text-dark-gray">Home</a></li>
+                    <li class="text-dark-gray">Terms</li>
+                </ul>
+            </div>
+
         </div>
     </div>
 </section>
 
 <!-- TERMS CONTENT -->
-<section class="pt-0 pb-5">
+<section class="pt-60px pb-80px">
     <div class="container">
         <div class="row justify-content-center">
+
             <div class="col-xl-9 col-lg-10">
 
-                <div class="bg-white p-50px md-p-30px border-radius-6px box-shadow-double-large">
+                <!-- LAST UPDATED -->
+                <p class="text-medium-gray mb-30px">
+                    Last updated:
+                    {% if terms %}
+                        {{ terms.updated_at|date:"d M Y" }}
+                    {% else %}
+                        2026
+                    {% endif %}
+                </p>
 
-                    <!-- DATE -->
-                    <div class="text-medium-gray mb-25px">
-                        Last updated:
-                        {% if terms %}
-                            {{ terms.updated_at|date:"d M Y" }}
-                        {% endif %}
-                    </div>
+                <!-- TERMS TEXT -->
+                <div class="terms-content">
 
-                    <!-- CONTENT -->
-                    <div class="terms-content text-dark-gray">
-                        {% if terms %}
-                            {{ terms.content|safe }}
-                        {% else %}
-                            <p>No terms available.</p>
-                        {% endif %}
-                    </div>
+                    {% if terms %}
+                        {{ terms.content|safe }}
+                    {% else %}
+
+                       
+                    {% endif %}
 
                 </div>
 
             </div>
+
         </div>
     </div>
 </section>
 
-{% include "components/footer.html" %}
+{% include 'components/footer.html' %}
 
-<!-- JS -->
-<script src="/static/js/jquery.js"></script>
-<script src="/static/js/vendors.min.js"></script>
-<script src="/static/js/main.js"></script>
+<!-- scripts -->
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/vendors.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 
 </body>
 </html>
