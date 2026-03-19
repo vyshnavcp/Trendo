@@ -131,28 +131,32 @@
                         <div style="text-align:right">
                             <div class="order-total">Total: ₹{{ order.total }}</div>
                             <button onclick="printOrder('order-{{ order.id }}')" class="print-btn">Print Invoice</button>
-                           {% if not order.is_cancelled and not order.cancel_requested and not order.is_delivered %}
-                            {% if order.seconds_passed <= 86400 %}
-                                <a href="{% url 'cancel_policy' order.id %}">
-                                    <button class="cancel-btn">Cancel Order</button>
-                                </a>
-                                <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
-                                    ⚠️ You can cancel this order within 24 hours of placement. Refunds will be processed within 1–7 business days.
-                                </div>
-                            {% else %}
-                                <span class="status-badge status-pending" style="background:#ccc;color:#555;">
-                                    Cancellation period expired
-                                </span>
-                                <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
-                                    ❌ Orders can only be cancelled within 24 hours of placement.
-                                </div>
+
+                            {# Only show cancel button for Razorpay payments #}
+                            {% if order.payment_method == "razorpay" %}
+                                {% if not order.is_cancelled and not order.cancel_requested and not order.is_delivered %}
+                                    {% if order.seconds_passed <= 86400 %}
+                                        <a href="{% url 'cancel_policy' order.id %}">
+                                            <button class="cancel-btn">Cancel Order</button>
+                                        </a>
+                                        <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
+                                            ⚠️ You can cancel this order within 24 hours of placement. Refunds will be processed within 1–7 business days.
+                                        </div>
+                                    {% else %}
+                                        <span class="status-badge status-pending" style="background:#ccc;color:#555;">
+                                            Cancellation period expired
+                                        </span>
+                                        <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
+                                            ❌ Orders can only be cancelled within 24 hours of placement.
+                                        </div>
+                                    {% endif %}
+                                {% elif order.cancel_requested %}
+                                    <span class="status-badge status-pending">Cancel request sent</span>
+                                    <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
+                                        ⚠️ Refunds will be processed within 1–7 business days after approval.
+                                    </div>
+                                {% endif %}
                             {% endif %}
-                        {% elif order.cancel_requested %}
-                            <span class="status-badge status-pending">Cancel request sent</span>
-                            <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
-                                ⚠️ Refunds will be processed within 1–7 business days after approval.
-                            </div>
-                        {% endif %}
                         </div>
                     </div>
 
