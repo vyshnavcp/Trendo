@@ -566,7 +566,7 @@
                                 <div class="swiper-slide">
                                     <div class="d-flex flex-column">
                                         <div class="align-self-center text-center w-90 last-paragraph-no-margin"> 
-                                            <h4 class="alt-font lh-48 ls-minus-1px text-dark-gray mb-0">{{ testimonial.review }} <span class="fw-500">@ {{ testimonial.name }}</span></h4>
+                                            <h4 class="alt-font lh-48 ls-minus-1px text-dark-gray mb-0">{{ testimonial.review|striptags|cut:"&nbsp;"|linebreaksbr }}<span class="fw-500">@ {{ testimonial.name|striptags|cut:"&nbsp;" }}</span></h4>
                                         </div>
                                     </div>
                                 </div>

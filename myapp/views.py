@@ -46,6 +46,7 @@ def home(request):
     categories = Category.objects.prefetch_related("subcategories").all()
     women_category = Category.objects.filter(name__iexact="Women").first()
     accessories_category = Category.objects.filter(name__iexact="Accessories").first()
+    testimonials = Testimonial.objects.filter(status=True).order_by('-created_at')
 
     return render(request, "home.html", {
         'blogs': blogs,
@@ -55,6 +56,7 @@ def home(request):
         "categories": categories,
         "women_category": women_category,
         "accessories_category": accessories_category,
+        "testimonials": testimonials,
     })
 
 def newsletter_subscribe(request):
@@ -82,6 +84,43 @@ def newsletter_list(request):
         "subscribers": subscribers,
         "total_count": total_count
     })
+
+def testimonial_list(request):
+    testimonials = Testimonial.objects.all().order_by('-id')
+    return render(request, 'testimonial_list.html', {
+        'testimonials': testimonials
+    })
+
+def add_testimonial(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        review = request.POST.get("review")
+
+        Testimonial.objects.create(
+            name=name,
+            review=review
+        )
+        return redirect('testimonial_list')
+
+    return render(request, 'add_testimonial.html')
+
+def edit_testimonial(request, id):
+    testimonial = get_object_or_404(Testimonial, id=id)
+
+    if request.method == "POST":
+        testimonial.name = request.POST.get("name")
+        testimonial.review = request.POST.get("review")
+        testimonial.save()
+        return redirect('testimonial_list')
+
+    return render(request, 'edit_testimonial.html', {
+        'testimonial': testimonial
+    })
+
+def delete_testimonial(request, id):
+    testimonial = get_object_or_404(Testimonial, id=id)
+    testimonial.delete()
+    return redirect('testimonial_list')
 
 def about(request):
     products = Product.objects.filter(status=True).order_by('?')[:4]

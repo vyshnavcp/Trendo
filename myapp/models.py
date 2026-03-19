@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from decimal import Decimal
 from django.utils import timezone
 
+
 class Contact(models.Model):
     name=models.CharField(max_length=20)
     email=models.CharField(max_length=200)
@@ -18,6 +19,15 @@ class Newsletter(models.Model):
 
     def __str__(self):
         return self.email
+
+class Testimonial(models.Model):
+    name = CKEditor5Field('Name')
+    review = CKEditor5Field('Review')
+    status = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
     
 class Registration(models.Model):
     user_name=models.CharField(max_length=200)

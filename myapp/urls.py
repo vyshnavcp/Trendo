@@ -7,6 +7,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', views.home, name='home'),
     path('newsletter/', views.newsletter_subscribe, name='newsletter_subscribe'),
+    path("dashboard/testimonials/", views.testimonial_list, name="testimonial_list"),
+    path("dashboard/testimonials/add/", views.add_testimonial, name="add_testimonial"),
+    path("dashboard/testimonials/edit/<int:id>/", views.edit_testimonial, name="edit_testimonial"),
+    path("dashboard/testimonials/delete/<int:id>/", views.delete_testimonial, name="delete_testimonial"),   
     path("dashboard/newsletters/", views.newsletter_list, name="newsletter_list"),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
