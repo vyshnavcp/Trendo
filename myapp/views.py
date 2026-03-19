@@ -39,6 +39,7 @@ from django.db.models import F
 from .decorators import role_required
 from datetime import timedelta 
 
+
 def home(request):
     blogs = Article.objects.order_by('-posted_on')[:4]
     best_seller_products = Product.objects.filter(is_best_seller=True)[:5]
@@ -974,6 +975,8 @@ def profile(request):
 
     return render(request, "profile.html", {"profile": profile})
 
+
+
 @login_required
 def my_orders(request):
     registration = get_object_or_404(Registration, authuser=request.user)
@@ -987,10 +990,19 @@ def my_orders(request):
         )
         .order_by("-created_at")
     )
-    return render(request, "my_orders.html", {
-        "orders": orders
-    })
 
+    current_time = timezone.now()
+    orders_with_time = []
+
+    for order in orders:
+        # calculate seconds passed since order creation
+        seconds_passed = (current_time - order.created_at).total_seconds()
+        order.seconds_passed = seconds_passed  # dynamically add attribute
+        orders_with_time.append(order)
+
+    return render(request, "my_orders.html", {
+        "orders": orders_with_time,
+    })
 
 @user_passes_test(
     lambda u: u.is_authenticated and u.is_staff,
