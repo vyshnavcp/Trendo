@@ -1,467 +1,238 @@
-
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
+    {% load static %}
+    <title>My Orders - Trendo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/vendors.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/icon.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/responsive.css' %}"/>
+    <link rel="stylesheet" href="{% static 'demos/clothing-store/clothing-store.css' %}" />
+    <style>
+        body { background:#fafafa; }
 
-<title>My Orders</title>
+        /* PREMIUM ORDER CARD */
+        .order-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(0,0,0,0.02);
+            border-left: 6px solid #ff6f61;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+        /* Hover gradient overlay */
+        .order-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(135deg, #ff6f61 0%, #ffb86c 100%);
+            opacity: 0;
+            transition: all 0.4s ease;
+            transform: rotate(45deg);
+            z-index: 0;
+        }
+        .order-card:hover::before { opacity: 0.08; }
+        .order-card:hover { transform: translateY(-6px); box-shadow: 0 25px 55px rgba(0,0,0,0.12); }
+        .order-card > * { position: relative; z-index: 1; }
 
-<link rel="stylesheet" href="/static/css/vendors.min.css"/>
-<link rel="stylesheet" href="/static/css/icon.min.css"/>
-<link rel="stylesheet" href="/static/css/style.css"/>
-<link rel="stylesheet" href="/static/css/responsive.css"/>
-<link rel="stylesheet" href="/static/demos/fashion-store/fashion-store.css" />
+        .order-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+        .order-id { font-size:16px; font-weight:600; }
+        .order-date { font-size:13px; color:#777; }
+        .order-total { font-size:16px; font-weight:600; }
+        .product-box { display:flex; align-items:center; gap:18px; }
+        .product-img { width:85px; height:105px; object-fit:cover; border-radius:12px; border:1px solid #eee; transition: transform 0.3s ease; }
+        .product-box:hover .product-img { transform: scale(1.05); }
+        .product-name { font-weight:600; font-size:14px; }
+        .variant-badge { display:inline-block; background:#f0f0f0; padding:4px 12px; border-radius:20px; font-size:12px; margin-right:5px; margin-top:5px; font-weight:500; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+        .cart-products th, .cart-products td { vertical-align:middle; }
 
-<style>
+        /* Premium Status Badges */
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 6px;
+            text-transform: uppercase;
+        }
+        .status-cancel { background: linear-gradient(90deg, #ffb3b3, #ff6f6f); color: #fff; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+        .status-delivered { background: linear-gradient(90deg, #c3f0d4, #1abc9c); color: #fff; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+        .status-pending { background: linear-gradient(90deg, #ffeaa7, #fab1a0); color: #fff; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
 
-body{
-background:#fafafa;
-}
+        /* Buttons */
+        .cancel-btn, .print-btn { border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
+        .cancel-btn { background: #ff6f61; color: #fff; border: none; }
+        .cancel-btn:hover { background: #e0483e; transform: scale(1.05); }
+        .print-btn { background: #fff; border:1px solid #333; color: #333; }
+        .print-btn:hover { background: #333; color:#fff; transform: scale(1.05); }
 
-/* ORDER CARD */
-
-.order-card{
-background:white;
-border-radius:14px;
-padding:35px;
-margin-bottom:40px;
-box-shadow:0 10px 25px rgba(0,0,0,0.06);
-transition:all .3s ease;
-border:1px solid #f0f0f0;
-}
-
-.order-card:hover{
-transform:translateY(-4px);
-box-shadow:0 20px 40px rgba(0,0,0,0.08);
-}
-
-/* HEADER */
-
-.order-header{
-display:flex;
-justify-content:space-between;
-align-items:flex-start;
-margin-bottom:20px;
-}
-
-.order-id{
-font-size:16px;
-font-weight:600;
-}
-
-.order-date{
-font-size:13px;
-color:#777;
-}
-
-.order-total{
-font-size:16px;
-font-weight:600;
-}
-
-/* PRODUCT */
-
-.product-box{
-display:flex;
-align-items:center;
-gap:18px;
-}
-
-.product-img{
-width:85px;
-height:105px;
-object-fit:cover;
-border-radius:8px;
-border:1px solid #eee;
-}
-
-.product-name{
-font-weight:600;
-font-size:14px;
-}
-
-.variant-badge{
-display:inline-block;
-background:#f7f7f7;
-padding:5px 12px;
-border-radius:20px;
-font-size:12px;
-margin-right:6px;
-margin-top:5px;
-font-weight:500;
-}
-
-/* TABLE */
-
-.cart-products{
-margin-top:25px;
-}
-
-.cart-products thead{
-background:#fafafa;
-}
-
-.cart-products th{
-font-size:14px;
-letter-spacing:.3px;
-}
-
-.cart-products td{
-vertical-align:middle;
-}
-
-/* STATUS BADGES */
-
-.status-badge{
-padding:6px 14px;
-border-radius:25px;
-font-size:12px;
-font-weight:600;
-display:inline-block;
-margin-top:6px;
-}
-
-.status-cancel{
-background:#ffe5e5;
-color:#c10000;
-}
-
-.status-delivered{
-background:#e3fff0;
-color:#007c3a;
-}
-
-.status-pending{
-background:#fff4dc;
-color:#9a6b00;
-}
-
-/* BUTTONS */
-
-.cancel-btn{
-background:#ff3b3b;
-color:white;
-border:none;
-padding:7px 16px;
-border-radius:6px;
-cursor:pointer;
-margin-top:8px;
-font-size:13px;
-font-weight:500;
-transition:all .2s ease;
-}
-
-.cancel-btn:hover{
-background:#d90000;
-transform:scale(1.04);
-}
-
-.print-btn{
-margin-top:6px;
-padding:7px 16px;
-border-radius:6px;
-border:1px solid #000;
-background:white;
-cursor:pointer;
-font-size:13px;
-transition:all .2s ease;
-}
-
-.print-btn:hover{
-background:black;
-color:white;
-}
-
-/* EMPTY STATE */
-
-.empty-orders{
-padding:80px 0;
-font-size:18px;
-color:#777;
-}
-
-/* PRINT */
-
-.print-data{
-display:none;
-}
-
-</style>
-
+        .empty-orders { padding:80px 0; font-size:18px; color:#777; }
+        .print-data{ display:none; }
+    </style>
 </head>
-
 <body data-mobile-nav-style="classic">
 
-{% include "components/navbar.html" %}
+{% include 'components/navbar.html' %}
 
-<section class="top-space-margin half-section bg-gradient-very-light-gray">
-<div class="container text-center">
-<h1 class="alt-font fw-600 text-dark-gray">My Orders</h1>
-</div>
+<!-- page title -->
+<section class="page-title-center-alignment cover-background position-relative py-0" style="background-image: url({% static 'images/banners/contact-banner.png' %})">
+    <div class="container">
+        <div class="row flex-column align-items-center justify-content-center h-300px">
+            <div class="col-12 text-center page-title-extra-large">
+                <h1 class="alt-font ls-minus-1px text-white">My Orders</h1>
+            </div>
+            <div class="col-12 breadcrumb breadcrumb-style-01 text-white d-flex justify-content-center">
+                <ul>
+                    <li><a href="{% url 'home' %}" class="text-white">Home</a></li>
+                    <li>My Orders</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </section>
 
+<!-- orders section -->
 <section class="pt-0">
-<div class="container">
-
-{% if orders %}
-
-{% for order in orders %}
-
-<div id="order-{{ order.id }}" class="order-card">
-
-<div class="order-header">
-
-<div>
-<div class="order-id">Order #{{ order.id }}</div>
-<div class="order-date">Placed on {{ order.created_at|date:"d M Y" }}</div>
-
-{% if order.is_cancelled %}
-<span class="status-badge status-cancel">Cancelled</span>
-{% elif order.is_delivered %}
-<span class="status-badge status-delivered">Delivered</span>
-{% else %}
-<span class="status-badge status-pending">Pending</span>
-{% endif %}
-
-</div>
-
-<div style="text-align:right">
-
-<div class="order-total">
-Total: ₹{{ order.total }}
-</div>
-
-<button onclick="printOrder('order-{{ order.id }}')" class="print-btn">
-Print Invoice
-</button>
-
-{% if order.is_cancelled %}
-<span class="status-badge status-cancel">Cancelled</span>
-
-{% elif order.cancel_requested %}
-<span class="status-badge status-pending">Cancel request sent</span>
-
-{% elif order.is_delivered %}
-<span class="status-badge status-delivered">Delivered</span>
-
-{% else %}
-<a href="{% url 'cancel_policy' order.id %}">
-<button class="cancel-btn">Cancel Order</button>
-</a>
-{% endif %}
-
-</div>
-
-</div>
-
-<table class="table cart-products">
-
-<thead>
-<tr>
-<th class="alt-font fw-600">Product</th>
-<th class="alt-font fw-600">Price</th>
-<th class="alt-font fw-600">Qty</th>
-<th class="alt-font fw-600">Total</th>
-</tr>
-</thead>
-
-<tbody>
-
-{% for item in order.items.all %}
-
-<tr>
-
-<td>
-
-<div class="product-box">
-
-<img src="{{ item.product.image1.url }}" class="product-img">
-
-<div>
-
-<div class="product-name">
-{{ item.product.name }}
-</div>
-
-{% if item.variant %}
-<div style="margin-top:5px">
-
-<span class="variant-badge">
-Color : {{ item.variant.color.name }}
-</span>
-
-<span class="variant-badge">
-Size : {{ item.variant.size.name }}
-</span>
-
-</div>
-{% endif %}
-
-</div>
-
-</div>
-
-</td>
-
-<td>₹{{ item.price }}</td>
-
-<td>{{ item.quantity }}</td>
-
-<td>₹{{ item.total_price }}</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-<div class="print-data">
-
-<h2>Order #{{ order.id }}</h2>
-
-<p>Date : {{ order.created_at|date:"d M Y" }}</p>
-
-<h4>Customer</h4>
-
-<p>
-{{ order.first_name }} <br>
-{{ order.phone }} <br>
-{{ order.address }} <br>
-{{ order.town }}, {{ order.state }} - {{ order.pincode }}
-</p>
-
-<table>
-
-<thead>
-<tr>
-<th>Product</th>
-<th>Variant</th>
-<th>Price</th>
-<th>Qty</th>
-<th>Total</th>
-</tr>
-</thead>
-
-<tbody>
-
-{% for item in order.items.all %}
-
-<tr>
-
-<td>{{ item.product.name }}</td>
-
-<td>
-{% if item.variant %}
-Color : {{ item.variant.color.name }} <br>
-Size : {{ item.variant.size.name }}
-{% endif %}
-</td>
-
-<td>₹{{ item.price }}</td>
-
-<td>{{ item.quantity }}</td>
-
-<td>₹{{ item.total_price }}</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-<h3 style="margin-top:20px">
-Grand Total : ₹{{ order.total }}
-</h3>
-
-</div>
-
-</div>
-
-{% endfor %}
-
-{% else %}
-
-<div class="text-center empty-orders">
-🛍️ You have no orders yet.
-</div>
-
-{% endif %}
-
-</div>
+    <div class="container">
+        {% if orders %}
+            {% for order in orders %}
+                <div id="order-{{ order.id }}" class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">Order #{{ order.id }}</div>
+                            <div class="order-date">Placed on {{ order.created_at|date:"d M Y" }}</div>
+                            {% if order.is_cancelled %}
+                                <span class="status-badge status-cancel">Cancelled</span>
+                            {% elif order.is_delivered %}
+                                <span class="status-badge status-delivered">Delivered</span>
+                            {% else %}
+                                <span class="status-badge status-pending">Pending</span>
+                            {% endif %}
+                        </div>
+                        <div style="text-align:right">
+                            <div class="order-total">Total: ₹{{ order.total }}</div>
+                            <button onclick="printOrder('order-{{ order.id }}')" class="print-btn">Print Invoice</button>
+                            {% if not order.is_cancelled and not order.cancel_requested and not order.is_delivered %}
+                                <a href="{% url 'cancel_policy' order.id %}">
+                                    <button class="cancel-btn">Cancel Order</button>
+                                </a>
+                            {% elif order.cancel_requested %}
+                                <span class="status-badge status-pending">Cancel request sent</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <table class="table cart-products">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                            <tr>
+                                <td>
+                                    <div class="product-box">
+                                        <img src="{{ item.product.image1.url }}" class="product-img">
+                                        <div>
+                                            <div class="product-name">{{ item.product.name }}</div>
+                                            {% if item.variant %}
+                                                <div style="margin-top:5px">
+                                                    <span class="variant-badge">Color: {{ item.variant.color.name }}</span>
+                                                    <span class="variant-badge">Size: {{ item.variant.size.name }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>₹{{ item.price }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ item.total_price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="print-data">
+                        <h2>Order #{{ order.id }}</h2>
+                        <p>Date: {{ order.created_at|date:"d M Y" }}</p>
+                        <h4>Customer</h4>
+                        <p>
+                            {{ order.first_name }} <br>
+                            {{ order.phone }} <br>
+                            {{ order.address }} <br>
+                            {{ order.town }}, {{ order.state }} - {{ order.pincode }}
+                        </p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Variant</th>
+                                    <th>Price</th>
+                                    <th>Qty</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>
+                                        {% if item.variant %}
+                                            Color: {{ item.variant.color.name }} <br>
+                                            Size: {{ item.variant.size.name }}
+                                        {% endif %}
+                                    </td>
+                                    <td>₹{{ item.price }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₹{{ item.total_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <h3 style="margin-top:20px">Grand Total: ₹{{ order.total }}</h3>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center empty-orders">🛍️ You have no orders yet.</div>
+        {% endif %}
+    </div>
 </section>
 
-{% include "components/footer.html" %}
+{% include 'components/footer.html' %}
 
-<script src="/static/js/jquery.js"></script>
-<script src="/static/js/vendors.min.js"></script>
-<script src="/static/js/main.js"></script>
-
+<script src="{% static 'js/jquery.js' %}"></script>
+<script src="{% static 'js/vendors.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 <script>
-
 function printOrder(orderId){
-
-var orderDiv = document.getElementById(orderId);
-
-var printContents = orderDiv.querySelector(".print-data").innerHTML;
-
-var newWin = window.open("","","width=900,height=700");
-
-newWin.document.write(`
-
-<html>
-
-<head>
-
-<title>Print Order</title>
-
-<style>
-
-body{
-font-family:Arial;
-padding:20px;
+    var orderDiv = document.getElementById(orderId);
+    var printContents = orderDiv.querySelector(".print-data").innerHTML;
+    var newWin = window.open("","","width=900,height=700");
+    newWin.document.write(`<html><head><title>Print Order</title><style>
+        body{font-family:Arial;padding:20px;}
+        table{width:100%;border-collapse:collapse;margin-top:20px;}
+        table,th,td{border:1px solid black;}
+        th,td{padding:8px;text-align:left;}
+    </style></head><body>${printContents}</body></html>`);
+    newWin.document.close();
+    newWin.print();
 }
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-}
-
-table,th,td{
-border:1px solid black;
-}
-
-th,td{
-padding:8px;
-text-align:left;
-}
-
-</style>
-
-</head>
-
-<body>
-
-${printContents}
-
-</body>
-
-</html>
-
-`);
-
-newWin.document.close();
-
-newWin.print();
-
-}
-
 </script>
 
 </body>

@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('my-orders/', views.my_orders, name='my_orders'),
     path('newsletter/', views.newsletter_subscribe, name='newsletter_subscribe'),
     path("dashboard/testimonials/", views.testimonial_list, name="testimonial_list"),
     path("dashboard/testimonials/add/", views.add_testimonial, name="add_testimonial"),
@@ -78,7 +79,6 @@ urlpatterns = [
     path("order/cash-on-delivery/<int:order_id>/",views.cash_on_delivery_success,name="cash_on_delivery_success"),
     path("ajax/validate-checkout/", views.ajax_validate_checkout, name="ajax_validate_checkout"),
     path("profile/", views.profile, name="profile"),
-    path("my-orders/", views.my_orders, name="my_orders"),
     path("ajax/shipping-charge/", views.ajax_shipping_charge, name="ajax_shipping_charge"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path('report/', views.report_page, name='report_page'),
