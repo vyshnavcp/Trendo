@@ -567,49 +567,71 @@ def review_post(request, slug):
         'message': '⚠ Invalid request method.'
     })
 
-
 @login_required(login_url='user_login')
 def cart_page(request):
     if request.user.is_staff:
         return redirect("home")
+
     try:
         registration = Registration.objects.get(authuser=request.user)
     except Registration.DoesNotExist:
         messages.warning(request, "Only customers can access cart.")
         return redirect("home")
+
     cart, _ = Cart.objects.get_or_create(registration=registration)
     items = cart.items.all()
     has_items = items.exists()
     message = None
+
     if request.method == "POST" and has_items:
+
+        # ✅ REMOVE COUPON
         if "remove_coupon" in request.POST:
             cart.coupon_code = None
             cart.coupon_discount = Decimal("0.00")
             cart.save()
             message = "Coupon removed"
+
+        # ✅ APPLY COUPON
         elif "coupon_code" in request.POST:
             coupon_code = request.POST.get("coupon_code", "").strip()
+
             if coupon_code:
                 try:
                     coupon = Coupon.objects.get(
                         code__iexact=coupon_code,
                         active=True
                     )
+
+                    cart_total = cart.subtotal()  # 🔥 ADD THIS
+
+                    # ❌ Expiry check
                     if coupon.expiry_date and coupon.expiry_date < date.today():
                         cart.coupon_code = None
                         cart.coupon_discount = Decimal("0.00")
                         message = "Coupon expired"
+
+                    # ❌ MIN CART VALUE CHECK 🔥
+                    elif cart_total < coupon.min_cart_value:
+                        cart.coupon_code = None
+                        cart.coupon_discount = Decimal("0.00")
+                        message = f"Minimum order should be ₹{coupon.min_cart_value}"
+
+                    # ✅ APPLY
                     else:
                         cart.coupon_code = coupon.code
                         cart.coupon_discount = coupon.discount_amount
                         message = "Coupon applied!"
+
                 except Coupon.DoesNotExist:
                     cart.coupon_code = None
                     cart.coupon_discount = Decimal("0.00")
                     message = "Invalid coupon"
 
                 cart.save()
+
     cart.update_totals()
+
     return render(request, "cart.html", {
         "cart": cart,
         "items": items,

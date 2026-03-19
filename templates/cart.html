@@ -206,7 +206,6 @@
                                         </p>
 
                                     {% else %}
-                                        <!-- APPLY COUPON -->
                                         <form method="POST" action="{% url 'cart_page' %}" class="d-flex align-items-center coupon-form">
                                             {% csrf_token %}
                                             
@@ -219,7 +218,6 @@
                                                 Apply
                                             </button>
                                         </form>
-
                                         {% if message %}
                                             <p class="text-danger mt-2">{{ message }}</p>
                                         {% endif %}
