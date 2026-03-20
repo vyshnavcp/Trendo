@@ -120,10 +120,15 @@
                         <div>
                             <div class="order-id">Order #{{ order.id }}</div>
                             <div class="order-date">Placed on {{ order.created_at|date:"d M Y" }}</div>
-                            {% if order.is_cancelled %}
+
+                            {% if order.refund_processed %}
+                                <span class="status-badge status-cancel">Cancelled & Refunded</span>
+                            {% elif order.is_cancelled %}
                                 <span class="status-badge status-cancel">Cancelled</span>
                             {% elif order.is_delivered %}
                                 <span class="status-badge status-delivered">Delivered</span>
+                            {% elif order.cancel_requested %}
+                                <span class="status-badge status-pending">Cancel Requested</span>
                             {% else %}
                                 <span class="status-badge status-pending">Pending</span>
                             {% endif %}
@@ -134,7 +139,7 @@
 
                             {# Only show cancel button for Razorpay payments #}
                             {% if order.payment_method == "razorpay" %}
-                                {% if not order.is_cancelled and not order.cancel_requested and not order.is_delivered %}
+                                {% if not order.is_cancelled and not order.cancel_requested and not order.is_delivered and not order.refund_processed %}
                                     {% if order.seconds_passed <= 86400 %}
                                         <a href="{% url 'cancel_policy' order.id %}">
                                             <button class="cancel-btn">Cancel Order</button>
@@ -150,10 +155,15 @@
                                             ❌ Orders can only be cancelled within 24 hours of placement.
                                         </div>
                                     {% endif %}
-                                {% elif order.cancel_requested %}
+                                {% elif order.cancel_requested and not order.refund_processed %}
                                     <span class="status-badge status-pending">Cancel request sent</span>
                                     <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
                                         ⚠️ Refunds will be processed within 1–7 business days after approval.
+                                    </div>
+                                {% elif order.refund_processed %}
+                                    <span class="status-badge status-cancel">Cancelled & Refunded</span>
+                                    <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
+                                        ✅ Your cancel request was approved. Refund has been processed.
                                     </div>
                                 {% endif %}
                             {% endif %}
