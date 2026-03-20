@@ -61,12 +61,12 @@
             </div>
             <!-- end footer column -->
             <!-- start footer column -->
-            <div class="col-6 col-xl-2 col-md-3 sm-mb-30px">
+           <div class="col-6 col-xl-2 col-md-3 sm-mb-30px">
                 <span class="fs-16 fw-500 text-white d-block mb-5px">Categories</span>
                 <ul>
                     {% for category in footer_categories %}
                         <li>
-                            <a href="{% url 'product' %}">
+                            <a href="{% url 'filter_by_subcategory' category.slug %}">
                                 {{ category.name }}
                             </a>
                         </li>

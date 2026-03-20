@@ -17,6 +17,7 @@ def cart_count(request):
     return {
         'cart_item_count': count
     }
+
 def footer_categories(request):
     """
     Adds categories + newsletter status to all templates
@@ -34,6 +35,7 @@ def footer_categories(request):
         'footer_categories': categories,
         'is_subscribed': is_subscribed
     }
+
 def navbar_categories(request):
     """
     Adds categories with subcategories for navbar mega menu
