@@ -349,22 +349,26 @@
         <section class="half-section pb-0 ps-15px pe-15px sm-ps-0 sm-pe-0">
             <div class="container-fluid">
                 <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 justify-content-center">
+
                     {% for category in categories|slice:":3" %}
                         {% for subcategory in category.subcategories.all|slice:":1" %}
                             {% with subcategory.products.first as product %}
+
+                            {% if product and product.image1 or subcategory.image %}
                             <div class="col shop-banner-style-01 md-mb-30px">
                                 <figure class="m-0 position-relative">
+
                                     {% if product and product.image1 %}
                                         <img src="{{ product.image1.url }}" class="w-100" alt="{{ product.name }}">
                                     {% elif subcategory.image %}
                                         <img src="{{ subcategory.image.url }}" class="w-100" alt="{{ subcategory.name }}">
-                                    {% else %}
-                                        <img src="https://placehold.co/610x630" class="w-100" alt="{{ subcategory.name }}">
                                     {% endif %}
+
                                     <figcaption class="w-100 h-100 bg-dark-gray-transparent-medium d-flex flex-column text-center justify-content-center align-items-center p-30px lg-ps-20px lg-pe-20px position-absolute top-0 start-0">
                                         <span class="banner-subtitle fs-14 fw-500 ls-1px text-uppercase text-white text-decoration-line-bottom d-inline-block mb-15px">
                                             {{ category.name }}
                                         </span>
+
                                         <h3 class="banner-title alt-font ls-minus-1px fw-400 text-white w-80 xxl-w-100">
                                             {% if product %}
                                                 {{ product.name }}
@@ -372,6 +376,7 @@
                                                 {{ subcategory.name }}
                                             {% endif %}
                                         </h3>
+
                                         <div class="banner-btn">
                                             <a href="{% url 'filter_by_subcategory' subcategory.slug %}" class="btn btn-medium btn-white btn-hover-animation-switch btn-box-shadow fw-600">
                                                 <span> 
@@ -382,15 +387,18 @@
                                             </a>
                                         </div>
                                     </figcaption>
+
                                 </figure>
                             </div>
+                            {% endif %}
+
                             {% endwith %}
                         {% endfor %}
                     {% endfor %}
+
                 </div>
             </div>
         </section>
-        
         <!-- start section -->
         <section class="overflow-hidden py-0 ps-15px pe-15px">
             <div class="container-fluid">
