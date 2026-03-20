@@ -223,12 +223,45 @@
                                     </div>
                                 </div>
                                 <div class="col-auto icon-with-text-style-08">
-                                    <div class="feature-box feature-box-left-icon-middle d-inline-flex align-middle">
-                                        <div class="feature-box-icon me-10px">  
-                                            <i class="feather icon-feather-share-2 align-middle text-dark-gray"></i>
-                                        </div>
+                                    <div class="feature-box feature-box-left-icon-middle d-inline-flex align-items-start">
+                                        <!-- CONTENT -->
                                         <div class="feature-box-content">
-                                            <a href="#" class="fw-500 text-dark-gray d-block">Share</a> 
+
+                                            <span class="fw-600 text-dark-gray d-block mb-2">Share</span>
+
+                                            <div class="share-icons d-flex align-items-center gap-2">
+
+                                                <!-- WhatsApp -->
+                                                <a href="https://wa.me/?text={{ product.name|urlencode }}%20-%20{{ request.build_absolute_uri|urlencode }}"
+                                                target="_blank"
+                                                class="share-btn whatsapp"
+                                                title="WhatsApp">
+                                                <i class="bi bi-whatsapp"></i>
+                                                </a>
+
+                                                <!-- Facebook -->
+                                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri|urlencode }}"
+                                                target="_blank"
+                                                class="share-btn facebook"
+                                                title="Facebook">
+                                                <i class="bi bi-facebook"></i>
+                                                </a>
+
+                                                <!-- Twitter -->
+                                                <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri|urlencode }}&text={{ product.name|urlencode }}"
+                                                target="_blank"
+                                                class="share-btn twitter"
+                                                title="Twitter">
+                                                <i class="bi bi-twitter-x"></i>
+                                                </a>
+
+                                                <!-- Copy -->
+                                                <button onclick="copyLink()" class="share-btn copy" title="Copy link">
+                                                    <i class="bi bi-link-45deg"></i>
+                                                </button>
+
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -247,12 +280,33 @@
                                 </div>
                                 <div class="col-12 icon-with-text-style-08 mb-10px">
                                     <div class="feature-box feature-box-left-icon d-inline-flex align-middle">
-                                        <div class="feature-box-icon me-10px">  
-                                            <i class="feather icon-feather-archive top-8px position-relative align-middle text-dark-gray"></i>
-                                        </div>
-                                        <div class="feature-box-content">
-                                            <span><span class="text-dark-gray fw-500">Free shipping & returns:</span> On all orders over ₹500</span>
-                                        </div>
+                                        
+                                        {% if product.additional_info %}
+                                            {% for key, value in product.additional_info.items %}
+                                            
+                                            <div class="col-12 icon-with-text-style-08 mb-10px">
+                                                <div class="feature-box feature-box-left-icon d-inline-flex align-middle">
+                                                    
+                                                    <!-- ICON -->
+                                                    <div class="feature-box-icon me-10px">  
+                                                        <i class="feather icon-feather-tag top-8px position-relative align-middle text-dark-gray"></i>
+                                                    </div>
+
+                                                    <!-- CONTENT -->
+                                                    <div class="feature-box-content">
+                                                        <span>
+                                                            <span class="text-dark-gray fw-500">
+                                                                {{ key|title|cut:"_" }}:
+                                                            </span> 
+                                                            {{ value }}
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -260,8 +314,8 @@
                                 <span class="fs-17 fw-500 text-dark-gray mb-8px d-block lh-initial">Guarantee safe and secure checkout</span>
                             </div>
                             <div>
-                                <div class="w-100 d-block"><span class="text-dark-gray fw-500">Category:</span> <a href="#">Women,</a> <a href="#">Tops</a>, <a href="#">Casual</a>, <a href="#">Summer</a>, <a href="#">Apparel</a></div>
-                                <div><span class="text-dark-gray fw-500">Tags: </span><a href="#">Fashion,</a> <a href="#">Lightweight,</a> <a href="#">Minimal</a>, <a href="#">Trendy</a></div>
+                                <!-- <div class="w-100 d-block"><span class="text-dark-gray fw-500">Category:</span> <a href="#">Women,</a> <a href="#">Tops</a>, <a href="#">Casual</a>, <a href="#">Summer</a>, <a href="#">Apparel</a></div> -->
+                                
                             </div>
                     </div>
                 </div>
@@ -710,6 +764,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+</script>
+<script>
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href)
+    .then(() => {
+        const msg = document.createElement("div");
+        msg.innerText = "✅ Link copied!";
+        msg.style.position = "fixed";
+        msg.style.bottom = "20px";
+        msg.style.right = "20px";
+        msg.style.background = "#000";
+        msg.style.color = "#fff";
+        msg.style.padding = "10px 15px";
+        msg.style.borderRadius = "8px";
+        msg.style.zIndex = "9999";
+        document.body.appendChild(msg);
+
+        setTimeout(() => msg.remove(), 2000);
+    })
+    .catch(() => alert("Failed to copy link"));
+}
 </script>
 
 

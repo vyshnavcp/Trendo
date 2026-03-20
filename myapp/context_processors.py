@@ -22,7 +22,7 @@ def footer_categories(request):
     """
     Adds categories + newsletter status to all templates
     """
-    categories = SubCategory.objects.all()
+    categories = Category.objects.all()
 
     is_subscribed = False
 

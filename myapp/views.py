@@ -1117,9 +1117,6 @@ def delete_subcategory(request, id):
     subcategory = get_object_or_404(SubCategory, id=id)
     subcategory.delete()
     return redirect("subcategory_list")
-from django.shortcuts import render, redirect
-from .models import Product, ProductColor, ProductVariant, Size, SubCategory
-import json
 
 def add_product(request):
 
