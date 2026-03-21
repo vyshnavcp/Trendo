@@ -222,6 +222,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'vyshnavcp01@gmail.com'
 EMAIL_HOST_PASSWORD = 'abyl ijuu ceky kyvk'
+ADMIN_EMAIL = "vyshnavcp01@gmail.com"
 
 RAZORPAY_KEY_ID = "rzp_test_S8qlnWKlA74eSw"
 RAZORPAY_KEY_SECRET = "GOjjmTCc88XW4K7CYiZEwcAv"

@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from .models import *
 from django.core.paginator import Paginator
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.contrib import messages
 from django.contrib.auth.models import User,Group
 from django.contrib.auth import authenticate,login,logout
@@ -38,6 +38,8 @@ from django.urls import reverse
 from django.db.models import F
 from .decorators import role_required
 from datetime import timedelta 
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 
 def home(request):
@@ -2048,12 +2050,29 @@ def cancel_policy(request, order_id):
     return render(request,"cancel_policy.html",{
         "order":order
     })
-
-@login_required
+login_required
 def confirm_cancel_request(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.cancel_requested = True
     order.save()
+    subject = f"🚨 Cancel Request - Order #{order.id}"
+
+    html_content = render_to_string("cancel_order_email.html", {
+        "order": order
+    })
+
+    text_content = strip_tags(html_content)
+
+    email = EmailMultiAlternatives(
+        subject,
+        text_content,
+        settings.DEFAULT_FROM_EMAIL,
+        [settings.ADMIN_EMAIL],
+    )
+
+    email.attach_alternative(html_content, "text/html")
+    email.send()
+
     return redirect("my_orders")
 
 @role_required(["Accountant"])
