@@ -25,6 +25,30 @@
         <link rel="stylesheet" href="{% static 'demos/clothing-store/clothing-store.css' %}" />
 
         <style>
+       .btn-premium-pink {
+    background: linear-gradient(135deg, #d66d7a, #c94f5f);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 22px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(201, 79, 95, 0.3);
+}
+
+/* Hover effect */
+.btn-premium-pink:hover {
+    background: linear-gradient(135deg, #c94f5f, #b63d4e);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(201, 79, 95, 0.4);
+    color: #fff;
+}
+
+/* Click effect */
+.btn-premium-pink:active {
+    transform: scale(0.96);
+}
             /* COMMON BOX */
 .option-box {
     cursor: pointer;
@@ -479,8 +503,8 @@
                                     {% endfor %}
                                 </div>
                                 {% if remaining_reviews %}
-                                <div class="text-center mt-3">
-                                    <button id="show-more-btn" class="btn btn-dark">
+                               <div class="text-center mt-3">
+                                    <button id="show-more-btn" class="btn btn-premium-pink">
                                         Show More Reviews
                                     </button>
                                 </div>
