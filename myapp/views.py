@@ -42,6 +42,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils.html import escape
 import logging
+from django.db import IntegrityError
 
 def home(request):
     blogs = Article.objects.order_by('-posted_on')[:4]
@@ -536,19 +537,24 @@ def review_post(request, slug):
     if request.method == 'POST':
         user = request.user
         product = get_object_or_404(Product, slug=slug)
+
         rating = request.POST.get('rating')
         comment = request.POST.get('comment')
+
         if not rating:
             return JsonResponse({
                 'status': 'error',
                 'message': '⚠ Please select a rating.'
             })
+
         if not comment:
             return JsonResponse({
                 'status': 'error',
                 'message': '⚠ Please write a review.'
             })
+
         registration, created = Registration.objects.get_or_create(authuser=user)
+
         try:
             Review.objects.create(
                 registration=registration,
@@ -563,13 +569,15 @@ def review_post(request, slug):
                 'status': 'error',
                 'message': '⚠ You have already submitted a review for this product.'
             })
+
         return JsonResponse({
             'status': 'success',
             'message': '✅ Thank you for your review!'
         })
+
     return JsonResponse({
         'status': 'error',
-        'message': '⚠ Invalid request method.'
+        'message': '⚠ Invalid request.'
     })
 
 @login_required(login_url='user_login')

@@ -455,13 +455,15 @@
                                 <div class="row justify-content-center">
                                     <div class="col-12">
                                         
-                                        <div class="p-7 lg-p-5 sm-p-7 bg-light-medium-gray border-radius-8px">
+                                       <div class="p-7 lg-p-5 sm-p-7 bg-light-medium-gray border-radius-8px">
                                             <div class="row justify-content-center mb-30px sm-mb-10px">
                                                 <div class="col-md-9 text-center">
                                                     <h4 class="alt-font text-dark-gray fw-500 mb-15px">Add a review</h4>
                                                 </div>
                                             </div>
-                                            <form id="reviewForm" class="row contact-form-style-02">
+
+                                            <!-- ✅ ADD method="POST" -->
+                                            <form id="reviewForm" method="POST" class="row contact-form-style-02">
                                                 {% csrf_token %}
 
                                                 <div class="col-lg-12 mb-20px">
@@ -483,7 +485,9 @@
                                                 </div>
 
                                                 <div class="col-lg-3">
-                                                    <button class="btn btn-dark-gray btn-small fw-500 btn-round-edge">Submit review</button>
+                                                    <button type="submit" class="btn btn-dark-gray btn-small fw-500 btn-round-edge">
+                                                        Submit review
+                                                    </button>
                                                 </div>
                                             </form>
                                         </div>
@@ -563,56 +567,61 @@
 
         <!-- rating -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-        let stars = document.querySelectorAll(".rating-stars .star");
-        let ratingInput = document.getElementById("ratingValue");
 
-        stars.forEach(star => {
-            star.addEventListener("click", function () {
-                let value = this.dataset.value;
-                ratingInput.value = value;
+<script>
+let stars = document.querySelectorAll(".rating-stars .star");
+let ratingInput = document.getElementById("ratingValue");
 
-                stars.forEach(s => {
-                    s.classList.toggle("text-golden-yellow", s.dataset.value <= value);
-                });
-            });
+// ⭐ Rating click
+stars.forEach(star => {
+    star.addEventListener("click", function () {
+        let value = this.dataset.value;
+        ratingInput.value = value;
+
+        stars.forEach(s => {
+            s.classList.toggle("text-golden-yellow", s.dataset.value <= value);
         });
-
-        document.getElementById("reviewForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-
-            fetch("{% url 'submit_review' product.id %}", {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}"
-                },
-                body: new FormData(this)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success") {
-                    Swal.fire("Thank you!", data.message, "success")
-                        .then(() => location.reload());
-                }
-            });
-        });
-        document.querySelector(".qty-plus").addEventListener("click", function (e) {
-    e.stopImmediatePropagation();
-
-    let input = document.querySelector(".qty-text");
-    input.value = parseInt(input.value) + 1;
+    });
 });
 
-document.querySelector(".qty-minus").addEventListener("click", function (e) {
-    e.stopImmediatePropagation();
+// ✅ Submit review
+document.getElementById("reviewForm").addEventListener("submit", function(e) {
+    e.preventDefault();
 
-    let input = document.querySelector(".qty-text");
-    if (parseInt(input.value) > 1) {
-        input.value = parseInt(input.value) - 1;
-    }
+    fetch("{% url 'submit_review' product.slug %}", {   // ✅ FIXED
+        method: "POST",
+        headers: {
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: new FormData(this)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            Swal.fire({
+                icon: "success",
+                title: "Thank you!",
+                text: data.message
+            }).then(() => {
+                location.reload();
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Oops!",
+                text: data.message
+            });
+        }
+    })
+    .catch(() => {
+        Swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: "Something went wrong!"
+        });
+    });
 });
-
-        </script>
+</script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
