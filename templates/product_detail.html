@@ -426,32 +426,65 @@
                                     </div>
                                 </div>
                                 
-                                {% for review in reviews %}
+                               {% for review in first_three_reviews %}
                                 <div class="row g-0 mb-4 md-mb-35px">
                                     <div class="col-12 border-bottom border-color-extra-medium-gray pb-40px xs-pb-30px xs-mb-30px">
                                         <div class="d-block d-md-flex w-100 align-items-center">
+
                                             <div class="w-300px md-w-250px sm-w-100 sm-mb-10px text-center">
-                                                <img src="{% if review.user.profile.profile_pic %}{{ review.user.profile.profile_pic.url }}{% else %}https://placehold.co/90x90{% endif %}" class="rounded-circle w-80px h-80px mb-10px" alt="">
-                                                <span class="text-dark-gray fw-600 d-block">{{ review.user.get_full_name|default:review.user.username }}</span>
+                                                <span class="text-dark-gray fw-600 d-block">
+                                                    {{ review.name }}
+                                                </span>
                                                 <div class="fs-14 lh-18">{{ review.created_at|date:"d M Y" }}</div>
                                             </div>  
+
                                             <div class="w-100 last-paragraph-no-margin sm-ps-0 position-relative text-center text-md-start">
                                                 <div class="text-golden-yellow">
                                                     {% for i in "12345" %}
-                                                        {% if forloop.counter <= review.rating %}
-                                                            ★
-                                                        {% else %}
-                                                            ☆
-                                                        {% endif %}
+                                                        {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
                                                     {% endfor %}
                                                 </div>
-                                                <p class="w-85 sm-w-100 sm-mt-15px">{{ review.comment }}</p>
+                                                <p class="w-85 sm-w-100 sm-mt-15px">{{ review.message }}</p>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
                                 {% endfor %}
+                                <div id="all-reviews" style="display: none;">
+                                    {% for review in remaining_reviews %}
+                                    <div class="row g-0 mb-4 md-mb-35px">
+                                        <div class="col-12 border-bottom border-color-extra-medium-gray pb-40px xs-pb-30px xs-mb-30px">
+                                            <div class="d-block d-md-flex w-100 align-items-center">
 
+                                                <div class="w-300px md-w-250px sm-w-100 sm-mb-10px text-center">
+                                                    <span class="text-dark-gray fw-600 d-block">
+                                                        {{ review.name }}
+                                                    </span>
+                                                    <div class="fs-14 lh-18">{{ review.created_at|date:"d M Y" }}</div>
+                                                </div>  
+
+                                                <div class="w-100 last-paragraph-no-margin sm-ps-0 position-relative text-center text-md-start">
+                                                    <div class="text-golden-yellow">
+                                                        {% for i in "12345" %}
+                                                            {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <p class="w-85 sm-w-100 sm-mt-15px">{{ review.message }}</p>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% if remaining_reviews %}
+                                <div class="text-center mt-3">
+                                    <button id="show-more-btn" class="btn btn-dark">
+                                        Show More Reviews
+                                    </button>
+                                </div>
+                                {% endif %}
                                 <div class="row justify-content-center">
                                     <div class="col-12">
                                         
@@ -462,7 +495,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- ✅ ADD method="POST" -->
                                             <form id="reviewForm" method="POST" class="row contact-form-style-02">
                                                 {% csrf_token %}
 
@@ -565,14 +597,14 @@
         
         {% include 'components/footer.html' %}
 
-        <!-- rating -->
+        
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 let stars = document.querySelectorAll(".rating-stars .star");
 let ratingInput = document.getElementById("ratingValue");
 
-// ⭐ Rating click
+
 stars.forEach(star => {
     star.addEventListener("click", function () {
         let value = this.dataset.value;
@@ -584,7 +616,7 @@ stars.forEach(star => {
     });
 });
 
-// ✅ Submit review
+
 document.getElementById("reviewForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -620,6 +652,11 @@ document.getElementById("reviewForm").addEventListener("submit", function(e) {
             text: "Something went wrong!"
         });
     });
+});
+
+document.getElementById("show-more-btn")?.addEventListener("click", function () {
+    document.getElementById("all-reviews").style.display = "block";
+    this.style.display = "none";
 });
 </script>
 <script>

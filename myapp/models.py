@@ -171,7 +171,7 @@ class Review(models.Model):
     name = models.CharField(max_length=200)
     email = models.CharField(max_length=200)
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
-    message = models.CharField(max_length=200)
+    message = models.CharField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True) 
     class Meta:
         constraints = [
