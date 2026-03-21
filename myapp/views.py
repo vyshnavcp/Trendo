@@ -40,7 +40,8 @@ from .decorators import role_required
 from datetime import timedelta 
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
+from django.utils.html import escape
+import logging
 
 def home(request):
     blogs = Article.objects.order_by('-posted_on')[:4]
@@ -2086,15 +2087,20 @@ def refund_requests(request):
         "orders": orders
     })
 
+from django.shortcuts import get_object_or_404, redirect
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+
+
+logger = logging.getLogger(__name__)
+
 @role_required(["Accountant"])
 def process_refund(request, order_id):
     order = get_object_or_404(Order, id=order_id)
+
     try:
         # 1️⃣ Refund via Razorpay
-        client = razorpay.Client(auth=(
-            settings.RAZORPAY_KEY_ID,
-            settings.RAZORPAY_KEY_SECRET
-        ))
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
         refund_amount = int(order.total * 100)
         refund = client.payment.refund(
             order.razorpay_payment_id,
@@ -2108,17 +2114,115 @@ def process_refund(request, order_id):
         order.refund_status = True
         order.save()
 
-        # 3️⃣ Restore stock for each ordered item
-        for item in order.items.all():  # 'items' is the related_name on OrderItem
-            if item.variant:  # if product has variant
-                item.variant.stock += item.quantity
-                item.variant.save()
-            else:  # fallback for non-variant products
-                item.product.stock += item.quantity
-                item.product.save()
+        # 3️⃣ Restore stock
+        for item in order.items.all():
+            product_or_variant = item.variant if item.variant else item.product
+            product_or_variant.stock += item.quantity
+            product_or_variant.save()
+
+        # 4️⃣ Prepare email content with brand
+        items_html = ""
+        text_items = ""
+        for item in order.items.all():
+            if item.variant:
+                variant_details = []
+                if hasattr(item.variant, "size") and item.variant.size:
+                    variant_details.append(str(item.variant.size))
+                if hasattr(item.variant, "color") and item.variant.color:
+                    variant_details.append(str(item.variant.color))
+                variant_str = " / ".join(variant_details)
+                product_name = escape(item.variant.product.name)
+                if variant_str:
+                    product_name += f" ({variant_str})"
+                brand_name = getattr(item.variant.product, "brand", "")
+            else:
+                product_name = escape(item.product.name)
+                brand_name = getattr(item.product, "brand", "")
+
+            qty = item.quantity
+            items_html += f"""
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #eee;">{product_name}</td>
+                <td style="padding:10px; border-bottom:1px solid #eee;">{brand_name}</td>
+                <td style="padding:10px; border-bottom:1px solid #eee;">{qty}</td>
+            </tr>
+            """
+            text_items += f"- {product_name} ({brand_name}) x {qty}\n"
+
+        subject = f"Refund Approved - Order #{order.id}"
+        text_content = f"""
+Hello {order.first_name},
+
+Your refund has been successfully processed.
+
+Order ID: #{order.id}
+Amount: ₹{order.total}
+Items:
+{text_items}
+
+The amount will be credited to your original payment method within 3–10 business days.
+
+Thank you.
+"""
+
+        html_content = f"""
+<html>
+<body style="margin:0; padding:0; background:#f4f6fb; font-family: Arial, sans-serif;">
+<div style="max-width:600px; margin:30px auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+    <div style="background:#28a745; padding:20px; text-align:center;">
+        <h2 style="color:#fff; margin:0;">Refund Approved ✅</h2>
+        <h3 style="color:#fff; margin:5px 0;">DVIVE Clothing</h3>
+    </div>
+    <div style="padding:30px; color:#333;">
+        <p>Hello <b>{escape(order.first_name)}</b>,</p>
+        <p>Your refund request has been <b style="color:#28a745;">approved</b> and processed successfully.</p>
+        <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #eee;"><b>Order ID</b></td>
+                <td style="padding:10px; border-bottom:1px solid #eee;">#{order.id}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #eee;"><b>Refund Amount</b></td>
+                <td style="padding:10px; border-bottom:1px solid #eee;">₹{order.total}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><b>Payment Method</b></td>
+                <td style="padding:10px;">{order.get_payment_method_display()}</td>
+            </tr>
+        </table>
+        <h4 style="margin-top:20px; color:#333;">Items Refunded:</h4>
+        <table style="width:100%; border-collapse:collapse;">
+            <tr>
+                <th style="text-align:left; padding:10px; border-bottom:1px solid #ddd;">Product</th>
+                <th style="text-align:left; padding:10px; border-bottom:1px solid #ddd;">Brand</th>
+                <th style="text-align:left; padding:10px; border-bottom:1px solid #ddd;">Quantity</th>
+            </tr>
+            {items_html}
+        </table>
+        <p style="margin-top:20px; color:#555;">
+            💳 The refunded amount will be credited to your original payment method within <b>3–10 business days</b>.
+        </p>
+        <hr style="margin:25px 0;">
+        <p style="text-align:center; font-size:13px; color:#999;">
+            Thank you for shopping with us ❤️
+        </p>
+    </div>
+</div>
+</body>
+</html>
+"""
+
+        email = EmailMultiAlternatives(
+            subject,
+            text_content,
+            settings.DEFAULT_FROM_EMAIL,
+            [order.email],
+        )
+        email.attach_alternative(html_content, "text/html")
+        email.send(fail_silently=False)
 
     except Exception as e:
-        print("Refund Error:", e)
+        logger.error(f"Refund Error for Order #{order.id}: {e}")
 
     return redirect("refund_requests")
 
