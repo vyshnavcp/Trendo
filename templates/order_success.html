@@ -20,70 +20,93 @@ body{
     display:flex;
     align-items:center;
     justify-content:center;
-    background:linear-gradient(135deg,#e8f5e9,#c8e6c9);
+    background:linear-gradient(135deg,#fdfbfb,#ebedee);
 }
 
 /* Card */
 .success-card{
-    width:430px;
+    width:450px;
     background:#fff;
-    border-radius:20px;
-    padding:45px 40px;
+    border-radius:25px;
+    padding:50px 40px;
     text-align:center;
-    box-shadow:0 25px 60px rgba(0,0,0,0.12);
-    animation:fadeIn .6s ease;
+    box-shadow:0 30px 60px rgba(0,0,0,0.12);
+    position:relative;
+    overflow:hidden;
+    animation:fadeInUp 0.8s ease forwards;
+    transform:translateY(30px);
+    transition:all 0.3s ease;
 }
 
-@keyframes fadeIn{
-    from{opacity:0;transform:translateY(25px);}
-    to{opacity:1;transform:translateY(0);}
+.success-card:hover{
+    transform:translateY(0px) scale(1.02);
+    box-shadow:0 35px 70px rgba(0,0,0,0.15);
 }
 
-/* Icon */
+@keyframes fadeInUp{
+    to {opacity:1; transform:translateY(0);}
+}
+
+/* Floating Check Animation */
 .icon-circle{
-    width:85px;
-    height:85px;
-    margin:0 auto 20px;
+    width:100px;
+    height:100px;
+    margin:0 auto 25px;
     border-radius:50%;
     background:linear-gradient(135deg,#22c55e,#16a34a);
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:42px;
+    font-size:50px;
     color:#fff;
-    box-shadow:0 12px 30px rgba(34,197,94,.35);
+    box-shadow:0 15px 40px rgba(34,197,94,0.35);
+    position:relative;
+    animation:floatCheck 1.2s ease-in-out infinite;
+}
+
+@keyframes floatCheck{
+    0%,100% {transform:translateY(0);}
+    50% {transform:translateY(-8px);}
 }
 
 /* Title */
 .success-title{
-    font-size:26px;
-    font-weight:600;
+    font-size:28px;
+    font-weight:700;
     color:#222;
-    margin-bottom:6px;
+    margin-bottom:8px;
+    letter-spacing:0.5px;
+    animation:titleFade 0.8s ease forwards;
+}
+
+@keyframes titleFade{
+    from {opacity:0; transform:translateY(10px);}
+    to {opacity:1; transform:translateY(0);}
 }
 
 /* Subtitle */
 .success-sub{
-    color:#666;
-    font-size:14px;
-    margin-bottom:28px;
+    color:#555;
+    font-size:15px;
+    margin-bottom:30px;
 }
 
 /* Order Box */
 .order-box{
-    background:#fafafa;
-    border-radius:14px;
-    padding:18px 20px;
+    background:#f9f9f9;
+    border-radius:16px;
+    padding:20px 25px;
     text-align:left;
-    margin-bottom:28px;
-    border:1px solid #f0f0f0;
+    margin-bottom:30px;
+    border:1px solid #e0e0e0;
+    animation:fadeIn 1s ease forwards;
 }
 
 .order-row{
     display:flex;
     justify-content:space-between;
-    margin-bottom:10px;
-    font-size:14px;
+    margin-bottom:12px;
+    font-size:15px;
     color:#555;
 }
 
@@ -104,28 +127,30 @@ body{
 /* Buttons */
 .btn-group{
     display:flex;
-    gap:12px;
+    gap:15px;
     justify-content:center;
+    flex-wrap:wrap;
 }
 
 .btn{
-    padding:12px 24px;
+    padding:14px 28px;
     border-radius:50px;
-    font-size:14px;
+    font-size:15px;
     font-weight:500;
     text-decoration:none;
-    transition:.3s;
+    transition:all 0.3s ease;
+    display:inline-block;
 }
 
 .btn-primary{
     background:linear-gradient(135deg,#22c55e,#16a34a);
     color:#fff;
-    box-shadow:0 8px 20px rgba(34,197,94,.35);
+    box-shadow:0 10px 25px rgba(34,197,94,0.35);
 }
 
 .btn-primary:hover{
-    transform:translateY(-2px);
-    box-shadow:0 12px 28px rgba(34,197,94,.45);
+    transform:translateY(-3px) scale(1.05);
+    box-shadow:0 15px 30px rgba(34,197,94,0.45);
 }
 
 .btn-secondary{
@@ -135,13 +160,37 @@ body{
 
 .btn-secondary:hover{
     background:#e5e7eb;
+    transform:translateY(-2px);
 }
 
 /* Responsive */
 @media(max-width:480px){
     .success-card{
-        width:92%;
+        width:95%;
         padding:35px 25px;
+    }
+
+    .icon-circle{
+        width:80px;
+        height:80px;
+        font-size:42px;
+    }
+
+    .success-title{
+        font-size:24px;
+    }
+
+    .success-sub{
+        font-size:14px;
+    }
+
+    .order-row{
+        font-size:14px;
+    }
+
+    .btn{
+        padding:12px 20px;
+        font-size:14px;
     }
 }
 </style>
@@ -154,7 +203,7 @@ body{
     <div class="icon-circle">✓</div>
 
     <div class="success-title">Payment Successful</div>
-    <div class="success-sub">Your payment has been confirmed</div>
+    <div class="success-sub">Your payment has been confirmed successfully!</div>
 
     {% if order %}
     <div class="order-box">
@@ -175,10 +224,7 @@ body{
 
     <div class="btn-group">
         <a href="{% url 'home' %}" class="btn btn-primary">Continue Shopping</a>
-
-        {% if order %}
-        <a href="{% url 'order_detail' order.id %}" class="btn btn-secondary">View Order</a>
-        {% endif %}
+      
     </div>
 
 </div>
