@@ -1097,6 +1097,7 @@ def my_orders(request):
     lambda u: u.is_authenticated and u.is_staff,
     login_url='user_login'
 )
+
 def dashboard(request):
     today = now().date()
     if request.user.is_superuser or request.user.groups.filter(name="Accountant").exists():
@@ -1108,7 +1109,8 @@ def dashboard(request):
     today_revenue = paid_orders.filter(created_at__date=today).aggregate(total=Sum("total"))["total"] or 0
     total_orders = orders.count()
     total_paid_orders = paid_orders.count()
-    pending_orders = orders.filter(payment_status=False, is_cancelled=False).count()
+    pending_orders = orders.filter(
+    is_cancelled=False).exclude(is_delivered=True).exclude(is_completed=True).count()
     pos_pending_payment = orders.filter(is_pos_order=True, payment_status=False, is_cancelled=False).count()
     total_customers = Registration.objects.count()
     total_products = Product.objects.count()
@@ -1588,13 +1590,17 @@ def paid_orders(request):
 @user_passes_test(staff_required, login_url='home')
 def pending_orders(request):
     if request.user.is_superuser or request.user.groups.filter(name="Accountant").exists():
-        orders = Order.objects.filter(payment_status=False, is_cancelled=False)
+        orders = Order.objects.filter(
+            is_cancelled=False,
+            is_delivered=False
+        )
     else:
         orders = Order.objects.filter(
             is_pos_order=True,
-            payment_status=False,
-            is_cancelled=False
+            is_cancelled=False,
+            is_delivered=False
         )
+
     return render(request, 'orders_view.html', {
         'orders': orders.order_by('-created_at'),
         'title': 'Pending Orders'
