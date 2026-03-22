@@ -1,4 +1,4 @@
-from .models import Cart, Category,SubCategory,Newsletter
+from .models import Cart, Category, Registration,SubCategory,Newsletter
 
 
 def cart_count(request):
@@ -44,3 +44,14 @@ def navbar_categories(request):
     return {
         "nav_categories": categories
     }
+
+def cart_count(request):
+    if request.user.is_authenticated:
+        try:
+            registration = Registration.objects.get(authuser=request.user)
+            cart = Cart.objects.get(registration=registration)
+            count = cart.items.count()  
+            return {"cart_count": count}
+        except:
+            return {"cart_count": 0}
+    return {"cart_count": 0}

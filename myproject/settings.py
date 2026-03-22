@@ -54,6 +54,7 @@ TEMPLATES = [
                 'myapp.context_processors.cart_count',
                 'myapp.context_processors.footer_categories',
                 'myapp.context_processors.navbar_categories',
+                'myapp.context_processors.cart_count',
                 
             ],
         },

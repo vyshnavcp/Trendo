@@ -1,6 +1,53 @@
 {% load static %}
+ <style>
+ .cart-link {
+    position: relative;
+    display: inline-block;
+}
 
+/* ICON HOVER EFFECT */
+.cart-link i {
+    transition: all 0.2s ease;
+}
+
+.cart-link:hover i {
+    transform: scale(1.1);
+    color: #000;
+}
+
+/* MODERN BADGE */
+.cart-badge-small {
+    position: absolute;
+    top: -5px;
+    right: -6px;
+
+    background: #000;
+    color: #fff;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    height: 15px;
+    min-width: 15px;
+    padding: 0 4px;
+
+    border-radius: 20px; /* pill style instead of circle */
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25); /* subtle depth */
+    transition: all 0.2s ease;
+}
+
+/* HOVER EFFECT */
+.cart-link:hover .cart-badge-small {
+    transform: scale(1.15);
+}
+    </style>
 <header>
+   
     <!-- start navigation -->
     <nav class="navbar navbar-expand-lg header-light bg-white disable-fixed border-radius-6px md-border-radius-0px">
         <div class="container-fluid">
@@ -93,9 +140,14 @@
                         </div>
                     </div>
                     <div class="widget-text icon">
-                        <a href="{% url 'cart_page' %}">
+                        <a href="{% url 'cart_page' %}" class="cart-link position-relative">
                             <i class="feather icon-feather-shopping-bag d-inline-block align-middle me-5px"></i>
-                            <span class="d-none d-xxl-inline-block">Cart</span>
+
+                            {% if cart_count > 0 %}
+                            <span id="cart-count-badge" class="cart-badge-small">
+                                {{ cart_count }}
+                            </span>
+                            {% endif %}
                         </a>
                     </div>
                     <div class="widget-text icon">
@@ -131,4 +183,38 @@
             </div>
         </div>
     </nav>
+    <script>
+function updateCartCount() {
+    fetch("{% url 'cart_count' %}")
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("cart-count-badge").innerText = data.count;
+    });
+}
+
+// Run on page load
+updateCartCount();
+
+// OPTIONAL: auto refresh every 5 sec
+setInterval(updateCartCount, 5000);
+
+document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+    btn.addEventListener("click", function(e){
+        e.preventDefault();
+
+        fetch(this.href, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success){
+                updateCartCount(); // 🔥 update instantly
+            }
+        });
+    });
+});
+</script>
+
 </header>

@@ -659,6 +659,17 @@ def cart_page(request):
     })
 
 @login_required
+def get_cart_count(request):
+    try:
+        registration = Registration.objects.get(authuser=request.user)
+        cart = Cart.objects.get(registration=registration)
+        count = cart.items.count()   # ✅ ONLY PRODUCT COUNT
+    except:
+        count = 0
+
+    return JsonResponse({"count": count})
+
+@login_required
 def change_cart_quantity(request, item_id):
     item = get_object_or_404(CartItem, id=item_id)
     cart = item.cart

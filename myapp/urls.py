@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path("ajax/cart-count/", views.get_cart_count, name="cart_count"),
     path('my-orders/', views.my_orders, name='my_orders'),
     path('newsletter/', views.newsletter_subscribe, name='newsletter_subscribe'),
     path("dashboard/testimonials/", views.testimonial_list, name="testimonial_list"),
