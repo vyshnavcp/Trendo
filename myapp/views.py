@@ -53,6 +53,7 @@ def home(request):
     women_category = Category.objects.filter(name__iexact="Women").first()
     accessories_category = Category.objects.filter(name__iexact="Accessories").first()
     testimonials = Testimonial.objects.filter(status=True).order_by('-created_at')
+    banner = HomeBanner.objects.filter(is_active=True).first()
 
     return render(request, "home.html", {
         'blogs': blogs,
@@ -63,6 +64,7 @@ def home(request):
         "women_category": women_category,
         "accessories_category": accessories_category,
         "testimonials": testimonials,
+        "banner": banner
     })
 
 def newsletter_subscribe(request):
@@ -2333,3 +2335,40 @@ def refund_report(request):
         "approved_refunds":approved_refunds,
         "pending_refunds":pending_refunds
     })
+
+def banner_list(request):
+    banners = HomeBanner.objects.all().order_by('-id')
+    return render(request, "banner_list.html", {"banners": banners})
+
+def add_banner(request):
+    if request.method == "POST":
+        HomeBanner.objects.create(
+            title=request.POST.get("title"),
+            image=request.FILES.get("image"),
+            mobile_image=request.FILES.get("mobile_image"),
+        )
+        return redirect("banner_list")
+
+    return render(request, "add_banner.html")
+
+def edit_banner(request, id):
+    banner = get_object_or_404(HomeBanner, id=id)
+
+    if request.method == "POST":
+        banner.title = request.POST.get("title")
+
+        if request.FILES.get("image"):
+            banner.image = request.FILES.get("image")
+
+        if request.FILES.get("mobile_image"):
+            banner.mobile_image = request.FILES.get("mobile_image")
+
+        banner.save()
+        return redirect("banner_list")
+
+    return render(request, "edit_banner.html", {"banner": banner})
+
+def delete_banner(request, id):
+    banner = get_object_or_404(HomeBanner, id=id)
+    banner.delete()
+    return redirect("banner_list")

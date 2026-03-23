@@ -24,6 +24,40 @@
         <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
         <link rel="stylesheet" href="{% static 'css/responsive.css' %}"/>
         <link rel="stylesheet" href="{% static 'demos/clothing-store/clothing-store.css' %}" />
+        <style>
+/* Container */
+.on-hover-bw-image {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Picture + Image */
+.on-hover-bw-image picture,
+.on-hover-bw-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Desktop */
+.on-hover-bw-image img {
+    object-fit: cover;
+    object-position: center;
+}
+
+/* 🔥 MOBILE FIX */
+@media (max-width: 767px) {
+    .on-hover-bw-image {
+        height: 420px; /* adjust if needed */
+    }
+
+    .on-hover-bw-image img {
+        object-fit: cover;
+        object-position: left center; /* 👈 KEY FIX */
+    }
+}
+        </style>
     </head>
     <body data-mobile-nav-style="classic">
 
@@ -31,7 +65,17 @@
 
         <!-- start hero banner -->
         <section class="full-screen ipad-top-space-margin position-relative md-h-500px sm-h-400px overflow-hidden on-hover-bw">
-            <div class="on-hover-bw-image position-absolute left-0 top-0 h-100 w-100"><img src="{% static 'images/home/home-banner.webp' %}" alt="" class="object-fit-cover" /></div>
+            <div class="on-hover-bw-image  ">
+                <picture>
+                    <source media="(max-width: 767px)"
+                        srcset="{% if banner.mobile_image %}{{ banner.mobile_image.url }}{% else %}{{ banner.image.url }}{% endif %}">
+
+                    <img src="{{ banner.image.url }}" 
+                        alt="" 
+                        class="object-fit-cover" />
+                </picture>
+
+            </div>
             <div class="opacity-medium bg-gradient-bottom-dark-transparent"></div>
             <div class="container-fluid h-100">
                 <div class="row h-100 align-items-center">
@@ -44,7 +88,7 @@
                         </div>
                     </div>
                     <div class="col-xxl-6 col-lg-8 text-center reveal-item-hover" data-anime='{ "el": "childs", "translateY": [30, 0], "opacity": [0,1], "duration": 600, "delay": 0, "staggervalue": 300, "easing": "easeOutQuad" }'>
-                        <a class="fs-100 alt-font fw-400 ls-minus-3px text-white mb-0 text-shadow-double-large reveal-action mx-auto d-block xl-w-85 lg-w-100" href="#">Latest fashion brand collection</a>
+                        <a class="fs-100 alt-font fw-400 ls-minus-3px text-white mb-0 text-shadow-double-large reveal-action mx-auto d-block xl-w-85 lg-w-100" href="#">{{ banner.title }}</a>
                     </div>
                     <div class="col-xxl-3 col-lg-2 reveal-item-hover text-end d-none d-lg-block">
                         <a href="{% url 'product' %}" class="fs-19 lg-fs-16 text-white text-white-hover text-decoration-line-bottom d-inline-block ms-15 me-15 xl-m-0" data-anime='{ "translateX": [150, 0], "opacity": [0,1], "duration": 600, "delay": 0, "staggervalue": 300, "easing": "easeOutQuad" }'>Women collection</a>
