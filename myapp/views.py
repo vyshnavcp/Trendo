@@ -1109,8 +1109,7 @@ def dashboard(request):
     today_revenue = paid_orders.filter(created_at__date=today).aggregate(total=Sum("total"))["total"] or 0
     total_orders = orders.count()
     total_paid_orders = paid_orders.count()
-    pending_orders = orders.filter(
-    is_cancelled=False).exclude(is_delivered=True).exclude(is_completed=True).count()
+    pending_orders = orders.filter(is_cancelled=False).exclude(is_delivered=True).exclude(is_completed=True).count()
     pos_pending_payment = orders.filter(is_pos_order=True, payment_status=False, is_cancelled=False).count()
     total_customers = Registration.objects.count()
     total_products = Product.objects.count()
@@ -1217,7 +1216,7 @@ def add_product(request):
     if request.method == "POST":
 
         name = request.POST.get("name")
-        slug = request.POST.get("slug")
+       
         brand = request.POST.get("brand")
         product_code = request.POST.get("product_code")
         description = request.POST.get("description")
@@ -1235,31 +1234,29 @@ def add_product(request):
         additional_info = request.POST.get("additional_info")
 
         try:
-            additional_info = json.loads(additional_info) if additional_info else {}
-        except:
-            additional_info = {}
-
-        product = Product.objects.create(
-            name=name,
-            slug=slug,
-            brand=brand,
-            product_code=product_code,
-            description=description,
-            subcategory_id=subcategory_id,
-            price=price,
-            cost_price=cost_price if cost_price else None,
-            old_price=old_price if old_price else None,
-            status=status,
-            is_signature_collection=is_signature_collection,
-            is_featured=is_featured,
-            is_best_seller=is_best_seller,
-            additional_info=additional_info,
-            image1=request.FILES.get("image1"),
-            image2=request.FILES.get("image2"),
-            image3=request.FILES.get("image3"),
-            image4=request.FILES.get("image4"),
-            image5=request.FILES.get("image5"),
-        )
+            product = Product.objects.create(
+                name=name,
+                brand=brand,
+                product_code=product_code,
+                description=description,
+                subcategory_id=subcategory_id,
+                price=price,
+                cost_price=cost_price if cost_price else None,
+                old_price=old_price if old_price else None,
+                status=status,
+                is_signature_collection=is_signature_collection,
+                is_featured=is_featured,
+                is_best_seller=is_best_seller,
+                additional_info=additional_info,
+                image1=request.FILES.get("image1"),
+                image2=request.FILES.get("image2"),
+                image3=request.FILES.get("image3"),
+                image4=request.FILES.get("image4"),
+                image5=request.FILES.get("image5"),
+            )
+        except IntegrityError:
+            messages.error(request, "Product with same code already exists!")
+            return redirect("add_product")
 
         color_names = request.POST.getlist("color_name[]")
         color_hex = request.POST.getlist("color_hex[]")
@@ -1279,8 +1276,8 @@ def add_product(request):
 
             color_obj = None
 
-            if color_name:  # create color only if exists
-                color_obj, created = ProductColor.objects.get_or_create(
+            if color_name:
+                color_obj, _ = ProductColor.objects.get_or_create(
                     product=product,
                     name=color_name,
                     defaults={"hex_code": color_hex_code}
@@ -1297,7 +1294,7 @@ def add_product(request):
 
         product.stock = total_stock
         product.save()
-
+        messages.success(request, "Product added successfully!")
         return redirect("product_list")
 
     return render(request, "add_product.html", {

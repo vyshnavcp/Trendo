@@ -16,7 +16,12 @@ body{
     background:#f4f6f9;
     margin:0;
 }
-
+td img {
+    transition: 0.3s;
+}
+td img:hover {
+    transform: scale(1.2);
+}
 /* ================= NAVBAR ================= */
 .header-with-topbar{
     background:#000;
@@ -183,30 +188,68 @@ body{
 <table class="table table-hover align-middle">
 <thead>
 <tr>
+    <th>Image</th>
     <th>Name</th>
+    <th>Code</th>
     <th>Brand</th>
     <th>Price</th>
     <th>Stock</th>
     <th>Actions</th>
 </tr>
 </thead>
-
 <tbody>
 {% for product in products %}
 <tr>
-    <td>{{ product.name }}</td>
-    <td>{{ product.brand }}</td>
-    <td>₹ {{ product.price }}</td>
-    <td>{{ product.stock }}</td>
+
+    <!-- IMAGE -->
     <td>
-        <a href="{% url 'edit_product' product.slug %}" class="btn btn-sm btn-edit">Edit</a>
-        <a href="{% url 'delete_product' product.slug %}" class="btn btn-sm btn-delete"
+        {% if product.image1 %}
+            <img src="{{ product.image1.url }}" 
+                 style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
+        {% else %}
+            <span class="text-muted">No Image</span>
+        {% endif %}
+    </td>
+
+    <!-- NAME -->
+    <td>{{ product.name }}</td>
+
+    <!-- PRODUCT CODE -->
+    <td>
+        <span class="badge bg-dark">
+            {{ product.product_code }}
+        </span>
+    </td>
+
+    <!-- BRAND -->
+    <td>{{ product.brand }}</td>
+
+    <!-- PRICE -->
+    <td>₹ {{ product.price }}</td>
+
+    <!-- STOCK -->
+    <td>
+        {% if product.stock > 0 %}
+            <span class="text-success fw-semibold">{{ product.stock }}</span>
+        {% else %}
+            <span class="text-danger fw-semibold">Out of Stock</span>
+        {% endif %}
+    </td>
+
+    <!-- ACTIONS -->
+    <td>
+        <a href="{% url 'edit_product' product.slug %}" 
+           class="btn btn-sm btn-edit">Edit</a>
+
+        <a href="{% url 'delete_product' product.slug %}" 
+           class="btn btn-sm btn-delete"
            onclick="return confirm('Delete product?')">Delete</a>
     </td>
+
 </tr>
 {% empty %}
 <tr>
-    <td colspan="5" class="text-center text-muted py-4">
+    <td colspan="7" class="text-center text-muted py-4">
         No products found
     </td>
 </tr>
