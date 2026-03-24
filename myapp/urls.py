@@ -104,6 +104,7 @@ urlpatterns = [
     path("dashboard/subcategory/edit/<int:id>/", views.edit_subcategory, name="edit_subcategory"),
     path("dashboard/subcategory/delete/<int:id>/", views.delete_subcategory, name="delete_subcategory"),
     path("dashboard/product/add/", views.add_product, name="add_product"),
+    path("ajax/validate-product-code/", views.ajax_validate_product_code, name="ajax_validate_product_code"),
     path("dashboard/products/", views.product_list, name="product_list"),
     path("dashboard/terms/", views.terms_list, name="terms_list"),
     path("dashboard/terms/add/", views.add_terms, name="add_terms"),
