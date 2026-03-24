@@ -42,7 +42,6 @@ urlpatterns = [
         ),
         name='password_reset'
     ),
-
     # Email sent confirmation
     path(
         'password-reset/done/',
@@ -51,7 +50,6 @@ urlpatterns = [
         ),
         name='password_reset_done'
     ),
-
     # Reset link (token + uid)
     path(
     'reset/<uidb64>/<token>/',
@@ -61,7 +59,6 @@ urlpatterns = [
     ),
     name='password_reset_confirm'
 ),
-
     # Password successfully changed
     path(
         'reset/done/',
@@ -153,12 +150,7 @@ urlpatterns = [
     path("confirm-cancel/<int:order_id>/", views.confirm_cancel_request, name="confirm_cancel_request"),
     path("admin-refund-requests/", views.refund_requests, name="refund_requests"),
     path("process-refund/<int:order_id>/", views.process_refund, name="process_refund"),
-    path("refund-report/", views.refund_report, name="refund_report"),
-    
-    
-    
-
-    
+    path("refund-report/", views.refund_report, name="refund_report"),  
 ]
 
 if settings.DEBUG:

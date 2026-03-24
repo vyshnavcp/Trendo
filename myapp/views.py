@@ -501,33 +501,47 @@ def staff_required(user):
 
 def user_login(request):
     return render(request,'login.html')
+from django.contrib import messages
+
 def login_post(request):
     login_input = request.POST.get('name','').strip()
     password = request.POST.get('password','').strip()
+
     if not login_input:
-        messages.error(request,"Username or Email required")
+        messages.error(request, "Username or Email required")
         return redirect('user_login')
+
     if not password:
-        messages.error(request,"Password required")
+        messages.error(request, "Password required")
         return redirect('user_login')
+
     try:
         user_obj = User.objects.get(email__iexact=login_input)
         username = user_obj.username
     except User.DoesNotExist:
         username = login_input
-    user = authenticate(request,username=username,password=password)
+
+    user = authenticate(request, username=username, password=password)
+
     if user:
-        login(request,user)
+        login(request, user)
+
+       
+        messages.success(request, f"Welcome back, {user.username}")
+
         if user.is_superuser:
             return redirect("dashboard")
+
         if user.groups.filter(name="Accountant").exists():
             return redirect("dashboard")
+
         if user.groups.filter(name="Staff").exists():
             return redirect("dashboard")
 
         return redirect("home")
 
-    messages.error(request,"Invalid username or password")
+    # ❌ INVALID LOGIN
+    messages.error(request, "Invalid username or password")
     return redirect('user_login')
     
 def user_logout(request):

@@ -15,19 +15,15 @@ class Contact(models.Model):
     
 class HomeBanner(models.Model):
     title = models.CharField(max_length=200)
-
     image = models.ImageField(upload_to='home_banners/')  # Desktop
     mobile_image = models.ImageField(upload_to='home_banners/', blank=True, null=True)
-
     is_active = models.BooleanField(default=True)
-
     def __str__(self):
         return self.title
     
 class Newsletter(models.Model):
     email = models.EmailField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
         return self.email
 
@@ -36,7 +32,6 @@ class Testimonial(models.Model):
     review = CKEditor5Field('Review')
     status = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
         return self.name
     
@@ -131,8 +126,6 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def save(self, *args, **kwargs):
-
-        # 🔥 BEST: use product_code to guarantee uniqueness
         if not self.slug:
             self.slug = slugify(f"{self.name}-{self.product_code}")
 
@@ -140,7 +133,6 @@ class Product(models.Model):
             self.additional_info = {}
 
         super().save(*args, **kwargs)
-
     def __str__(self):
         return self.name
     @property
