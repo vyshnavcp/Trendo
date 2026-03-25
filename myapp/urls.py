@@ -150,6 +150,8 @@ urlpatterns = [
     path("confirm-cancel/<int:order_id>/", views.confirm_cancel_request, name="confirm_cancel_request"),
     path("admin-refund-requests/", views.refund_requests, name="refund_requests"),
     path("process-refund/<int:order_id>/", views.process_refund, name="process_refund"),
+    path("cod-cancel-policy/<int:order_id>/", views.cod_cancel_policy, name="cod_cancel_policy"),
+    path("confirm-cod-cancel/<int:order_id>/", views.confirm_cod_cancel, name="confirm_cod_cancel"),
     path("refund-report/", views.refund_report, name="refund_report"),  
 ]
 

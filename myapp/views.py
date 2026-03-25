@@ -1109,6 +1109,70 @@ def my_orders(request):
         "orders": orders_with_time,
     })
 
+@login_required
+def cod_cancel_policy(request, order_id):
+    registration = get_object_or_404(Registration, authuser=request.user)
+    order = get_object_or_404(Order, id=order_id, registration=registration)
+
+    if order.payment_method != "cod":
+        messages.error(request, "Invalid request.")
+        return redirect("my_orders")
+
+    current_time = timezone.now()
+    seconds_passed = (current_time - order.created_at).total_seconds()
+
+    can_cancel = (
+        seconds_passed <= 86400 and
+        not order.is_cancelled and
+        not order.is_delivered and
+        not order.cancel_requested
+    )
+
+    return render(request, "cod_cancel_policy.html", {
+        "order": order,
+        "can_cancel": can_cancel,
+    })
+login_required
+def confirm_cod_cancel(request, order_id):
+    registration = get_object_or_404(Registration, authuser=request.user)
+    order = get_object_or_404(Order, id=order_id, registration=registration)
+
+    if request.method == "POST":
+        if order.payment_method == "cod" and not order.cancel_requested and not order.is_cancelled:
+
+            # ✅ Update order
+            order.cancel_requested = True
+            order.cancel_requested_at = timezone.now()
+            order.save()
+
+            # =========================
+            # 📧 SEND EMAIL TO ADMIN
+            # =========================
+            subject = f"🚨 Cancel Request - Order #{order.id}"
+
+            html_content = render_to_string("cancel_order_email.html", {
+                "order": order
+            })
+
+            text_content = strip_tags(html_content)
+
+            email = EmailMultiAlternatives(
+                subject,
+                text_content,
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.ADMIN_EMAIL],  # admin mail
+            )
+
+            email.attach_alternative(html_content, "text/html")
+            email.send(fail_silently=False)
+
+            messages.success(request, "COD order cancel request sent successfully.")
+
+        else:
+            messages.error(request, "Cannot cancel this order.")
+
+    return redirect("my_orders")
+
 @user_passes_test(
     lambda u: u.is_authenticated and u.is_staff,
     login_url='user_login'
@@ -2165,7 +2229,8 @@ def cancel_policy(request, order_id):
     return render(request,"cancel_policy.html",{
         "order":order
     })
-login_required
+
+@login_required
 def confirm_cancel_request(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.cancel_requested = True
@@ -2201,42 +2266,74 @@ def refund_requests(request):
         "orders": orders
     })
 
-from django.shortcuts import get_object_or_404, redirect
-from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
-
 
 logger = logging.getLogger(__name__)
-
-@role_required(["Accountant"])
+@role_required(["Accountant","admin"])
+@transaction.atomic
 def process_refund(request, order_id):
+    if request.method != "POST":
+        return redirect("refund_requests")
+
     order = get_object_or_404(Order, id=order_id)
 
-    try:
-        # 1️⃣ Refund via Razorpay
-        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-        refund_amount = int(order.total * 100)
-        refund = client.payment.refund(
-            order.razorpay_payment_id,
-            {"amount": refund_amount, "speed": "normal"}
-        )
-        order.refund_id = refund["id"]
+    if order.refund_processed:
+        logger.warning(f"Order #{order.id} already processed.")
+        return redirect("refund_requests")
 
-        # 2️⃣ Update order status
+    try:
+
+        # =========================
+        # 🟢 RAZORPAY REFUND
+        # =========================
+        if order.payment_method != "cod" and order.razorpay_payment_id:
+
+            client = razorpay.Client(auth=(
+                settings.RAZORPAY_KEY_ID,
+                settings.RAZORPAY_KEY_SECRET
+            ))
+
+            payment = client.payment.fetch(order.razorpay_payment_id)
+            captured_amount = payment.get("amount", 0)
+
+            refund_amount = int(order.total * 100)
+
+            if refund_amount > captured_amount:
+                refund_amount = captured_amount
+
+            refund = client.payment.refund(
+                order.razorpay_payment_id,
+                {"amount": refund_amount, "speed": "normal"}
+            )
+
+            order.refund_id = refund.get("id")
+
+        # =========================
+        # 🟢 COD → NO REFUND API
+        # =========================
+        if order.payment_method == "cod":
+            order.refund_status = False  # no refund money
+
+        # =========================
+        # UPDATE ORDER STATUS
+        # =========================
         order.refund_processed = True
         order.is_cancelled = True
-        order.refund_status = True
         order.save()
 
-        # 3️⃣ Restore stock
+        # =========================
+        # 🔁 RESTORE STOCK (COMMON)
+        # =========================
         for item in order.items.all():
             product_or_variant = item.variant if item.variant else item.product
             product_or_variant.stock += item.quantity
             product_or_variant.save()
 
-        # 4️⃣ Prepare email content with brand
+        # =========================
+        # 📦 BUILD EMAIL CONTENT
+        # =========================
         items_html = ""
         text_items = ""
+
         for item in order.items.all():
             if item.variant:
                 variant_details = []
@@ -2244,16 +2341,20 @@ def process_refund(request, order_id):
                     variant_details.append(str(item.variant.size))
                 if hasattr(item.variant, "color") and item.variant.color:
                     variant_details.append(str(item.variant.color))
+
                 variant_str = " / ".join(variant_details)
-                product_name = escape(item.variant.product.name)
+
+                product_name = f"{escape(item.variant.product.name)}"
                 if variant_str:
                     product_name += f" ({variant_str})"
+
                 brand_name = getattr(item.variant.product, "brand", "")
             else:
                 product_name = escape(item.product.name)
                 brand_name = getattr(item.product, "brand", "")
 
             qty = item.quantity
+
             items_html += f"""
             <tr>
                 <td style="padding:10px; border-bottom:1px solid #eee;">{product_name}</td>
@@ -2261,20 +2362,38 @@ def process_refund(request, order_id):
                 <td style="padding:10px; border-bottom:1px solid #eee;">{qty}</td>
             </tr>
             """
+
             text_items += f"- {product_name} ({brand_name}) x {qty}\n"
 
-        subject = f"Refund Approved - Order #{order.id}"
+        # =========================
+        # 📧 SUBJECT (COD vs REFUND)
+        # =========================
+        if order.payment_method == "cod":
+            subject = f"Order Cancelled - Order #{order.id}"
+            heading = "Order Cancelled ❌"
+            message_line = "Your COD order has been cancelled successfully."
+            extra_note = "No payment was collected for this order."
+        else:
+            subject = f"Refund Approved - Order #{order.id}"
+            heading = "Refund Approved ✅"
+            message_line = "Your refund request has been approved and processed successfully."
+            extra_note = "Refund will be credited within 3–10 business days."
+
+        # =========================
+        # 📩 EMAIL TEMPLATE (SAME STYLE)
+        # =========================
         text_content = f"""
 Hello {order.first_name},
 
-Your refund has been successfully processed.
+{message_line}
 
 Order ID: #{order.id}
 Amount: ₹{order.total}
+
 Items:
 {text_items}
 
-The amount will be credited to your original payment method within 3–10 business days.
+{extra_note}
 
 Thank you.
 """
@@ -2283,20 +2402,23 @@ Thank you.
 <html>
 <body style="margin:0; padding:0; background:#f4f6fb; font-family: Arial, sans-serif;">
 <div style="max-width:600px; margin:30px auto; background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+
     <div style="background:#28a745; padding:20px; text-align:center;">
-        <h2 style="color:#fff; margin:0;">Refund Approved ✅</h2>
-        <h3 style="color:#fff; margin:5px 0;">DVIVE Clothing</h3>
+        <h2 style="color:#fff; margin:0;">{heading}</h2>
     </div>
+
     <div style="padding:30px; color:#333;">
         <p>Hello <b>{escape(order.first_name)}</b>,</p>
-        <p>Your refund request has been <b style="color:#28a745;">approved</b> and processed successfully.</p>
+
+        <p>{message_line}</p>
+
         <table style="width:100%; border-collapse:collapse; margin-top:20px;">
             <tr>
                 <td style="padding:10px; border-bottom:1px solid #eee;"><b>Order ID</b></td>
                 <td style="padding:10px; border-bottom:1px solid #eee;">#{order.id}</td>
             </tr>
             <tr>
-                <td style="padding:10px; border-bottom:1px solid #eee;"><b>Refund Amount</b></td>
+                <td style="padding:10px; border-bottom:1px solid #eee;"><b>Amount</b></td>
                 <td style="padding:10px; border-bottom:1px solid #eee;">₹{order.total}</td>
             </tr>
             <tr>
@@ -2304,7 +2426,9 @@ Thank you.
                 <td style="padding:10px;">{order.get_payment_method_display()}</td>
             </tr>
         </table>
-        <h4 style="margin-top:20px; color:#333;">Items Refunded:</h4>
+
+        <h4 style="margin-top:20px;">Items:</h4>
+
         <table style="width:100%; border-collapse:collapse;">
             <tr>
                 <th style="text-align:left; padding:10px; border-bottom:1px solid #ddd;">Product</th>
@@ -2313,19 +2437,26 @@ Thank you.
             </tr>
             {items_html}
         </table>
+
         <p style="margin-top:20px; color:#555;">
-            💳 The refunded amount will be credited to your original payment method within <b>3–10 business days</b>.
+            {extra_note}
         </p>
+
         <hr style="margin:25px 0;">
+
         <p style="text-align:center; font-size:13px; color:#999;">
             Thank you for shopping with us ❤️
         </p>
     </div>
+
 </div>
 </body>
 </html>
 """
 
+        # =========================
+        # 📤 SEND EMAIL
+        # =========================
         email = EmailMultiAlternatives(
             subject,
             text_content,
@@ -2335,8 +2466,13 @@ Thank you.
         email.attach_alternative(html_content, "text/html")
         email.send(fail_silently=False)
 
+    except razorpay.errors.BadRequestError as e:
+        logger.error(f"Razorpay refund failed for Order #{order.id}: {str(e)}")
+        raise e
+
     except Exception as e:
-        logger.error(f"Refund Error for Order #{order.id}: {e}")
+        logger.error(f"Refund failed for Order #{order.id}: {str(e)}")
+        raise e
 
     return redirect("refund_requests")
 

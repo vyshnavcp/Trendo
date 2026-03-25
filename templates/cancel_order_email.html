@@ -48,7 +48,15 @@
                 </tr>
                 <tr>
                     <td style="padding:10px; font-weight:bold;">Payment Method:</td>
-                    <td>{{ order.get_payment_method_display }}</td>
+                    <td>
+                        {% if order.payment_method == "cod" %}
+                            Cash on Delivery (COD)
+                        {% elif order.payment_method == "razorpay" %}
+                            Razorpay (Online Payment)
+                        {% else %}
+                            {{ order.get_payment_method_display }}
+                        {% endif %}
+                    </td>
                 </tr>
             </table>
 

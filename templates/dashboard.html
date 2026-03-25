@@ -282,7 +282,7 @@ width:fit-content;
 <div class="col-md-3">
 <a href="{% url 'refund_requests' %}" class="text-decoration-none">
 <div class="stat-card position-relative">
-<div class="stat-title">Refund Requests</div>
+<div class="stat-title">Refund Requests/Cancel order</div>
 <div class="stat-value">
 {{ refund_count }}
 </div>
@@ -469,8 +469,8 @@ Quick Actions
 <a href="{% url 'coupon_list' %}" class="quick-btn"><i class="bi bi-tags"></i> View Coupon</a>
 
 {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
-<a href="{% url 'refund_requests' %}" class="quick-btn"><i class="bi bi-arrow-counterclockwise"></i> Refund Requests</a>
-<a href="{% url 'refund_report' %}" class="quick-btn"><i class="bi bi-cash-coin"></i> Refund Report</a>
+<a href="{% url 'refund_requests' %}" class="quick-btn"><i class="bi bi-arrow-counterclockwise"></i> Refund Requests/Cancel order</a>
+<a href="{% url 'refund_report' %}" class="quick-btn"><i class="bi bi-cash-coin"></i> Refund/Cancel order Report</a>
 <a href="{% url 'add_banner' %}" class="quick-btn"><i class="bi bi-image"></i> Add Banner</a>
 <a href="{% url 'banner_list' %}" class="quick-btn"><i class="bi bi-images"></i> View Banners</a>
 <a href="{% url 'contact_list' %}" class="quick-btn"><i class="bi bi-envelope"></i> Contact Messages</a>
