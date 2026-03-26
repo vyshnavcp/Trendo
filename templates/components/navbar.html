@@ -14,8 +14,7 @@
     transform: scale(1.1);
     color: #000;
 }
-
-/* MODERN BADGE */
+/* MODERN BADGE FIX */
 .cart-badge-small {
     position: absolute;
     top: -5px;
@@ -24,20 +23,21 @@
     background: #000;
     color: #fff;
 
-    font-size: 9px;
+    font-size: 10px; /* slightly bigger for readability */
     font-weight: 600;
+    line-height: 1;   /* ensures vertical centering */
 
-    height: 15px;
-    min-width: 15px;
-    padding: 0 4px;
+    height: 18px;      /* slightly bigger for multi-digit numbers */
+    min-width: 18px;   /* ensures circle/pill shape */
+    padding: 4px 5px;    /* horizontal padding for double-digit counts */
 
-    border-radius: 20px; /* pill style instead of circle */
-    
+    border-radius: 50%; /* perfect circle for single-digit, pill for multi-digit */
+
     display: flex;
     align-items: center;
     justify-content: center;
 
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25); /* subtle depth */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     transition: all 0.2s ease;
 }
 
@@ -45,6 +45,7 @@
 .cart-link:hover .cart-badge-small {
     transform: scale(1.15);
 }
+
     </style>
 <header>
    
@@ -143,11 +144,9 @@
                         <a href="{% url 'cart_page' %}" class="cart-link position-relative">
                             <i class="feather icon-feather-shopping-bag d-inline-block align-middle me-5px"></i>
 
-                            {% if cart_count > 0 %}
                             <span id="cart-count-badge" class="cart-badge-small">
                                 {{ cart_count }}
                             </span>
-                            {% endif %}
                         </a>
                     </div>
                     <div class="widget-text icon">
@@ -196,7 +195,6 @@ function updateCartCount() {
 updateCartCount();
 
 // OPTIONAL: auto refresh every 5 sec
-setInterval(updateCartCount, 5000);
 
 document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
     btn.addEventListener("click", function(e){
