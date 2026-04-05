@@ -44,31 +44,112 @@
                 0%   { background-color: #e8f5e9; }
                 100% { background-color: transparent; }
             }
+
             .coupon-form {
-    gap: 10px;
-}
+                gap: 10px;
+            }
 
-.coupon-input {
-    height: 50px;
-    border-radius: 8px;
-}
+            .coupon-input {
+                height: 50px;
+                border-radius: 8px;
+            }
 
-.coupon-btn {
-    height: 50px;
-    padding: 0 20px;
-    white-space: nowrap; /* 🔥 prevents APP / LY breaking */
-    border-radius: 8px;
-    font-weight: 500;
-}
-.coupon-btn {
-    height: 50px;
-    padding: 0 22px;
-    min-width: 110px;     /* 🔥 ensures enough width */
-    white-space: nowrap;  /* 🔥 prevents text breaking */
-    border-radius: 8px;
-    font-weight: 500;
-    text-align: center;
-}
+            .coupon-btn {
+                height: 50px;
+                padding: 0 22px;
+                min-width: 110px;
+                white-space: nowrap;
+                border-radius: 8px;
+                font-weight: 500;
+                text-align: center;
+            }
+
+            /* Coupon remove button — inline flex layout */
+            .coupon-input-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .coupon-input-wrapper .form-control {
+                flex: 1;
+                height: 50px;
+                border-radius: 8px;
+            }
+
+            .coupon-remove-btn {
+                height: 50px;
+                padding: 0 20px;
+                white-space: nowrap;
+                background: #000;
+                color: white;
+                border: none;
+                font-size: 13px;
+                font-weight: 600;
+                border-radius: 8px;
+                cursor: pointer;
+                letter-spacing: .4px;
+                transition: .2s;
+                flex-shrink: 0;
+            }
+
+            .coupon-remove-btn:hover {
+                background: #333;
+            }
+
+            /* Stock warning badge */
+            .stock-warning {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                margin-top: 6px;
+                padding: 4px 10px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #9a6a00;
+                background: #fff6d6;
+                border: 1px solid #ffe08a;
+                border-radius: 6px;
+                line-height: 1.4;
+            }
+
+            .stock-warning::before {
+                content: "⚠";
+                font-size: 13px;
+            }
+
+            /* Close button */
+            .close-button {
+                color: rgb(0, 0, 0);
+                border: none;
+                background: none;
+                border-radius: 30px;
+                height: 35px;
+                width: 35px;
+                display: flex;
+                cursor: pointer;
+                justify-content: center;
+                align-content: center;
+            }
+
+            .close-button:hover {
+                background-color: rgb(238, 4, 4);
+                color: white;
+            }
+
+            @media (max-width: 768px) {
+                .cart-products td.product-remove {
+                    display: table-cell !important;
+                    width: 30px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+
+                .cart-products td.product-remove button {
+                    right: 0;
+                    position: absolute;
+                }
+            }
         </style>
     </head>
     <body data-mobile-nav-style="classic">
@@ -118,26 +199,24 @@
                                             <td class="product-remove">
                                                 <form method="POST" action="{% url 'remove_cart_item' item.id %}">
                                                     {% csrf_token %}
-                                                    <button type="submit" style="background:none;border:none;">x</button>
+                                                    <button type="submit" class="fs-20 fw-500 close-button">x</button>
                                                 </form>
                                             </td>
 
                                             <td class="product-thumbnail">
                                                 <a href="{% url 'product_detail' item.product.slug %}">
-                                                    
                                                     {% if item.product.image1 %}
                                                         <img class="cart-product-image" src="{{ item.product.image1.url }}" alt="">
                                                     {% else %}
                                                         <img class="cart-product-image" src="https://placehold.co/600x740" alt="">
                                                     {% endif %}
-                                                    
                                                 </a>
                                             </td>
 
                                             <td class="product-name">
                                                 <a href="{% url 'product_detail' item.variant.product.slug %}" 
-                                                class="text-dark-gray fw-500 d-block lh-initial">
-                                                {{ item.variant.product.name }}
+                                                   class="text-dark-gray fw-500 d-block lh-initial">
+                                                    {{ item.variant.product.name }}
                                                 </a> 
                                                 <span class="fs-14">
                                                     Color: {{ item.variant.color.name }} |
@@ -164,10 +243,19 @@
                                                     <form method="POST" action="{% url 'change_cart_quantity' item.id %}">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="action" value="plus">
-                                                        <button type="submit" class="qty-plus">+</button>
+                                                        <button type="submit" class="qty-plus"
+                                                            {% if item.quantity >= item.product.stock %}disabled{% endif %}>
+                                                            +
+                                                        </button>
                                                     </form>
 
                                                 </div>
+
+                                                {% if item.quantity >= item.product.stock %}
+                                                    <small class="stock-warning d-block mt-5px">
+                                                        Only {{ item.product.stock }} items available
+                                                    </small>
+                                                {% endif %}
                                             </td>
 
                                             <td class="product-subtotal">
@@ -189,38 +277,35 @@
                             <div class="col-xl-6 col-xxl-7 col-md-6"> 
                                 <div class="coupon-code-panel">
 
-                                    {% if coupon_code %}
+                                    {% if coupon_code and coupon_discount > 0 %}
                                         <!-- REMOVE COUPON -->
                                         <form method="POST" action="{% url 'cart_page' %}" class="coupon-container">
                                             {% csrf_token %}
                                             <input type="hidden" name="remove_coupon" value="1">
-
-                                            <div class="d-flex">
-                                                <input type="text" class="form-control me-2" value="{{ coupon_code }}" disabled>
-                                                <button type="submit" class="btn btn-danger coupon-btn">Remove</button>
+                                            <div class="coupon-input-wrapper">
+                                                <input type="text" class="form-control" value="{{ coupon_code }}" disabled>
+                                                <button type="submit" class="coupon-remove-btn">Remove</button>
                                             </div>
                                         </form>
-
-                                        <p class="text-success mt-2">
-                                            Coupon applied: ₹{{ coupon_discount }}
-                                        </p>
+                                        
 
                                     {% else %}
                                         <form method="POST" action="{% url 'cart_page' %}" class="d-flex align-items-center coupon-form">
                                             {% csrf_token %}
-                                            
                                             <input type="text" 
-                                                name="coupon_code" 
-                                                class="form-control me-2 coupon-input" 
-                                                placeholder="Enter coupon code">
-
+                                                   name="coupon_code" 
+                                                   class="form-control me-2 coupon-input" 
+                                                   placeholder="Enter coupon code">
                                             <button type="submit" class="btn btn-dark coupon-btn">
                                                 Apply
                                             </button>
                                         </form>
-                                        {% if message %}
-                                            <p class="text-danger mt-2">{{ message }}</p>
-                                        {% endif %}
+                                    {% endif %}
+
+                                    {% if message %}
+                                        <p class="mt-2" style="color:#d92323; font-size:13px; font-weight:500;">
+                                            {{ message }}
+                                        </p>
                                     {% endif %}
 
                                 </div>
@@ -240,11 +325,11 @@
                                 <tbody>
                                     <tr>
                                         <th class="w-45 fw-500 text-dark-gray">Subtotal</th>
-                                        <td class="text-dark-gray fw-600">₹{{ total }}</td>
+                                        <td class="text-dark-gray fw-600">₹{{ subtotal }}</td>
                                     </tr>
                                     <tr>
                                         <th class="w-45 fw-500 text-dark-gray">Discount</th>
-                                        <td class="text-dark-gray fw-600">₹{{ coupon_discount }}</td>
+                                        <td class="text-dark-gray fw-600">- ₹{{ coupon_discount }}</td>
                                     </tr>
                                     <tr class="total-amount">
                                         <th class="fw-500 text-dark-gray pb-0">Total</th>
