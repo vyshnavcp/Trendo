@@ -1271,7 +1271,6 @@ def confirm_cod_cancel(request, order_id):
 )
 
 
-
 @login_required
 @role_required(["admin", "Accountant", "Staff"])
 def dashboard(request):
@@ -1356,18 +1355,33 @@ def dashboard(request):
         order__is_cancelled=False,
         order__refund_processed=False,
         order__return_approved=False
-    ).select_related("product")
+    ).select_related("product", "order")
 
     for item in order_items:
         if item.product and item.product.cost_price:
-            profit = (item.price - item.product.cost_price) * item.quantity
-            total_income += profit
+
+            order = item.order
+            item_total = item.price * item.quantity
+
+            # ✅ Coupon distribution
+            if order.coupon_discount and order.subtotal and order.subtotal > 0:
+                proportion = item_total / order.subtotal
+                item_coupon_discount = (order.coupon_discount * proportion).quantize(Decimal("0.01"))
+            else:
+                item_coupon_discount = Decimal("0.00")
+
+            profit_per_item = item.price - item.product.cost_price
+
+            # ✅ FINAL NET PROFIT
+            total_profit = (profit_per_item * item.quantity) - item_coupon_discount
+
+            total_income += total_profit
 
     # ✅ Context
     context = {
         "total_revenue": total_revenue,
         "today_revenue": today_revenue,
-        "total_income": total_income,
+        "total_net_income": total_income,
 
         "total_orders": total_orders,
         "paid_orders": total_paid_orders,
@@ -2264,11 +2278,14 @@ def faq_page(request):
 @role_required(["Accountant"])
 @staff_member_required
 def pos_page(request):
-    products = Product.objects.filter(status=True).prefetch_related(
-        "variants__color",
-        "variants__size"
-    )
+    products = Product.objects.filter(status=True).select_related(
+    "subcategory__category"
+).prefetch_related(
+    "variants__color",
+    "variants__size"
+)
     return render(request, "pos.html", {"products": products})
+
 @role_required(["Accountant","Staff"])
 @staff_member_required
 @csrf_exempt
@@ -2302,15 +2319,21 @@ def pos_create_order(request):
             registration=None,
             first_name=customer_name,
             phone=customer_phone,
-            payment_method=pos_payment_type,
+            payment_method="pos",              # ✅ IMPORTANT FIX
             pos_payment_type=pos_payment_type,
             payment_status=True,
             is_completed=True,
+
+            # ✅ AUTO DELIVERY FOR POS
+            is_shipped=True,
+            is_delivered=True,
+            delivered_at=timezone.now(),
+
             is_pos_order=True,
             reference=reference,
             subtotal=0,
             total=0,
-            coupon_discount=Decimal("0.00")  # initialize
+            coupon_discount=Decimal("0.00")
         )
 
         for item in items:
@@ -2497,48 +2520,63 @@ def pos_update_order(request, order_id):
         })
     
 
-    
 @role_required(["Accountant"])
 @staff_member_required
 def total_income_page(request):
 
     order_items = OrderItem.objects.filter(
-        order__payment_status=True,     # ✅ only paid
-        order__is_cancelled=False,      # ✅ not cancelled
-        order__refund_processed=False   # ✅ not refunded (covers returns too)
-    ).select_related("product")
+        order__payment_status=True,
+        order__is_cancelled=False,
+        order__refund_processed=False
+    ).select_related("product", "order")
 
     product_data = []
     total_income = Decimal("0.00")
     total_revenue = Decimal("0.00")
+    total_discount = Decimal("0.00")
 
     for item in order_items:
         if item.product and item.product.cost_price:
 
+            order = item.order
+            item_total = item.price * item.quantity
+
+            # Proportional coupon discount for this item
+            if order.coupon_discount and order.subtotal and order.subtotal > 0:
+                proportion = item_total / order.subtotal
+                item_coupon_discount = (order.coupon_discount * proportion).quantize(Decimal("0.01"))
+            else:
+                item_coupon_discount = Decimal("0.00")
+
+            effective_selling = item_total - item_coupon_discount
             profit_per_item = item.price - item.product.cost_price
-            total_profit = profit_per_item * item.quantity
-            total_selling = item.price * item.quantity
+            total_profit = (profit_per_item * item.quantity) - item_coupon_discount
+            total_selling = item_total
 
             total_income += total_profit
-            total_revenue += total_selling
+            total_revenue += effective_selling
+            total_discount += item_coupon_discount
 
             product_data.append({
                 "product": item.product,
                 "quantity": item.quantity,
                 "selling_price": item.price,
                 "cost_price": item.product.cost_price,
+                "coupon_discount": item_coupon_discount,
+                "effective_selling": effective_selling,
                 "profit_per_item": profit_per_item,
                 "total_profit": total_profit,
-                "total_selling": total_selling
+                "total_selling": total_selling,
+                "has_coupon": item_coupon_discount > 0,
             })
 
     return render(request, "total_income.html", {
         "title": "Total Income Report",
         "products": product_data,
         "total_income": total_income,
-        "total_revenue": total_revenue
+        "total_revenue": total_revenue,
+        "total_discount": total_discount,
     })
-
 
 @role_required(["Accountant"])
 def create_user(request):

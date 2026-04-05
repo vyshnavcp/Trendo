@@ -125,7 +125,13 @@ class Product(models.Model):
     image5 = models.ImageField(upload_to='products/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    @property
+    def total_stock(self):
+        return sum(variant.stock for variant in self.variants.all())
+    
     def save(self, *args, **kwargs):
+
+        # 🔥 BEST: use product_code to guarantee uniqueness
         if not self.slug:
             self.slug = slugify(f"{self.name}-{self.product_code}")
 
@@ -133,8 +139,10 @@ class Product(models.Model):
             self.additional_info = {}
 
         super().save(*args, **kwargs)
+
     def __str__(self):
         return self.name
+
     @property
     def style_type(self):
         return self.additional_info.get("style_type", [])
@@ -225,7 +233,7 @@ class Coupon(models.Model):
     expiry_date = models.DateField(null=True, blank=True)
     def __str__(self):
         return self.code
-      
+    
 class Order(models.Model):
 
     PAYMENT_CHOICES = (
@@ -279,7 +287,6 @@ class Order(models.Model):
     refund_id = models.CharField(max_length=120, blank=True, null=True)
     refund_status = models.BooleanField(default=False)
     payment_status = models.BooleanField(default=False)
-
     is_completed = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
     delivered_at = models.DateTimeField(blank=True, null=True)
@@ -309,6 +316,9 @@ class Order(models.Model):
         return self.is_completed
 
     def get_status_display(self):
+        
+        if self.is_pos_order:
+            return "Delivered"
 
     # RETURN FLOW
         if self.return_requested and not self.return_approved:
