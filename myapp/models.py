@@ -269,6 +269,12 @@ class Order(models.Model):
         null=True,
         help_text="Only for POS Billing"
     )
+    
+    return_requested = models.BooleanField(default=False)
+    return_requested_at = models.DateTimeField(blank=True, null=True)
+
+    return_approved = models.BooleanField(default=False)
+
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
     refund_id = models.CharField(max_length=120, blank=True, null=True)
@@ -301,18 +307,38 @@ class Order(models.Model):
         return self.is_completed
 
     def get_status_display(self):
+
+
+        if self.return_requested and not self.return_approved:
+            return "Return Requested"
+
+        if self.return_approved and not self.refund_processed:
+            return "Return Approved"
+
+        if self.return_approved and self.refund_processed:
+            return "Returned"
+
+
         if self.is_cancelled:
             return "Cancelled"
+
         if self.cancel_requested:
             return "Cancel Requested"
+
+    
         if self.refund_processed:
             return "Refunded"
+
+
         if self.is_delivered:
             return "Delivered"
+
         if self.is_pos_order and not self.payment_status:
             return "POS Payment Pending"
+
         if not self.is_completed:
             return "Pending"
+
         return "Completed"
     
 class OrderItem(models.Model):

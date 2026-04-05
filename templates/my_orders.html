@@ -123,83 +123,108 @@
                             <div class="order-id">Order #{{ order.id }}</div>
                             <div class="order-date">Placed on {{ order.created_at|date:"d M Y" }}</div>
 
-                            {% if order.refund_processed %}
+                            {% if order.return_requested and not order.return_approved %}
+                                <span class="status-badge status-pending">Return Requested</span>
+
+                                {% elif order.return_approved and order.refund_processed %}
+                                <span class="status-badge status-refunded">Returned</span>
+
+                                {% elif order.is_cancelled and order.refund_processed %}
                                 <span class="status-badge status-cancel">Cancelled & Refunded</span>
-                            {% elif order.is_cancelled %}
+
+                                {% elif order.refund_processed %}
+                                <span class="status-badge status-refunded">Refunded</span>
+
+                                {% elif order.is_cancelled %}
                                 <span class="status-badge status-cancel">Cancelled</span>
-                            {% elif order.is_delivered %}
+
+                                {% elif order.is_delivered %}
                                 <span class="status-badge status-delivered">Delivered</span>
-                            {% elif order.cancel_requested %}
+
+                                {% elif order.cancel_requested %}
                                 <span class="status-badge status-pending">Cancel Requested</span>
-                            {% else %}
+
+                                {% else %}
                                 <span class="status-badge status-pending">Pending</span>
-                            {% endif %}
+                                {% endif %}
                         </div>
                         <div style="text-align:right">
                             <div class="order-total">Total: ₹{{ order.total }}</div>
                             <button onclick="printOrder('order-{{ order.id }}')" class="print-btn">Print Invoice</button>
 
-                           {# Show cancel options for both Razorpay & COD #}
+                            {# Cancel Order Logic #}
                             {% if not order.is_cancelled and not order.cancel_requested and not order.is_delivered and not order.refund_processed %}
 
                                 {% if order.seconds_passed <= 86400 %}
 
                                     {% if order.payment_method == "cod" %}
-
                                         <a href="{% url 'cod_cancel_policy' order.id %}">
                                             <button class="cancel-btn">Cancel Order (COD)</button>
                                         </a>
-
-                                        <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
+                                        <div class="cancel-info mt-2">
                                             ⚠️ COD orders can be cancelled within 24 hours before dispatch. No refund required.
                                         </div>
-
                                     {% else %}
-
                                         <a href="{% url 'cancel_policy' order.id %}">
                                             <button class="cancel-btn">Cancel Order</button>
                                         </a>
-
-                                        <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
+                                        <div class="cancel-info mt-2">
                                             ⚠️ You can cancel this order within 24 hours of placement. Refunds will be processed in 1–7 business days.
                                         </div>
-
                                     {% endif %}
 
                                 {% else %}
-
                                     <span class="status-badge status-pending" style="background:#ccc;color:#555;">
                                         Cancellation period expired
                                     </span>
-
-                                    <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
+                                    <div class="cancel-info mt-2">
                                         ❌ Orders can only be cancelled within 24 hours of placement.
                                     </div>
-
                                 {% endif %}
 
                             {% elif order.cancel_requested and not order.refund_processed %}
-
                                 <span class="status-badge status-pending">Cancel request sent</span>
+                                <div class="cancel-info mt-2">⏳ Waiting for admin approval.</div>
 
-                                <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
-                                    ⏳ Waiting for admin approval.
+                            {% elif order.return_approved and order.refund_processed %}
+                                <div class="cancel-info mt-2">
+                                    🔄 Return completed successfully.
+                                </div>
+
+                            {% elif order.is_cancelled and order.refund_processed %}
+                                <span class="status-badge status-cancel">Cancelled & Refunded</span>
+                                <div class="cancel-info mt-2">
+                                    💰 Refund processed successfully (Cancelled Order).
                                 </div>
 
                             {% elif order.refund_processed %}
-
-                                <span class="status-badge status-cancel">Cancelled & Refunded</span>
-
-                                <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
-                                    ✅ Refund processed successfully.
+                                <div class="cancel-info mt-2">
+                                    💰 Refund processed successfully.
                                 </div>
 
                             {% elif order.is_cancelled %}
-
                                 <span class="status-badge status-cancel">Cancelled</span>
+                                <div class="cancel-info mt-2">❌ Order has been cancelled.</div>
 
-                                <div class="cancel-info mt-2" style="font-size:13px;color:#555;">
-                                    ❌ Order has been cancelled.
+                            {% endif %}
+
+                            {# Return Order Logic for Delivered Orders #}
+                            {% if order.is_delivered and not order.return_requested and not order.refund_processed %}
+                                {% if order.seconds_passed <= 604800 %}  {# 7 days in seconds #}
+                                    <a href="{% url 'return_policy' order.id %}">
+                                        <button class="cancel-btn" style="background:#0066ff;">Return Order</button>
+                                    </a>
+                                    <div class="cancel-info mt-2">
+                                        🔄 Return allowed within 7 days after delivery.
+                                    </div>
+                                {% else %}
+                                    <div class="cancel-info mt-2">
+                                        ❌ Return period expired
+                                    </div>
+                                {% endif %}
+                            {% elif order.return_requested and not order.refund_processed %}
+                                <div class="cancel-info mt-2">
+                                    ⏳ Return request sent. Waiting for approval.
                                 </div>
 
                             {% endif %}

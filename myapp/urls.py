@@ -152,7 +152,12 @@ urlpatterns = [
     path("process-refund/<int:order_id>/", views.process_refund, name="process_refund"),
     path("cod-cancel-policy/<int:order_id>/", views.cod_cancel_policy, name="cod_cancel_policy"),
     path("confirm-cod-cancel/<int:order_id>/", views.confirm_cod_cancel, name="confirm_cod_cancel"),
-    path("refund-report/", views.refund_report, name="refund_report"),  
+    path("return-policy/<int:order_id>/", views.return_policy, name="return_policy"),
+    path("confirm-return/<int:order_id>/", views.confirm_return, name="confirm_return"),
+    path("admin-return-requests/", views.return_requests, name="return_requests"),
+    path("process-return/<int:order_id>/", views.process_return, name="process_return"),
+    path("refund-report/", views.refund_report, name="refund_report"),
+    path("return-report/", views.return_report, name="return_report"),
 ]
 
 if settings.DEBUG:
