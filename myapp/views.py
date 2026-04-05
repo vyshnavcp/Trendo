@@ -43,6 +43,7 @@ from django.utils.html import strip_tags
 from django.utils.html import escape
 import logging
 from django.db import IntegrityError
+from django.middleware.csrf import rotate_token
 
 def home(request):
     blogs = Article.objects.order_by('-posted_on')[:4]
@@ -508,11 +509,11 @@ def login_post(request):
     password = request.POST.get('password','').strip()
 
     if not login_input:
-        messages.error(request, "Username or Email required")
+        messages.error(request,"Username or Email required")
         return redirect('user_login')
 
     if not password:
-        messages.error(request, "Password required")
+        messages.error(request,"Password required")
         return redirect('user_login')
 
     try:
@@ -525,23 +526,26 @@ def login_post(request):
 
     if user:
         login(request, user)
+        rotate_token(request)
 
-       
+        # ✅ ADD THIS HERE (clear old messages)
+        from django.contrib.messages import get_messages
+        storage = get_messages(request)
+        for _ in storage:
+            pass
+
         messages.success(request, f"Welcome back, {user.username}")
 
         if user.is_superuser:
             return redirect("dashboard")
-
         if user.groups.filter(name="Accountant").exists():
             return redirect("dashboard")
-
         if user.groups.filter(name="Staff").exists():
             return redirect("dashboard")
 
         return redirect("home")
 
-    # ❌ INVALID LOGIN
-    messages.error(request, "Invalid username or password")
+    messages.error(request,"Invalid username or password")
     return redirect('user_login')
     
 def user_logout(request):
@@ -1085,6 +1089,7 @@ def profile(request):
 @login_required
 def my_orders(request):
     registration = get_object_or_404(Registration, authuser=request.user)
+
     orders = (
         Order.objects
         .filter(registration=registration)
@@ -1097,16 +1102,20 @@ def my_orders(request):
     )
 
     current_time = timezone.now()
-    orders_with_time = []
 
     for order in orders:
-        # calculate seconds passed since order creation
-        seconds_passed = (current_time - order.created_at).total_seconds()
-        order.seconds_passed = seconds_passed  # dynamically add attribute
-        orders_with_time.append(order)
+
+        # ✅ Cancel time (based on order created)
+        order.cancel_seconds = (current_time - order.created_at).total_seconds()
+
+        # ✅ Return time (based on delivery time)
+        if order.delivered_at:
+            order.return_seconds = (current_time - order.delivered_at).total_seconds()
+        else:
+            order.return_seconds = None
 
     return render(request, "my_orders.html", {
-        "orders": orders_with_time,
+        "orders": orders,
     })
 
 
@@ -1220,18 +1229,19 @@ def confirm_cod_cancel(request, order_id):
 )
 
 
+
 @login_required
 @role_required(["admin", "Accountant", "Staff"])
 def dashboard(request):
     today = now().date()
 
-    # 🔐 Role-based order access
+    # ✅ Role-based orders
     if request.user.is_superuser or request.user.groups.filter(name="Accountant").exists():
         orders = Order.objects.all().order_by('-created_at')
     else:
         orders = Order.objects.filter(is_pos_order=True).order_by('-created_at')
 
-    # 💰 Paid Orders (clean business logic)
+    # ✅ Paid orders (clean + strict)
     paid_orders = orders.filter(
         payment_status=True,
         is_cancelled=False,
@@ -1239,16 +1249,18 @@ def dashboard(request):
         return_approved=False
     )
 
-    # 📊 Revenue
-    total_revenue = paid_orders.aggregate(total=Sum("total"))["total"] or 0
+    # ✅ Revenue
+    total_revenue = paid_orders.aggregate(total=Sum("total"))["total"] or Decimal("0.00")
+
     today_revenue = paid_orders.filter(
         created_at__date=today
-    ).aggregate(total=Sum("total"))["total"] or 0
+    ).aggregate(total=Sum("total"))["total"] or Decimal("0.00")
 
-    # 📦 Orders Count
+    # ✅ Order counts
     total_orders = orders.count()
     total_paid_orders = paid_orders.count()
 
+    # ✅ Pending orders
     pending_orders = orders.filter(
         is_cancelled=False
     ).exclude(
@@ -1257,37 +1269,44 @@ def dashboard(request):
         is_completed=True
     ).count()
 
-    # 🏪 POS Pending Payments
+    # ✅ POS pending payments
     pos_pending_payment = orders.filter(
         is_pos_order=True,
         payment_status=False,
         is_cancelled=False
     ).count()
 
-    # 👥 Customers & Products
+    # ✅ Customers & Products
     total_customers = Registration.objects.count()
     total_products = Product.objects.count()
 
-    # 💸 Refund Requests
-    refund_requests_count = Order.objects.filter(
+    # ✅ Refund & Return Requests
+    pending_refunds = Order.objects.filter(
         cancel_requested=True,
         refund_processed=False
-    ).count()
+    )
+    refund_count = pending_refunds.count()
 
-    # 🚨 New Refund Alerts (last 24 hrs)
-    new_refunds_count = Order.objects.filter(
-        cancel_requested=True,
-        refund_processed=False,
+    new_refunds_count = pending_refunds.filter(
         created_at__gte=now() - timedelta(days=1)
     ).count()
 
-    # 🔄 Return Requests
-    return_requests_count = Order.objects.filter(
+    return_requests = Order.objects.filter(
         return_requested=True,
         refund_processed=False
+    )
+    return_requests_count = return_requests.count()
+
+    new_return_requests_count = return_requests.filter(
+        created_at__gte=now() - timedelta(days=1)
+    ).count()
+    shipping_orders_count = orders.filter(
+    is_shipped=True,
+    is_delivered=False,
+    is_cancelled=False
     ).count()
 
-    # 💵 Profit Calculation
+    # ✅ Profit / Income Calculation
     total_income = Decimal("0.00")
 
     order_items = OrderItem.objects.filter(
@@ -1302,7 +1321,7 @@ def dashboard(request):
             profit = (item.price - item.product.cost_price) * item.quantity
             total_income += profit
 
-    # 📦 Final Context
+    # ✅ Context
     context = {
         "total_revenue": total_revenue,
         "today_revenue": today_revenue,
@@ -1317,9 +1336,12 @@ def dashboard(request):
         "total_customers": total_customers,
         "total_products": total_products,
 
-        "refund_requests_count": refund_requests_count,
-        "return_requests_count": return_requests_count,
-        "new_refunds_count": new_refunds_count,
+        "refund_count": refund_count if refund_count > 0 else None,
+        "new_refunds_count": new_refunds_count if new_refunds_count > 0 else None,
+
+        "return_requests_count": return_requests_count if return_requests_count > 0 else None,
+        "new_return_requests_count": new_return_requests_count if new_return_requests_count > 0 else None,
+        "shipping_orders_count": shipping_orders_count,
 
         "orders": orders,
     }
@@ -1913,17 +1935,18 @@ def mark_order_completed(request, order_id):
     # 🔥 REDIRECT TO NEW PAGE
     return redirect("delivery_page", order_id=order.id)
 
+@login_required
+@role_required(['admin','Accountant'])
 def mark_as_delivered(request, order_id):
     order = get_object_or_404(Order, id=order_id)
 
     if order.is_cancelled or order.refund_processed:
-        messages.error(request, "Cannot deliver this order.")
         return redirect("order_detail", order_id=order.id)
 
     order.is_delivered = True
+    order.delivered_at = timezone.now()  # ✅ ADD THIS
     order.save()
 
-    messages.success(request, "Order marked as Delivered.")
     return redirect("order_detail", order_id=order.id)
 
 @role_required(["Accountant","Staff"])
@@ -1934,16 +1957,17 @@ def delivery_page(request, order_id):
     return render(request, "delivery_page.html", {
         "order": order
     })
+
 @role_required(["Accountant","Staff"])
 @login_required
 def shipping_orders(request):
-    orders = Order.objects.filter(is_shipped=True, is_delivered=False).order_by("-created_at")
+    orders = Order.objects.filter(
+        is_shipped=True
+    ).order_by("-created_at")
 
     return render(request, "shipping_orders.html", {
         "orders": orders
     })
-
-
 @role_required(["Accountant","Staff"])
 def cancel_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -2468,6 +2492,17 @@ def cancel_policy(request, order_id):
 @login_required
 def confirm_cancel_request(request, order_id):
     order = get_object_or_404(Order, id=order_id)
+
+    # ❌ Prevent duplicate cancel requests
+    if order.cancel_requested:
+        messages.warning(request, "Cancellation already requested.")
+        return redirect("my_orders")
+
+    # ✅ 24-hour restriction
+    if timezone.now() > order.created_at + timedelta(hours=24):
+        messages.error(request, "❌ Cancellation period expired (24 hours).")
+        return redirect("my_orders")
+
     order.cancel_requested = True
     order.save()
     subject = f"🚨 Cancel Request - Order #{order.id}"

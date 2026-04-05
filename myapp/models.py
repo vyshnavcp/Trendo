@@ -282,6 +282,7 @@ class Order(models.Model):
 
     is_completed = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
+    delivered_at = models.DateTimeField(blank=True, null=True)
     is_cancelled = models.BooleanField(default=False)
     is_pos_order = models.BooleanField(default=False)
     cancel_requested = models.BooleanField(default=False)
