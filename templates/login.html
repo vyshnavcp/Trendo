@@ -14,9 +14,65 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
     <link rel="stylesheet" href="{% static 'css/responsive.css' %}"/>
     <link rel="stylesheet" href="{% static 'demos/clothing-store/clothing-store.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* SweetAlert Premium Popup */
+        .swal2-popup {
+            border-radius: 18px !important;
+            padding: 40px 30px !important;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+            background: rgba(255,255,255,0.95) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .page-loader,
+        .preloader,
+        .loader {
+            display: none !important;
+        }
+
+        .swal2-title {
+            font-size: 28px !important;
+            font-weight: 700 !important;
+            color: #1c1c1c !important;
+        }
+
+        .swal2-html-container {
+            font-size: 16px !important;
+            color: #555 !important;
+            margin-top: 10px !important;
+        }
+
+        .swal2-confirm {
+            border-radius: 10px !important;
+            padding: 12px 28px !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            background: linear-gradient(135deg,#000,#333) !important;
+            border: none !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            transition: all 0.3s ease;
+        }
+
+        .swal2-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .swal2-icon {
+            transform: scale(1.1);
+        }
+
+        .swal2-backdrop-show {
+            backdrop-filter: blur(6px);
+            background: rgba(0,0,0,0.65) !important;
+        }
+    </style>
 </head>
 
 <body data-mobile-nav-style="classic">
@@ -33,12 +89,12 @@
                     Member login
                 </span>
 
-                <form method="post" action="{% url 'login_post' %}">
+                <form method="post" action="{% url 'login_post' %}" onsubmit="let btn = this.querySelector('button[type=submit]'); btn.disabled = true; btn.innerText = 'Logging in...';">
                     {% csrf_token %}
 
                     <label class="text-dark-gray mb-10px fw-500">
                         Email<span class="text-red">*</span>
-                    </label> 
+                    </label>
                     <input class="mb-20px required"
                            type="text"
                            name="name"
@@ -47,20 +103,22 @@
 
                     <label class="text-dark-gray mb-10px fw-500">
                         Password<span class="text-red">*</span>
-                    </label> 
+                    </label>
                     <input id="password"
                            class="mb-10px required"
                            type="password"
                            name="password"
                            placeholder="Enter your password"
-                           required />
+                           minlength="6"
+                           required
+                           pattern="^(?=.*[A-Za-z]).{6,}$" />
 
-                    <small id="password_error" class="text-danger"></small>
+                    <div id="password_error" class="text-danger fs-12"></div>
 
                     <div class="position-relative text-end mb-20px">
-                        <a href="{% url 'password_reset' %}" 
+                        <a href="{% url 'password_reset' %}"
                            class="fs-14 text-dark-gray fw-500 text-decoration-line-bottom">
-                           Forget your password?
+                            Forget your password?
                         </a>
                     </div>
 
@@ -70,8 +128,8 @@
                     </button>
 
                     <div class="text-center">
-                        Don't have an account? 
-                        <a href="{% url 'register' %}" 
+                        Don't have an account?
+                        <a href="{% url 'register' %}"
                            class="fw-500 text-decoration-line-bottom">
                             Register Now
                         </a>
@@ -95,22 +153,26 @@
 {% if messages %}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-
     {% for message in messages %}
-
     Swal.fire({
         icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}",
-        title: "{% if message.tags == 'error' %}Login Failed{% else %}Notice{% endif %}",
+        title: "{% if message.tags == 'success' %}Success{% elif message.tags == 'error' %}Login Failed{% else %}Notice{% endif %}",
         text: "{{ message }}",
-        confirmButtonText: "OK",
-        timer: 3000
+        confirmButtonText: "{% if message.tags == 'success' %}Continue{% else %}Try Again{% endif %}",
+        showClass: {
+            popup: "animate__animated animate__zoomIn"
+        },
+        hideClass: {
+            popup: "animate__animated animate__fadeOut"
+        },
+        timer: 3000,
+        timerProgressBar: true
     });
-
     {% endfor %}
-
 });
 </script>
 {% endif %}
+
 <script>
 const passwordInput = document.getElementById("password");
 const passwordError = document.getElementById("password_error");
