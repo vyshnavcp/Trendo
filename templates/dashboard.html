@@ -187,20 +187,6 @@ width:fit-content;
 
 <div class="main">
 
-<!-- ✅ MESSAGE ALERT ADDED -->
-
-{% if messages %}
-<div class="mb-3">
-{% for message in messages %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-{{ message }}
-<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-{% endfor %}
-</div>
-{% endif %}
-
-<!-- HEADER -->
 
 <div class="topbar">
 
@@ -214,30 +200,33 @@ width:fit-content;
 
 <!-- METRICS -->
  
-
 <div class="row g-4 mb-4">
 
 {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
 
 <div class="col-md-3">
+<a href="{% url 'report_page' %}" class="text-decoration-none text-dark d-block">
 <div class="stat-card">
 <div class="stat-title">Total Revenue</div>
 <div class="stat-value">₹ {{ total_revenue }}</div>
 </div>
+</a>
 </div>
 
 <div class="col-md-3">
+<a href="{% url 'report_page' %}?today=1" class="text-decoration-none text-dark d-block">
 <div class="stat-card">
 <div class="stat-title">Today Revenue</div>
 <div class="stat-value">₹ {{ today_revenue }}</div>
 </div>
+</a>
 </div>
 
 <div class="col-md-3">
-<a href="{% url 'total_income' %}" class="text-decoration-none text-dark">
+<a href="{% url 'total_income' %}" class="text-decoration-none text-dark d-block">
 <div class="stat-card">
 <div class="stat-title">Total Income</div>
-<div class="stat-value">₹ {{ total_income }}</div>
+<div class="stat-value">₹ {{ total_net_income }}</div>
 </div>
 </a>
 </div>
@@ -245,73 +234,64 @@ width:fit-content;
 {% endif %}
 
 <div class="col-md-3">
+<a href="{% url 'order_list' %}" class="text-decoration-none text-dark d-block">
 <div class="stat-card">
 <div class="stat-title">Total Orders</div>
 <div class="stat-value">
-<a href="{% url 'order_list' %}" class="text-dark text-decoration-none">
 {{ total_orders }}
+</div>
+</div>
 </a>
-</div>
-</div>
 </div>
 
 <div class="col-md-3">
+<a href="{% url 'paid_orders' %}" class="text-decoration-none text-dark d-block">
 <div class="stat-card">
 <div class="stat-title">Paid Orders</div>
 <div class="stat-value">
-<a href="{% url 'paid_orders' %}" class="text-dark text-decoration-none">
 {{ paid_orders }}
+</div>
+</div>
 </a>
 </div>
-</div>
-</div>
-
 
 <div class="col-md-3">
+<a href="{% url 'pending_orders' %}" class="text-decoration-none text-dark d-block">
 <div class="stat-card">
 <div class="stat-title">Pending Orders</div>
 <div class="stat-value">
-<a href="{% url 'pending_orders' %}" class="text-dark text-decoration-none">
 {{ pending_orders }}
+</div>
+</div>
 </a>
 </div>
-</div>
-</div>
-{% if refund_requests_count %}
+
+{% if refund_requests_count > 0 %}
 <div class="col-md-3">
-<a href="{% url 'refund_requests' %}" class="text-decoration-none">
-<div class="stat-card position-relative">
-
-<div class="stat-title">Refund Requests / Cancel Order</div>
-
-<div class="stat-value">
+<a href="{% url 'refund_requests' %}" class="text-decoration-none text-dark d-block">
+<div class="stat-card border border-danger">
+<div class="stat-title text-danger">Refund/Cancel order Requests</div>
+<div class="stat-value text-danger">
 {{ refund_requests_count }}
 </div>
-
-{% if new_refunds_count %}
-<span class="badge bg-danger position-absolute top-0 end-0 m-2">
-{{ new_refunds_count }} New
-</span>
-{% endif %}
-
 </div>
 </a>
 </div>
 {% endif %}
-
 
 {% if return_requests_count > 0 %}
 <div class="col-md-3">
-    <a href="{% url 'return_requests' %}" class="text-decoration-none text-dark">
-        <div class="stat-card border border-warning">
-            <div class="stat-title text-warning">Return Requests</div>
-            <div class="stat-value text-warning">
-                {{ return_requests_count }}
-            </div>
-        </div>
-    </a>
+<a href="{% url 'return_requests' %}" class="text-decoration-none text-dark d-block">
+<div class="stat-card border border-warning">
+<div class="stat-title text-warning">Return Requests</div>
+<div class="stat-value text-warning">
+{{ return_requests_count }}
+</div>
+</div>
+</a>
 </div>
 {% endif %}
+
 </div>
 
 <div class="row">
@@ -413,13 +393,34 @@ Retail Shop
 {% if order.is_cancelled %}
 <span class="badge bg-danger">Cancelled</span>
 
+{% elif order.return_requested and not order.return_approved %}
+<span class="badge bg-warning text-dark">Return Requested</span>
+
+{% elif order.return_approved and not order.refund_processed %}
+<span class="badge bg-info text-dark">Return Approved</span>
+
+{% elif order.return_approved and order.refund_processed %}
+<span class="badge bg-success">Returned</span>
+
+{% elif order.is_shipped and not order.is_delivered %}
+<span class="badge bg-primary">Shipping Processing</span>
+
 {% elif order.is_delivered %}
 <span class="badge bg-success">Delivered</span>
 
-{% else %}
-<span class="badge bg-warning text-dark">Pending</span>
-{% endif %}
+{% elif order.is_pos_order %}
+    {% if order.payment_status %}
+        <span class="badge bg-success">Paid</span>
+    {% else %}
+        <span class="badge bg-warning text-dark">Pending Payment</span>
+    {% endif %}
 
+{% elif order.payment_status %}
+    <span class="badge bg-success">Paid</span>
+
+{% else %}
+    <span class="badge bg-secondary">Pending</span>
+{% endif %}
 </td>
 
 <td>{{ order.created_at|date:"d M Y" }}</td>
@@ -471,7 +472,17 @@ Quick Actions
 </div>
 
 <div class="card-body d-grid gap-2">
+<a href="{% url 'shipping_orders' %}" class="quick-btn justify-content-between">
+    <span>
+        <i class="bi bi-truck"></i> Shipping Orders
+    </span>
 
+    {% if shipping_orders_count > 0 %}
+        <span class="badge bg-primary">
+            {{ shipping_orders_count }}
+        </span>
+    {% endif %}
+</a>
 <a href="{% url 'pos_page' %}" class="quick-btn"><i class="bi bi-receipt"></i> POS Billing</a>
 <a href="{% url 'add_category' %}" class="quick-btn"><i class="bi bi-plus-square"></i> Add Category</a>
 <a href="{% url 'category_list' %}" class="quick-btn"><i class="bi bi-card-list"></i> View Category</a>
@@ -485,19 +496,16 @@ Quick Actions
 <a href="{% url 'coupon_list' %}" class="quick-btn"><i class="bi bi-tags"></i> View Coupon</a>
 
 {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
-<a href="{% url 'refund_requests' %}" class="quick-btn"><i class="bi bi-arrow-counterclockwise"></i> Refund Requests/Cancel order</a>
-<a href="{% url 'refund_report' %}" class="quick-btn"><i class="bi bi-cash-coin"></i> Refund/Cancel order Report</a>
-<a href="{% url 'return_requests' %}" class="quick-btn"><i class="bi bi-arrow-repeat"></i> Return Requests</a>
-<a href="{% url 'return_report' %}" class="quick-btn"><i class="bi bi-clipboard-data"></i> Return Report</a>
-<a href="{% url 'add_banner' %}" class="quick-btn"><i class="bi bi-image"></i> Add Banner</a>
-<a href="{% url 'banner_list' %}" class="quick-btn"><i class="bi bi-images"></i> View Banners</a>
-<a href="{% url 'contact_list' %}" class="quick-btn"><i class="bi bi-envelope"></i> Contact Messages</a>
-<a href="{% url 'newsletter_list' %}" class="quick-btn"><i class="bi bi-envelope-paper"></i> Newsletter Subscribers</a>
-<a href="{% url 'add_testimonial' %}" class="quick-btn"><i class="bi bi-plus-circle"></i> Add Testimonial</a>
-<a href="{% url 'testimonial_list' %}" class="quick-btn"><i class="bi bi-chat-left-text"></i> Testimonials</a>
+<a href="{% url 'refund_requests' %}" class="quick-btn"><i class="bi bi-arrow-counterclockwise"></i> Refund Requests</a>
+<a href="{% url 'refund_report' %}" class="quick-btn"><i class="bi bi-cash-coin"></i> Refund/Cancel List</a>
+<a href="{% url 'return_requests' %}" class="quick-btn"><i class="bi bi-box-arrow-in-left"></i> Return Requests</a>
+<a href="{% url 'return_report' %}" class="quick-btn"><i class="bi bi-arrow-repeat"></i> Return Report</a>
 <a href="{% url 'create_user' %}" class="quick-btn"><i class="bi bi-person-plus"></i> Create Employee</a>
 <a href="{% url 'employee_list' %}" class="quick-btn"><i class="bi bi-people"></i> Employee List</a>
 <a href="{% url 'review_list' %}" class="quick-btn"><i class="bi bi-chat-square-text"></i> View Reviews</a>
+<a href="{% url 'add_banner' %}" class="quick-btn"><i class="bi bi-image"></i> Add Banner</a>
+<a href="{% url 'banner_list' %}" class="quick-btn"><i class="bi bi-images"></i> View Banners</a>
+<a href="{% url 'contact_list' %}" class="quick-btn"><i class="bi bi-envelope"></i> Contact List</a>
 <a href="{% url 'add_article' %}" class="quick-btn"><i class="bi bi-newspaper"></i> Add Article</a>
 <a href="{% url 'article_list' %}" class="quick-btn"><i class="bi bi-card-text"></i> View Articles</a>
 <a href="{% url 'add_terms' %}" class="quick-btn"><i class="bi bi-file-earmark-plus"></i> Add Terms</a>

@@ -14,16 +14,17 @@
     <style>
         body { background:#fafafa; }
         .cancel-info {
-    background: #fef9f5;
-    border-left: 4px solid #ff6f61;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    color: #555;
-}
-.h-300px {
-    height: 500px !important;}
-       
+            background: #fef9f5;
+            border-left: 4px solid #ff6f61;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+        }
+        .h-300px {
+            height: 500px !important;
+        }
+
         .order-card {
             background: #ffffff;
             border-radius: 16px;
@@ -37,7 +38,6 @@
             overflow: hidden;
         }
 
-        /* Hover gradient overlay */
         .order-card::before {
             content: "";
             position: absolute;
@@ -79,6 +79,7 @@
         .status-cancel { background: linear-gradient(90deg, #ffb3b3, #ff6f6f); color: #fff; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
         .status-delivered { background: linear-gradient(90deg, #c3f0d4, #1abc9c); color: #fff; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
         .status-pending { background: linear-gradient(90deg, #ffeaa7, #fab1a0); color: #fff; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+        .status-refunded { background: linear-gradient(90deg, #a8d8ff, #0066ff); color: #fff; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
 
         /* Buttons */
         .cancel-btn, .print-btn { border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
@@ -126,28 +127,35 @@
                             {% if order.return_requested and not order.return_approved %}
                                 <span class="status-badge status-pending">Return Requested</span>
 
-                                {% elif order.return_approved and order.refund_processed %}
+                            {% elif order.return_approved and not order.refund_processed %}
+                                <span class="status-badge status-pending">Return Approved</span>
+
+                            {% elif order.return_approved and order.refund_processed %}
                                 <span class="status-badge status-refunded">Returned</span>
 
-                                {% elif order.is_cancelled and order.refund_processed %}
+                            {% elif order.is_cancelled and order.refund_processed %}
                                 <span class="status-badge status-cancel">Cancelled & Refunded</span>
 
-                                {% elif order.refund_processed %}
+                            {% elif order.refund_processed %}
                                 <span class="status-badge status-refunded">Refunded</span>
 
-                                {% elif order.is_cancelled %}
+                            {% elif order.is_cancelled %}
                                 <span class="status-badge status-cancel">Cancelled</span>
 
-                                {% elif order.is_delivered %}
+                            {% elif order.is_shipped and not order.is_delivered %}
+                                <span class="status-badge status-pending">Shipping Processing</span>
+
+                            {% elif order.is_delivered %}
                                 <span class="status-badge status-delivered">Delivered</span>
 
-                                {% elif order.cancel_requested %}
+                            {% elif order.cancel_requested %}
                                 <span class="status-badge status-pending">Cancel Requested</span>
 
-                                {% else %}
+                            {% else %}
                                 <span class="status-badge status-pending">Pending</span>
-                                {% endif %}
+                            {% endif %}
                         </div>
+
                         <div style="text-align:right">
                             <div class="order-total">Total: ₹{{ order.total }}</div>
                             <button onclick="printOrder('order-{{ order.id }}')" class="print-btn">Print Invoice</button>
@@ -174,17 +182,13 @@
                                     {% endif %}
 
                                 {% else %}
-                                    <span class="status-badge status-pending" style="background:#ccc;color:#555;">
-                                        Cancellation period expired
-                                    </span>
                                     <div class="cancel-info mt-2">
-                                        ❌ Orders can only be cancelled within 24 hours of placement.
+                                        ❌ Cancellation period expired (24 hours passed)
                                     </div>
                                 {% endif %}
 
                             {% elif order.cancel_requested and not order.refund_processed %}
-                                <span class="status-badge status-pending">Cancel request sent</span>
-                                <div class="cancel-info mt-2">⏳ Waiting for admin approval.</div>
+                                <div class="cancel-info mt-2">⏳ Cancel request sent. Waiting for approval.</div>
 
                             {% elif order.return_approved and order.refund_processed %}
                                 <div class="cancel-info mt-2">
@@ -199,11 +203,10 @@
 
                             {% elif order.refund_processed %}
                                 <div class="cancel-info mt-2">
-                                    💰 Refund processed successfully.
+                                    💰 Refund completed successfully.
                                 </div>
 
                             {% elif order.is_cancelled %}
-                                <span class="status-badge status-cancel">Cancelled</span>
                                 <div class="cancel-info mt-2">❌ Order has been cancelled.</div>
 
                             {% endif %}
@@ -226,7 +229,6 @@
                                 <div class="cancel-info mt-2">
                                     ⏳ Return request sent. Waiting for approval.
                                 </div>
-
                             {% endif %}
                         </div>
                     </div>
