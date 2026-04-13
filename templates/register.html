@@ -36,116 +36,70 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.12) !important;
         }
 
-        /* 💎 PREMIUM VALIDATION BOX */
-        .error-box {
-            display: none;
-            padding: 14px 18px;
-            border-radius: 14px;
-            font-size: 15px;
+        /* INLINE VALIDATION MESSAGE */
+        .field-msg {
+            font-size: 12px;
             font-weight: 500;
-            margin-top: 8px;
-            margin-bottom: 14px;
-            line-height: 1.4;
-            letter-spacing: 0.3px;
-            backdrop-filter: blur(8px);
-            border: 1px solid transparent;
-            animation: smoothFade 0.35s ease;
+            margin-top: 4px;
+            margin-bottom: 8px;
+            padding-left: 2px;
+            display: none;
+            transition: all 0.2s ease;
         }
-
-        /* ❌ ERROR STYLE */
-        .error-box.error {
-            background: linear-gradient(135deg, #fff0f0, #ffe5e5);
-            color: #b30000;
-            border: 1px solid #ffb3b3;
-            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.08);
-        }
-
-        /* ✅ SUCCESS STYLE */
-        .error-box.success {
-            background: linear-gradient(135deg, #eafff3, #d4ffe8);
-            color: #007c3a;
-            border: 1px solid #a6f5c4;
-            box-shadow: 0 4px 12px rgba(0, 128, 0, 0.08);
-        }
+        .field-msg.error { color: #cc0000; }
+        .field-msg.success { color: #1a7a3f; }
 
         /* INPUT STATES */
         .input-error {
             border: 1.5px solid #ff3b3b !important;
-            box-shadow: 0 0 12px rgba(255, 59, 59, 0.25);
+            box-shadow: 0 0 0 3px rgba(255,59,59,0.08);
         }
-
         .input-success {
             border: 1.5px solid #28a745 !important;
-            box-shadow: 0 0 12px rgba(40, 167, 69, 0.25);
+            box-shadow: 0 0 0 3px rgba(40,167,69,0.08);
         }
 
-        /* ✨ PREMIUM INPUT */
         input {
-            transition: all 0.25s ease;
-            font-size: 15px;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
         }
-
         input:focus {
             border: 1.5px solid #000 !important;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-
-        /* ✨ ANIMATION */
-        @keyframes smoothFade {
-            from {
-                opacity: 0;
-                transform: translateY(-8px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            box-shadow: 0 0 10px rgba(0,0,0,0.12);
         }
         </style>
     </head>
     <body data-mobile-nav-style="classic">
         
         {% include 'components/navbar.html' %}
-
-        <!-- start page title -->
-        <section class="page-title-center-alignment ipad-top-space-margin cover-background position-relative py-0" style="background-image: url({% static 'images/banners/contact-banner.png' %})">
-            <div class="container">
-                <div class="row flex-column align-items-center justify-content-center h-500px md-h-400px sm-h-300px">
-                    <div class="col-12 text-center position-relative page-title-extra-large">
-                        <h1 class="alt-font ls-minus-1px text-white d-inline-block mb-10px mt-3 md-mt-50px">Register Now</h1>
-                    </div>
-                </div>
-            </div>
-        </section>
         
         <!-- start section -->
         <section>
             <div class="container">
                 <div class="row g-0 justify-content-center">
-                    <div class="col-lg-6 col-md-10 p-4 bg-light-medium-gray border-radius-10px" data-anime='{ "translateY": [0, 0], "opacity": [0,1], "duration": 600, "delay":150, "staggervalue": 150, "easing": "easeOutQuad" }'>
+                    <div class="col-lg-6 col-md-10 p-4 bg-light-medium-gray border-radius-10px mt-7" data-anime='{ "translateY": [0, 0], "opacity": [0,1], "duration": 600, "delay":150, "staggervalue": 150, "easing": "easeOutQuad" }'>
                         <span class="fs-26 xs-fs-24 alt-font fw-500 text-dark-gray mb-20px d-block">Create an account</span>
                         <form id="regForm" action="{% url 'reg_post' %}" method="post">
                             {% csrf_token %}
 
                             <label class="text-dark-gray mb-10px fw-500">Username<span class="text-red">*</span></label>
                             <input class="mb-5px required" id="name" name="name" type="text" placeholder="Enter your username" />
-                            <div id="name_error" class="error-box"></div>
+                            <div id="name_error" class="field-msg"></div>
 
                             <label class="text-dark-gray mb-10px fw-500">Email address<span class="text-red">*</span></label>
                             <input class="mb-5px required" type="email" name="email" id="email" placeholder="Enter your email" />
-                            <div id="email_error" class="error-box"></div>
+                            <div id="email_error" class="field-msg"></div>
 
                             <label class="text-dark-gray mb-10px fw-500">Phone Number<span class="text-red">*</span></label>
                             <input class="mb-5px required" type="tel" name="phone" id="phone" placeholder="Enter your phone number" />
-                            <div id="phone_error" class="error-box"></div>
+                            <div id="phone_error" class="field-msg"></div>
 
                             <label class="text-dark-gray mb-10px fw-500">Password<span class="text-red">*</span></label>
                             <input class="mb-5px required" type="password" id="password" name="password" placeholder="Enter your password" />
-                            <div id="password_error" class="error-box"></div>
+                            <div id="password_error" class="field-msg"></div>
 
                             <label class="text-dark-gray mb-10px fw-500">Confirm Password<span class="text-red">*</span></label>
                             <input class="mb-5px required" type="password" name="confirm_password" id="confirm_password" placeholder="Re-enter your password" />
-                            <div id="confirm_password_error" class="error-box"></div>
+                            <div id="confirm_password_error" class="field-msg"></div>
 
                             <span class="fs-13 lh-22 w-90 lg-w-100 md-w-90 sm-w-100 d-block mb-30px">Your personal data will be used to support your experience throughout this website, to manage access to your account, and for other purposes described in our <a href="#" class="text-dark-gray text-decoration-line-bottom fw-500">privacy policy.</a></span>
                             <input type="hidden" name="redirect" value="">
@@ -171,7 +125,6 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script>
-        // ✅ CSRF
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -187,120 +140,94 @@
             return cookieValue;
         }
 
-        // ✅ FIELDS
-        const nameField = document.getElementById("name");
-        const emailField = document.getElementById("email");
-        const phoneField = document.getElementById("phone");
-        const passwordField = document.getElementById("password");
+        const nameField            = document.getElementById("name");
+        const emailField           = document.getElementById("email");
+        const phoneField           = document.getElementById("phone");
+        const passwordField        = document.getElementById("password");
         const confirmPasswordField = document.getElementById("confirm_password");
 
-        // ✅ ERROR BOXES
-        const nameErr = document.getElementById("name_error");
-        const emailErr = document.getElementById("email_error");
-        const phoneErr = document.getElementById("phone_error");
-        const passErr = document.getElementById("password_error");
+        const nameErr        = document.getElementById("name_error");
+        const emailErr       = document.getElementById("email_error");
+        const phoneErr       = document.getElementById("phone_error");
+        const passErr        = document.getElementById("password_error");
         const confirmPassErr = document.getElementById("confirm_password_error");
 
-        // ✅ FLAGS
-        let validName = false;
-        let validEmail = false;
-        let validPhone = false;
-        let validPassword = false;
+        let validName            = false;
+        let validEmail           = false;
+        let validPhone           = false;
+        let validPassword        = false;
         let validConfirmPassword = false;
 
-        // ✅ MAIN VALIDATION
-        function validateForm() {
-
-            // 🔥 CONFIRM PASSWORD (NO API NEEDED)
-            if (confirmPasswordField.value.length === 0) {
-                confirmPassErr.style.display = "none";
-                confirmPasswordField.classList.remove("input-error", "input-success");
-                validConfirmPassword = false;
-
-            } else if (confirmPasswordField.value !== passwordField.value) {
-                confirmPassErr.innerHTML = `
-                    <span style="font-size:16px;">❌</span>
-                    <span style="margin-left:6px;">Passwords do not match</span>
-                `;
-                confirmPassErr.className = "error-box error";
-                confirmPassErr.style.display = "block";
-                confirmPasswordField.classList.add("input-error");
-                confirmPasswordField.classList.remove("input-success");
-                validConfirmPassword = false;
-
+        function showMsg(box, field, message, isSuccess) {
+            if (!message && !isSuccess) {
+                box.style.display = "none";
+                box.className = "field-msg";
+                field.classList.remove("input-error", "input-success");
+                return;
+            }
+            box.style.display = "block";
+            if (isSuccess) {
+                box.textContent = "✓ Looks good";
+                box.className = "field-msg success";
+                field.classList.add("input-success");
+                field.classList.remove("input-error");
             } else {
-                confirmPassErr.innerHTML = `
-                    <span style="font-size:16px;">✔</span>
-                    <span style="margin-left:6px;">Passwords match</span>
-                `;
-                confirmPassErr.className = "error-box success";
-                confirmPassErr.style.display = "block";
-                confirmPasswordField.classList.add("input-success");
-                confirmPasswordField.classList.remove("input-error");
+                box.textContent = "✕ " + message;
+                box.className = "field-msg error";
+                field.classList.add("input-error");
+                field.classList.remove("input-success");
+            }
+        }
+
+        function validateForm() {
+            // Confirm password (no API needed)
+            if (confirmPasswordField.value.length === 0) {
+                showMsg(confirmPassErr, confirmPasswordField, null, false);
+                validConfirmPassword = false;
+            } else if (confirmPasswordField.value !== passwordField.value) {
+                showMsg(confirmPassErr, confirmPasswordField, "Passwords do not match", false);
+                validConfirmPassword = false;
+            } else {
+                showMsg(confirmPassErr, confirmPasswordField, null, true);
                 validConfirmPassword = true;
             }
 
-            // ✅ API CALL
+            // API validation
             fetch(`/ajax/validate-register/?name=${nameField.value}&email=${emailField.value}&phone=${phoneField.value}&password=${passwordField.value}&confirm_password=${confirmPasswordField.value}`, {
                 method: "GET",
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken')
-                }
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
             })
             .then(res => res.json())
             .then(data => {
-
-                function showValidation(field, box, message) {
-                    if (message) {
-                        box.innerHTML = `
-                            <span style="font-size:16px;">❌</span>
-                            <span style="margin-left:6px;">${message}</span>
-                        `;
-                        box.className = "error-box error";
-                        box.style.display = "block";
-                        field.classList.remove("input-success");
-                        field.classList.add("input-error");
-
+                function handle(field, box, errorMsg, validFlag) {
+                    if (errorMsg) {
+                        showMsg(box, field, errorMsg, false);
+                        return false;
                     } else if (field.value.length > 0) {
-                        box.innerHTML = `
-                            <span style="font-size:16px;">✔</span>
-                            <span style="margin-left:6px;">Looks perfect</span>
-                        `;
-                        box.className = "error-box success";
-                        box.style.display = "block";
-                        field.classList.remove("input-error");
-                        field.classList.add("input-success");
-
+                        showMsg(box, field, null, true);
+                        return true;
                     } else {
-                        box.style.display = "none";
-                        field.classList.remove("input-error", "input-success");
+                        showMsg(box, field, null, false);
+                        return false;
                     }
                 }
 
-                showValidation(nameField, nameErr, data.name_error);
-                showValidation(emailField, emailErr, data.email_error);
-                showValidation(phoneField, phoneErr, data.phone_error);
-                showValidation(passwordField, passErr, data.password_error);
-
-                validName = !data.name_error;
-                validEmail = !data.email_error;
-                validPhone = !data.phone_error;
-                validPassword = !data.password_error;
+                validName     = handle(nameField,     nameErr,    data.name_error,     validName);
+                validEmail    = handle(emailField,    emailErr,   data.email_error,    validEmail);
+                validPhone    = handle(phoneField,    phoneErr,   data.phone_error,    validPhone);
+                validPassword = handle(passwordField, passErr,    data.password_error, validPassword);
             });
         }
 
-        // ✅ EVENTS
         nameField.addEventListener("input", validateForm);
         emailField.addEventListener("input", validateForm);
         phoneField.addEventListener("input", validateForm);
         passwordField.addEventListener("input", validateForm);
         confirmPasswordField.addEventListener("input", validateForm);
 
-        // ✅ SUBMIT
         document.getElementById("regForm").addEventListener("submit", function(e) {
             const btn = document.getElementById("registerBtn");
 
-            // ❌ If invalid → stop
             if (!validName || !validEmail || !validPhone || !validPassword || !validConfirmPassword) {
                 e.preventDefault();
                 Swal.fire({
@@ -321,7 +248,6 @@
                 return;
             }
 
-            // ✅ If valid → disable button + spinner
             btn.disabled = true;
             btn.innerHTML = "Creating account... <span class='spinner-border spinner-border-sm'></span>";
             btn.style.opacity = "0.7";

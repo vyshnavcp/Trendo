@@ -1982,7 +1982,6 @@ def report_page(request):
             'per_page': PER_PAGE,
         })
 
-    # ── HTML RESPONSE ──
     return render(request, 'report_page.html', {
         'title': 'Order Report',
     })
