@@ -117,6 +117,7 @@ class Product(models.Model):
     is_signature_collection = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
     is_best_seller = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     stock = models.PositiveIntegerField(default=0)
     image1 = models.ImageField(upload_to='products/', blank=True, null=True)
     image2 = models.ImageField(upload_to='products/', blank=True, null=True)

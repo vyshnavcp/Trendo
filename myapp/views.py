@@ -47,9 +47,9 @@ from django.middleware.csrf import rotate_token
 
 def home(request):
     blogs = Article.objects.order_by('-posted_on')[:4]
-    best_seller_products = Product.objects.filter(is_best_seller=True)[:5]
-    featured_product= Product.objects.filter(is_featured=True)[:6]
-    signature_products = Product.objects.filter(is_signature_collection=True, status=True)[:8]
+    best_seller_products = Product.objects.filter(is_best_seller=True,is_active=True)[:5]
+    featured_product= Product.objects.filter(is_featured=True,is_active=True)[:6]
+    signature_products = Product.objects.filter(is_signature_collection=True, status=True,is_active=True)[:8]
     categories = Category.objects.prefetch_related("subcategories").all()
     women_category = Category.objects.filter(name__iexact="Women").first()
     accessories_category = Category.objects.filter(name__iexact="Accessories").first()
@@ -199,7 +199,7 @@ def delete_contact(request, contact_id):
 
 
 def product(request, slug=None):
-    products = Product.objects.filter(status=True).distinct()
+    products = Product.objects.filter(status=True,is_active=True).distinct()
     if request.GET.get('latest') == '1':
         products = products.order_by('-created_at')
     query = request.GET.get('q')
@@ -263,7 +263,7 @@ def product(request, slug=None):
     })
 
 def product_detail(request, slug):
-    product = get_object_or_404(Product, slug=slug)
+    product = get_object_or_404(Product, slug=slug,is_active=True)
     variants = product.variants.select_related('size', 'color')
     colors = list({v.color for v in variants if v.color})
     sizes = list({v.size for v in variants if v.size})
@@ -280,7 +280,7 @@ def product_detail(request, slug):
     for i in range(1, 6):
         rating_percent[i] = round((rating_dict[i] / total_reviews) * 100) if total_reviews else 0
     related_products = Product.objects.filter(
-        subcategory=product.subcategory
+        subcategory=product.subcategory,is_active=True
     ).exclude(id=product.id)[:4]
     product_images = []
     for img_field in ['image1', 'image2', 'image3', 'image4', 'image5']:
@@ -1576,12 +1576,77 @@ def ajax_validate_product_code(request):
         "exists": exists
     })
 
+
 @staff_member_required
 def product_list(request):
-    products = Product.objects.all()
+    query = request.GET.get('q', '')
+    status_filter = request.GET.get('status', '')
+    product_qs = Product.objects.all()
+
+    if query:
+        product_qs = product_qs.filter(
+            Q(name__icontains=query) |
+            Q(brand__icontains=query) |
+            Q(product_code__icontains=query)
+        )
+
+    if status_filter == 'active':
+        product_qs = product_qs.filter(is_active=True)
+    elif status_filter == 'inactive':
+        product_qs = product_qs.filter(is_active=False)
+
+    paginator = Paginator(product_qs, 30)
+    page_number = request.GET.get('page')
+    products = paginator.get_page(page_number)
+
     return render(request, "product_list.html", {
-        "products": products
+        "products": products,
+        "query": query,
+        "status_filter": status_filter,
+        "total_active": Product.objects.filter(is_active=True).count(),
+        "total_inactive": Product.objects.filter(is_active=False).count(),
+        "total_all": Product.objects.count(),
     })
+
+
+@staff_member_required
+def product_search_suggestions(request):
+    query = request.GET.get('q', '').strip()
+    status_filter = request.GET.get('status', '')
+    results = []
+
+    if query:
+        qs = Product.objects.filter(
+            Q(name__icontains=query) |
+            Q(brand__icontains=query) |
+            Q(product_code__icontains=query)
+        )
+        if status_filter == 'active':
+            qs = qs.filter(is_active=True)
+        elif status_filter == 'inactive':
+            qs = qs.filter(is_active=False)
+
+        for p in qs.values('name', 'brand', 'product_code', 'slug', 'price')[:8]:
+            results.append({
+                'name': p['name'],
+                'brand': p['brand'],
+                'product_code': p['product_code'],
+                'price': str(p['price']),
+                'slug': p['slug'],
+            })
+
+    return JsonResponse({'results': results})
+
+
+def toggle_product_active(request, slug):
+    product = get_object_or_404(Product, slug=slug)
+    product.is_active = not product.is_active
+    product.save()
+    next_url = request.GET.get('next', '')
+    if next_url:
+        from urllib.parse import unquote
+        return redirect(unquote(next_url))
+    return redirect('product_list')
 
 @staff_member_required
 @transaction.atomic
@@ -1789,104 +1854,137 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 
-@role_required(["Accountant"])
+
+@role_required(["Accountant","admin"])
 @login_required(login_url='user_login')
 def report_page(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
     orders = Order.objects.all()
 
-    # ================= DATE FILTER =================
+    # ── DATE FILTER ──
     from_date = request.GET.get('from_date')
-    to_date = request.GET.get('to_date')
+    to_date   = request.GET.get('to_date')
 
     if from_date:
-        orders = orders.filter(created_at__date__gte=datetime.strptime(from_date, "%Y-%m-%d"))
+        try:
+            orders = orders.filter(
+                created_at__date__gte=datetime.strptime(from_date, "%Y-%m-%d").date()
+            )
+        except ValueError:
+            pass
 
     if to_date:
-        orders = orders.filter(created_at__date__lte=datetime.strptime(to_date, "%Y-%m-%d"))
-
-    # ================= PAYMENT FILTER =================
-    payment = request.GET.get('payment')
-
-    if payment:
-        if payment == "cod":
-            orders = orders.filter(payment_method="cod", is_pos_order=False)
-
-        elif payment == "razorpay":
-            orders = orders.filter(payment_method="razorpay", is_pos_order=False)
-
-        elif payment == "pos_paid":
-            orders = orders.filter(is_pos_order=True, payment_status=True)
-
-        elif payment == "pos_pending":
-            orders = orders.filter(is_pos_order=True, payment_status=False)
-
-    # ================= STATUS FILTER =================
-    status = request.GET.get('status')
-
-    if status:
-        if status == "pending":
+        try:
             orders = orders.filter(
-                is_delivered=False,
-                is_cancelled=False
-            ).exclude(
-                is_pos_order=True,
-                payment_status=True
+                created_at__date__lte=datetime.strptime(to_date, "%Y-%m-%d").date()
             )
+        except ValueError:
+            pass
 
-        elif status == "completed":
-            # Include delivered online orders OR POS paid orders
-            orders = orders.filter(
-                Q(is_delivered=True, is_cancelled=False, return_approved=False) |
-                Q(is_pos_order=True, payment_status=True)
-            )
+    # ── PAYMENT FILTER ──
+    payment = request.GET.get('payment', '').strip()
 
-        elif status == "cancelled":
-            orders = orders.filter(is_cancelled=True)
+    if payment == 'cod':
+        orders = orders.filter(payment_method='cod', is_pos_order=False)
+    elif payment == 'razorpay':
+        orders = orders.filter(payment_method='razorpay', is_pos_order=False)
+    elif payment == 'pos_paid':
+        orders = orders.filter(is_pos_order=True, payment_status=True)
+    elif payment == 'pos_pending':
+        orders = orders.filter(is_pos_order=True, payment_status=False)
 
-        elif status == "returned":
-            orders = orders.filter(return_approved=True)
+    # ── STATUS FILTER ──
+    status = request.GET.get('status', '').strip()
 
-    # ================= COUNTS =================
+    if status == 'pending':
+        orders = orders.filter(
+            is_delivered=False,
+            is_cancelled=False,
+        ).exclude(is_pos_order=True, payment_status=True)
+
+    elif status == 'completed':
+        orders = orders.filter(
+            Q(is_delivered=True, is_cancelled=False, return_approved=False) |
+            Q(is_pos_order=True, payment_status=True)
+        )
+
+    elif status == 'cancelled':
+        orders = orders.filter(is_cancelled=True)
+
+    elif status == 'returned':
+        orders = orders.filter(return_approved=True)
+
+    # ── SUMMARY COUNTS (before pagination) ──
     total_orders = orders.count()
 
-    # ✅ VALID REVENUE = delivered online orders (exclude cancelled, returned, refunded)
     valid_orders = orders.filter(
         is_delivered=True,
         is_cancelled=False,
         return_approved=False,
-        refund_processed=False
+        refund_processed=False,
     )
-
     total_revenue = valid_orders.aggregate(Sum('total'))['total__sum'] or 0
 
-    # ✅ Paid orders = delivered online OR POS paid
     total_paid_orders = orders.filter(
         Q(is_delivered=True, is_cancelled=False, return_approved=False, refund_processed=False) |
         Q(is_pos_order=True, payment_status=True)
     ).count()
 
-    # Pending orders = not delivered and not cancelled
-    pending_orders = orders.filter(
+    pending_orders_count = orders.filter(
         is_delivered=False,
-        is_cancelled=False
-    ).exclude(
-        is_pos_order=True,
-        payment_status=True
-    ).count()
+        is_cancelled=False,
+    ).exclude(is_pos_order=True, payment_status=True).count()
 
-    # Returned orders
-    returned_orders = orders.filter(return_approved=True).count()
+    returned_orders_count = orders.filter(return_approved=True).count()
 
-    # ================= RESPONSE =================
-    return render(request, "report_page.html", {
-        "title": "Order Report",
-        "orders": orders.order_by("-created_at"),
-        "total_orders": total_orders,
-        "total_revenue": total_revenue,
-        "total_paid_orders": total_paid_orders,
-        "pending_orders": pending_orders,
-        "returned_orders": returned_orders,
+    # ── PAGINATION ──
+    PER_PAGE = 20
+    paginator = Paginator(orders.order_by('-created_at'), PER_PAGE)
+    page_number = request.GET.get('page', 1)
+
+    try:
+        page_number = int(page_number)
+    except (ValueError, TypeError):
+        page_number = 1
+
+    page_obj = paginator.get_page(page_number)
+
+    # ── AJAX RESPONSE ──
+    if is_ajax:
+        orders_data = []
+        for o in page_obj:
+            orders_data.append({
+                'id': o.id,
+                'first_name': o.first_name,
+                'total': str(o.total),
+                'payment_method': o.payment_method or '',
+                'is_pos_order': o.is_pos_order,
+                'payment_status': o.payment_status,
+                'pos_payment_type': getattr(o, 'pos_payment_type', '') or '',
+                'is_delivered': o.is_delivered,
+                'is_cancelled': o.is_cancelled,
+                'return_approved': o.return_approved,
+                'refund_processed': o.refund_processed,
+                'return_requested': getattr(o, 'return_requested', False),
+                'created_at': o.created_at.strftime('%d %b %Y'),
+            })
+
+        return JsonResponse({
+            'orders': orders_data,
+            'total_orders': total_orders,
+            'total_revenue': str(total_revenue),
+            'total_paid_orders': total_paid_orders,
+            'pending_orders': pending_orders_count,
+            'returned_orders': returned_orders_count,
+            'current_page': page_obj.number,
+            'total_pages': paginator.num_pages,
+            'per_page': PER_PAGE,
+        })
+
+    # ── HTML RESPONSE ──
+    return render(request, 'report_page.html', {
+        'title': 'Order Report',
     })
 
 

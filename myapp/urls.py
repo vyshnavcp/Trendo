@@ -161,6 +161,8 @@ urlpatterns = [
     path('order/<int:order_id>/deliver/', views.mark_as_delivered, name='mark_as_delivered'),
     path("delivery/<int:order_id>/", views.delivery_page, name="delivery_page"),
     path("shipping-orders/", views.shipping_orders, name="shipping_orders"),
+    path('product/toggle-active/<slug:slug>/', views.toggle_product_active, name='toggle_product_active'),
+    path('ajax/product-suggestions/', views.product_search_suggestions, name='product_search_suggestions'),
 ]
 
 if settings.DEBUG:
