@@ -222,7 +222,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'vyshnavcp01@gmail.com'
-EMAIL_HOST_PASSWORD = 'fizt tiff kijn mkta'
+EMAIL_HOST_PASSWORD = 'ocne erpl iqpo ugrm'
 ADMIN_EMAIL = "vyshnavcp01@gmail.com"
 
 RAZORPAY_KEY_ID = "rzp_test_S8qlnWKlA74eSw"
