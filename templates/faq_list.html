@@ -1,209 +1,138 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>FAQs</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'main.html' %}
+{% block title %}FAQs{% endblock %}
+{% load static %}
 
-<!-- Bootstrap + Icons + Font -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+{% block content %}
 
-<style>
-body{
-    font-family:'Poppins', sans-serif;
-    background:#f4f6f9;
-    margin:0;
-}
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <h4><i class="bi bi-question-circle" style="color:var(--accent);"></i> FAQs</h4>
+    <p>Manage your store frequently asked questions</p>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'add_faq' %}" class="btn btn-sm btn-dark" style="border-radius:9px; font-weight:500;">
+      <i class="bi bi-plus-lg me-1"></i> Add FAQ
+    </a>
+  </div>
+</div>
 
-/* ================= NAVBAR ================= */
-.header-with-topbar{
-    background:#000;
-    box-shadow:0 4px 20px rgba(0,0,0,0.35);
-}
-.dashboard-header{
-    padding:18px 24px;
-}
-.dashboard-header h4,
-.dashboard-header small,
-.dashboard-header i{
-    color:#fff;
-}
-.dashboard-header .nav-link{
-    color:#fff !important;
-    font-weight:500;
-    transition:0.3s;
-}
-.dashboard-header .nav-link:hover{
-    color:#bdbdbd !important;
-}
-.navbar-toggler{
-    border:0;
-}
-.navbar-toggler-icon{
-    filter:invert(1);
-}
+<!-- TABLE -->
+<div class="orders-wrap mb-4">
 
-/* ================= PAGE CONTENT ================= */
-.page-wrapper{
-    padding:50px 20px;
-}
-.container-box{
-    max-width:1200px;
-    margin:auto;
-}
+  <div class="orders-header">
+    <span class="orders-header-title">
+      <i class="ti ti-help" style="font-size:17px;color:var(--accent);"></i>
+      All FAQs
+      {% if page_obj.paginator.count %}
+        <span class="orders-count-pill">{{ page_obj.paginator.count }} total</span>
+      {% endif %}
+    </span>
+  </div>
 
-.card{
-    border-radius: 16px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-.card:hover{
-    transform: translateY(-4px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.12);
-}
+  <div class="table-scroll-wrap">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Question</th>
+          <th>Answer</th>
+          <th style="width:120px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in page_obj %}
+        <tr>
+          <td><span class="order-id">#{{ f.id }}</span></td>
 
-.table{
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:0 6px 20px rgba(0,0,0,0.05);
-    background:#fff;
-}
-.table thead th{
-    background:#f0f0f0;
-    font-weight:600;
-    color:#1f2937;
-}
-.table-hover tbody tr:hover{
-    background:#f3f4f6;
-}
+          <td style="max-width:280px;">
+            <span style="font-weight:500; color:var(--text);">
+              {{ f.question|truncatechars:80 }}
+            </span>
+          </td>
 
-.btn-edit, .btn-add{
-    background:#111;
-    color:#fff;
-    border-radius:8px;
-    font-weight:500;
-    transition:0.3s;
-}
-.btn-edit:hover, .btn-add:hover{
-    background:#333;
-    transform:translateY(-2px);
-    box-shadow:0 6px 12px rgba(0,0,0,0.25);
-}
-.btn-delete{
-    background:black;
-    color:#fff;
-    border-radius:8px;
-    font-weight:500;
-    transition:0.3s;
-}
-.btn-delete:hover{
-    background:#c0392b;
-    transform:translateY(-2px);
-    box-shadow:0 6px 12px rgba(0,0,0,0.25);
-}
+          <td style="max-width:380px;">
+            <span style="
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              color: var(--muted);
+              font-size: .82rem;
+              line-height: 1.55;
+            ">{{ f.answer|striptags|truncatechars:120 }}</span>
+          </td>
 
-@media(max-width:768px){
-    .table, th, td{
-        font-size:14px;
-    }
-    .btn-edit, .btn-delete, .btn-add{
-        font-size:13px;
-        padding:4px 10px;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<!-- ================= NAVBAR ================= -->
-<header class="header-with-topbar">
-<nav class="navbar dashboard-header navbar-expand-lg">
-    <div class="container-fluid px-0">
-
-        <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-speedometer2 fs-2"></i>
-            <div>
-                <h4 class="mb-0">Admin Dashboard</h4>
-                <small>Overview of store performance</small>
+          <td>
+            <div class="d-flex gap-2">
+              <a href="{% url 'edit_faq' f.id %}" class="btn-edit" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <a href="{% url 'delete_faq' f.id %}"
+                 class="btn-edit"
+                 style="background:rgba(239,68,68,.1);color:#dc2626;"
+                 onclick="return confirm('Delete this FAQ?')"
+                 title="Delete">
+                <i class="bi bi-trash"></i>
+              </a>
             </div>
-        </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr class="empty-row">
+          <td colspan="4">
+            <i class="bi bi-question-circle empty-icon"></i>
+            No FAQs added yet.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-        <button class="navbar-toggler" type="button"
-                data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div class="pagination-wrap">
+    <span class="pagination-info">
+      Showing <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+      of <strong>{{ page_obj.paginator.count }}</strong> entries
+    </span>
+    <div class="pagination-controls">
 
-        <div class="collapse navbar-collapse justify-content-end" id="adminNavbar">
-            <ul class="navbar-nav align-items-lg-center gap-lg-3 mt-3 mt-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'dashboard' %}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'user_logout' %}">
-                        Logout
-                    </a>
-                </li>
-            </ul>
-        </div>
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="page-btn"><i class="bi bi-chevron-double-left"></i></a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="page-btn"><i class="bi bi-chevron-left"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-left"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-left"></i></span>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="page-btn active">{{ num }}</span>
+        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="page-btn"><i class="bi bi-chevron-right"></i></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="page-btn"><i class="bi bi-chevron-double-right"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-right"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-right"></i></span>
+      {% endif %}
 
     </div>
-</nav>
-</header>
-
-<!-- ================= PAGE CONTENT ================= -->
-<div class="page-wrapper">
-<div class="container-box">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold">FAQs</h4>
-    <a href="{% url 'add_faq' %}" class="btn btn-sm btn-add">+ Add FAQ</a>
-</div>
-
-<div class="card">
-<div class="card-body">
-
-<table class="table table-hover align-middle">
-<thead>
-<tr>
-    <th>ID</th>
-    <th>Question</th>
-    <th width="200">Actions</th>
-</tr>
-</thead>
-
-<tbody>
-{% for f in faqs %}
-<tr>
-    <td>#{{ f.id }}</td>
-    <td>{{ f.question|truncatechars:60 }}</td>
-    <td>
-        <a href="{% url 'edit_faq' f.id %}" class="btn btn-sm btn-edit">Edit</a>
-        <a href="{% url 'delete_faq' f.id %}"
-           class="btn btn-sm btn-delete"
-           onclick="return confirm('Delete FAQ?')">
-           Delete
-        </a>
-    </td>
-</tr>
-{% empty %}
-<tr>
-    <td colspan="3" class="text-center text-muted py-4">
-        No FAQ Added
-    </td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+  </div>
+  {% endif %}
 
 </div>
-</div>
 
-</div>
-</div>
+{% endblock %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% block js %}{% endblock %}

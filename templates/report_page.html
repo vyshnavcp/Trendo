@@ -1,105 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>{{ title }}</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+{% extends 'main.html' %}
+{% block title %}Order Report{% endblock %}
+{% load static %}
 
+{% block css %}
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink: #0a0a0f;
-  --surface: #f7f7fa;
-  --card: #ffffff;
-  --accent: #6c47ff;
   --accent2: #ff6b6b;
-  --gold: #f5a623;
-  --muted: #8a8a9a;
-  --border: #e8e8f0;
-  --green: #00c48c;
-  --red: #ff4757;
-  --yellow: #ffbe21;
-  --radius: 14px;
-  --shadow: 0 4px 24px rgba(108,71,255,.10);
-  --shadow-lg: 0 12px 40px rgba(10,10,15,.13);
+  --gold:    #f5a623;
+  --green:   #00c48c;
+  --red:     #ff4757;
+  --yellow:  #ffbe21;
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: var(--surface);
-  font-family: 'DM Sans', sans-serif;
-  color: var(--ink);
-  min-height: 100vh;
-}
-
-/* ── HEADER ── */
-.site-header {
-  background: var(--ink);
-  padding: 0 32px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  border-bottom: 1px solid rgba(255,255,255,.07);
-}
-.site-header nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
-  gap: 20px;
-}
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #fff;
-  text-decoration: none;
-}
-.logo-icon {
-  width: 36px; height: 36px;
-  background: var(--accent);
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font-size: 18px;
-  color: #fff;
-}
-.logo-text {
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: -.3px;
-  color: #fff;
-}
-.logo-sub {
-  font-size: 11px;
-  color: rgba(255,255,255,.45);
-  font-weight: 400;
-  display: block;
-  line-height: 1;
-}
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  list-style: none;
-}
-.nav-links a {
-  color: rgba(255,255,255,.6);
-  text-decoration: none;
-  font-size: 13.5px;
-  font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 8px;
-  transition: all .2s;
-}
-.nav-links a:hover { color: #fff; background: rgba(255,255,255,.08); }
-.nav-links .logout a { color: var(--accent2); }
-.nav-links .logout a:hover { background: rgba(255,107,107,.12); }
-
-/* ── MAIN ── */
-.main { padding: 32px; max-width: 1440px; margin: 0 auto; }
 
 /* ── PAGE TOP ── */
 .page-top {
@@ -111,20 +23,21 @@ body {
   gap: 16px;
 }
 .page-title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: -.6px;
-  color: var(--ink);
+  letter-spacing: -.5px;
+  color: var(--text);
 }
 .page-title span { color: var(--accent); }
-.page-sub { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.page-sub { font-size: 13.5px; color: var(--muted); margin-top: 3px; }
+
 .export-btn {
-  background: var(--ink);
+  background: var(--text);
   color: #fff;
   border: none;
   border-radius: 10px;
   padding: 10px 20px;
-  font-family: inherit;
+  font-family: 'Inter', sans-serif;
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
@@ -136,183 +49,193 @@ body {
 .export-btn:hover { background: var(--accent); }
 
 /* ── STATS STRIP ── */
-.stats-strip {
+.rpt-stats {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
-  margin-bottom: 28px;
+  gap: 14px;
+  margin-bottom: 24px;
 }
-.stat-card {
-  background: var(--card);
+.rpt-stat {
+  background: var(--card-bg);
   border-radius: var(--radius);
-  padding: 20px 22px;
+  padding: 18px 20px;
   border: 1px solid var(--border);
   position: relative;
   overflow: hidden;
   transition: box-shadow .2s, transform .2s;
+  cursor: default;
 }
-.stat-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
-.stat-card::before {
+.rpt-stat:hover { box-shadow: 0 10px 30px rgba(0,0,0,.08); transform: translateY(-2px); }
+.rpt-stat::before {
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
   height: 3px;
-  background: var(--card-accent, var(--accent));
   border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--stripe, var(--accent));
 }
-.stat-card.c-total   { --card-accent: var(--accent); }
-.stat-card.c-revenue { --card-accent: var(--green); }
-.stat-card.c-paid    { --card-accent: var(--gold); }
-.stat-card.c-pending { --card-accent: var(--yellow); }
-.stat-card.c-returned{ --card-accent: var(--red); }
+.rpt-stat.c-total    { --stripe: var(--accent); }
+.rpt-stat.c-revenue  { --stripe: var(--green); }
+.rpt-stat.c-paid     { --stripe: var(--gold); }
+.rpt-stat.c-pending  { --stripe: var(--yellow); }
+.rpt-stat.c-returned { --stripe: var(--red); }
 
-.stat-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .8px;
+.rpt-stat-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 8px;
 }
-.stat-value {
+.rpt-stat-value {
   font-family: 'Space Mono', monospace;
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--ink);
-  line-height: 1;
-}
-
-/* ── REVENUE: plain font, no weird symbol ── */
-.stat-card.c-revenue .stat-value {
-  font-family: 'DM Sans', sans-serif;
   font-size: 22px;
   font-weight: 700;
+  color: var(--text);
+  line-height: 1;
 }
-
-.stat-icon {
+.rpt-stat.c-revenue .rpt-stat-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+}
+.rpt-stat-icon {
   position: absolute;
-  right: 18px; top: 50%;
+  right: 16px; top: 50%;
   transform: translateY(-50%);
-  font-size: 32px;
-  opacity: .07;
+  font-size: 30px;
+  opacity: .06;
 }
 
-/* ── FILTERS ── */
+/* ── FILTER BAR ── */
 .filter-bar {
-  background: var(--card);
+  background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px 24px;
-  margin-bottom: 24px;
+  padding: 18px 22px;
+  margin-bottom: 22px;
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 14px;
   align-items: flex-end;
 }
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   flex: 1;
-  min-width: 160px;
+  min-width: 150px;
 }
 .filter-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .07em;
   text-transform: uppercase;
   color: var(--muted);
 }
-.filter-bar input, .filter-bar select {
+.filter-bar input,
+.filter-bar select {
   border: 1.5px solid var(--border);
   border-radius: 9px;
-  padding: 9px 14px;
-  font-family: inherit;
+  padding: 9px 13px;
+  font-family: 'Inter', sans-serif;
   font-size: 13.5px;
-  color: var(--ink);
-  background: var(--surface);
+  color: var(--text);
+  background: var(--page-bg);
   transition: border-color .2s, box-shadow .2s;
   outline: none;
-  cursor: pointer;
 }
-.filter-bar input:focus, .filter-bar select:focus {
+.filter-bar input:focus,
+.filter-bar select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(108,71,255,.12);
-  background: #fff;
+  box-shadow: 0 0 0 3px rgba(108,99,255,.12);
+  background: var(--card-bg);
 }
 .reset-btn {
   background: transparent;
   border: 1.5px solid var(--border);
   border-radius: 9px;
   padding: 9px 18px;
-  font-family: inherit;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: var(--muted);
   cursor: pointer;
   transition: .2s;
+  white-space: nowrap;
 }
-.reset-btn:hover { border-color: var(--ink); color: var(--ink); }
+.reset-btn:hover { border-color: var(--text); color: var(--text); }
 
-/* ── TABLE ── */
-.table-card {
-  background: var(--card);
-  border-radius: var(--radius);
+/* ── TABLE CARD ── */
+.rpt-table-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: 0 2px 16px rgba(0,0,0,.05);
 }
-.table-header-row {
+.rpt-table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 24px;
+  padding: 16px 22px;
   border-bottom: 1px solid var(--border);
+  background: linear-gradient(to bottom, #fafbff, #fff);
 }
-.table-title { font-size: 15px; font-weight: 700; }
-.order-count {
-  font-size: 12px;
-  background: rgba(108,71,255,.1);
+.rpt-table-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rpt-count-pill {
+  font-size: 11.5px;
+  font-weight: 600;
+  background: rgba(108,99,255,.1);
   color: var(--accent);
   padding: 4px 12px;
   border-radius: 20px;
-  font-weight: 600;
   font-family: 'Space Mono', monospace;
 }
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-thead th {
-  background: var(--surface);
-  padding: 12px 16px;
-  font-size: 11px;
+
+.rpt-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.rpt-table { width: 100%; border-collapse: collapse; min-width: 560px; }
+.rpt-table thead th {
+  background: var(--page-bg);
+  padding: 11px 16px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: .7px;
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--muted);
   text-align: left;
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
 }
-tbody tr {
+.rpt-table tbody tr {
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: background .15s;
 }
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: rgba(108,71,255,.04); }
-tbody td {
-  padding: 14px 16px;
+.rpt-table tbody tr:last-child { border-bottom: none; }
+.rpt-table tbody tr:hover { background: #f5f6ff; }
+.rpt-table tbody td {
+  padding: 13px 16px;
   font-size: 13.5px;
-  color: var(--ink);
+  color: var(--text);
   vertical-align: middle;
 }
-.order-id {
+
+.rpt-order-id {
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--muted);
   font-weight: 700;
 }
-.customer-name { font-weight: 600; }
-.amount {
+.rpt-cust { font-weight: 600; }
+.rpt-amount {
   font-family: 'Space Mono', monospace;
   font-weight: 700;
   font-size: 13px;
@@ -325,8 +248,9 @@ tbody td {
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 6px;
-  background: var(--surface);
+  background: var(--page-bg);
   border: 1px solid var(--border);
+  white-space: nowrap;
 }
 .status-pill {
   display: inline-flex;
@@ -334,63 +258,66 @@ tbody td {
   gap: 5px;
   font-size: 11px;
   font-weight: 700;
-  padding: 5px 12px;
+  padding: 4px 11px;
   border-radius: 20px;
-  letter-spacing: .3px;
+  letter-spacing: .03em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
-.s-completed  { background: rgba(0,196,140,.12); color: #00875a; }
-.s-pending    { background: rgba(255,190,33,.15); color: #a67c00; }
-.s-cancelled  { background: rgba(255,71,87,.12);  color: #c0392b; }
-.s-returned   { background: rgba(108,71,255,.12); color: var(--accent); }
-.s-return-req { background: rgba(255,107,107,.12);color: #c0392b; }
-.s-paid       { background: rgba(0,196,140,.12);  color: #00875a; }
+.s-completed  { background: rgba(0,196,140,.12);  color: #00875a; }
+.s-pending    { background: rgba(255,190,33,.15);  color: #a67c00; }
+.s-cancelled  { background: rgba(255,71,87,.12);   color: #c0392b; }
+.s-returned   { background: rgba(108,99,255,.12);  color: var(--accent); }
+.s-return-req { background: rgba(255,107,107,.12); color: #c0392b; }
+.s-paid       { background: rgba(0,196,140,.12);   color: #00875a; }
 
-.date-cell { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+.rpt-date { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
 
-.empty-state {
+.rpt-empty {
   padding: 60px 20px;
   text-align: center;
   color: var(--muted);
 }
-.empty-state i { font-size: 48px; display: block; margin-bottom: 12px; opacity: .3; }
+.rpt-empty i { font-size: 40px; display: block; margin-bottom: 10px; opacity: .2; }
 
 /* ── PAGINATION ── */
-.pagination-wrap {
+.rpt-pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 14px 22px;
   border-top: 1px solid var(--border);
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
+  background: #fafbff;
 }
-.page-info { font-size: 13px; color: var(--muted); }
-.page-info strong { color: var(--ink); }
-.page-btns { display: flex; gap: 6px; }
-.page-btn {
-  width: 34px; height: 34px;
-  border: 1.5px solid var(--border);
-  background: transparent;
+.rpt-page-info { font-size: 12.5px; color: var(--muted); }
+.rpt-page-info strong { color: var(--text); }
+.rpt-page-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+.rpt-page-btn {
+  min-width: 32px; height: 32px;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
   border-radius: 8px;
   font-family: 'Space Mono', monospace;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
-  display: grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: .15s;
-  color: var(--ink);
+  color: var(--text);
 }
-.page-btn:hover { border-color: var(--accent); color: var(--accent); }
-.page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-.page-btn:disabled { opacity: .3; pointer-events: none; }
+.rpt-page-btn:hover      { border-color: var(--accent); color: var(--accent); background: rgba(108,99,255,.05); }
+.rpt-page-btn.active     { background: var(--accent); border-color: var(--accent); color: #fff; }
+.rpt-page-btn:disabled   { opacity: .3; pointer-events: none; }
 
-/* ── LOADING OVERLAY ── */
-.loading-overlay {
+/* ── LOADING ── */
+.rpt-loading-overlay {
   position: fixed; inset: 0;
-  background: rgba(247,247,250,.7);
-  backdrop-filter: blur(2px);
+  background: rgba(241,243,249,.7);
   display: grid;
   place-items: center;
   z-index: 999;
@@ -398,174 +325,158 @@ tbody td {
   pointer-events: none;
   transition: opacity .2s;
 }
-.loading-overlay.active { opacity: 1; pointer-events: all; }
-.spinner {
-  width: 40px; height: 40px;
+.rpt-loading-overlay.active { opacity: 1; pointer-events: all; }
+.rpt-spinner {
+  width: 38px; height: 38px;
   border: 3px solid var(--border);
   border-top-color: var(--accent);
   border-radius: 50%;
-  animation: spin .7s linear infinite;
+  animation: rptSpin .7s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.fade-in { animation: fadeIn .25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes rptSpin { to { transform: rotate(360deg); } }
+.rpt-fade { animation: rptFade .25s ease; }
+@keyframes rptFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 900px) {
-  .main { padding: 16px; }
-  .stats-strip { grid-template-columns: repeat(2, 1fr); }
-  .nav-links { display: none; }
-}
-@media (max-width: 600px) {
-  .stats-strip { grid-template-columns: 1fr; }
-  .site-header { padding: 0 16px; }
-}
+@media (max-width: 1100px) { .rpt-stats { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 750px)  { .rpt-stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .rpt-stats { grid-template-columns: 1fr; } }
 </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
 
 <!-- LOADING -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
+<div class="rpt-loading-overlay" id="rptLoading">
+  <div class="rpt-spinner"></div>
 </div>
 
-<!-- HEADER -->
-<header class="site-header">
-  <nav>
-    <a href="{% url 'dashboard' %}" class="logo">
-      <div class="logo-icon"><i class="bi bi-speedometer2"></i></div>
-      <div>
-        <span class="logo-text">Admin Panel</span>
-        <span class="logo-sub">Store Management</span>
-      </div>
-    </a>
-    <ul class="nav-links">
-      <li><a href="{% url 'dashboard' %}"><i class="bi bi-house me-1"></i>Home</a></li>
-      <li><a href="{% url 'order_list' %}"><i class="bi bi-bag me-1"></i>Orders</a></li>
-      <li><a href="{% url 'paid_orders' %}"><i class="bi bi-check-circle me-1"></i>Paid</a></li>
-      <li><a href="{% url 'pending_orders' %}"><i class="bi bi-clock me-1"></i>Pending</a></li>
-      <li><a href="{% url 'customer_list' %}"><i class="bi bi-people me-1"></i>Customers</a></li>
-      <li class="logout"><a href="{% url 'user_logout' %}"><i class="bi bi-box-arrow-right me-1"></i>Logout</a></li>
-    </ul>
-  </nav>
-</header>
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- PAGE TOP -->
-  <div class="page-top">
-    <div>
-      <h1 class="page-title">Order <span>Report</span></h1>
-      <p class="page-sub">Live sales & order analytics — updates instantly</p>
-    </div>
+<!-- PAGE TOP -->
+<div class="topbar">
+  <div class="topbar-left">
+    <h4>Order <span style="color:var(--accent)">Report</span></h4>
+    <p>Live sales & order analytics — updates instantly</p>
+  </div>
+  <div class="topbar-right">
     <button class="export-btn" onclick="window.print()">
-      <i class="bi bi-download"></i> Export
+      <i class="ti ti-download"></i> Export
     </button>
   </div>
-
-  <!-- STATS STRIP -->
-  <div class="stats-strip">
-    <div class="stat-card c-total">
-      <div class="stat-label">Total Orders</div>
-      <div class="stat-value" id="statTotal">—</div>
-      <i class="bi bi-bag stat-icon"></i>
-    </div>
-    <div class="stat-card c-revenue">
-      <div class="stat-label">Revenue</div>
-      <div class="stat-value" id="statRevenue">—</div>
-      <i class="bi bi-currency-rupee stat-icon"></i>
-    </div>
-    <div class="stat-card c-paid">
-      <div class="stat-label">Paid Orders</div>
-      <div class="stat-value" id="statPaid">—</div>
-      <i class="bi bi-check-circle stat-icon"></i>
-    </div>
-    <div class="stat-card c-pending">
-      <div class="stat-label">Pending</div>
-      <div class="stat-value" id="statPending">—</div>
-      <i class="bi bi-hourglass stat-icon"></i>
-    </div>
-    <div class="stat-card c-returned">
-      <div class="stat-label">Returned</div>
-      <div class="stat-value" id="statReturned">—</div>
-      <i class="bi bi-arrow-return-left stat-icon"></i>
-    </div>
-  </div>
-
-  <!-- FILTER BAR -->
-  <div class="filter-bar">
-    <div class="filter-group">
-      <label class="filter-label">From Date</label>
-      <input type="date" id="fFromDate">
-    </div>
-    <div class="filter-group">
-      <label class="filter-label">To Date</label>
-      <input type="date" id="fToDate">
-    </div>
-    <div class="filter-group">
-      <label class="filter-label">Payment Method</label>
-      <select id="fPayment">
-        <option value="">All Methods</option>
-        <option value="cod">COD</option>
-        <option value="razorpay">Razorpay</option>
-        <option value="pos_paid">Retail Shop</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label class="filter-label">Status</label>
-      <select id="fStatus">
-        <option value="">All Statuses</option>
-        <option value="pending">Pending</option>
-        <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
-        <option value="returned">Returned</option>
-      </select>
-    </div>
-    <button class="reset-btn" id="resetBtn">
-      <i class="bi bi-x-circle me-1"></i>Reset
-    </button>
-  </div>
-
-  <!-- TABLE CARD -->
-  <div class="table-card">
-    <div class="table-header-row">
-      <span class="table-title"><i class="bi bi-table me-2" style="color:var(--accent)"></i>Orders</span>
-      <span class="order-count" id="countBadge">— orders</span>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Total</th>
-            <th>Method</th>
-            <th>Payment</th>
-            <th>Status</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody id="orderTableBody">
-          <tr><td colspan="7"><div class="empty-state"><i class="bi bi-hourglass-split"></i>Loading orders…</div></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="pagination-wrap" id="paginationWrap" style="display:none">
-      <span class="page-info" id="pageInfo"></span>
-      <div class="page-btns" id="pageBtns"></div>
-    </div>
-  </div>
-
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- STATS STRIP -->
+<div class="rpt-stats">
+  <div class="rpt-stat c-total">
+    <div class="rpt-stat-label">Total Orders</div>
+    <div class="rpt-stat-value" id="statTotal">—</div>
+    <i class="ti ti-shopping-bag rpt-stat-icon"></i>
+  </div>
+  <div class="rpt-stat c-revenue">
+    <div class="rpt-stat-label">Revenue</div>
+    <div class="rpt-stat-value" id="statRevenue">—</div>
+    <i class="ti ti-currency-rupee rpt-stat-icon"></i>
+  </div>
+  <div class="rpt-stat c-paid">
+    <div class="rpt-stat-label">Paid Orders</div>
+    <div class="rpt-stat-value" id="statPaid">—</div>
+    <i class="ti ti-circle-check rpt-stat-icon"></i>
+  </div>
+  <div class="rpt-stat c-pending">
+    <div class="rpt-stat-label">Pending</div>
+    <div class="rpt-stat-value" id="statPending">—</div>
+    <i class="ti ti-hourglass rpt-stat-icon"></i>
+  </div>
+  <div class="rpt-stat c-returned">
+    <div class="rpt-stat-label">Returned</div>
+    <div class="rpt-stat-value" id="statReturned">—</div>
+    <i class="ti ti-arrow-back rpt-stat-icon"></i>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <label class="filter-label">From Date</label>
+    <input type="date" id="fFromDate">
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">To Date</label>
+    <input type="date" id="fToDate">
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Payment Method</label>
+    <select id="fPayment">
+      <option value="">All Methods</option>
+      <option value="cod">COD</option>
+      <option value="razorpay">Razorpay</option>
+      <option value="pos_paid">Retail Shop</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Status</label>
+    <select id="fStatus">
+      <option value="">All Statuses</option>
+      <option value="pending">Pending</option>
+      <option value="completed">Completed</option>
+      <option value="cancelled">Cancelled</option>
+      <option value="returned">Returned</option>
+    </select>
+  </div>
+  <button class="reset-btn" id="resetBtn">
+    <i class="ti ti-x"></i> Reset
+  </button>
+</div>
+
+<!-- TABLE CARD -->
+<div class="rpt-table-card">
+  <div class="rpt-table-header">
+    <span class="rpt-table-title">
+      <i class="ti ti-table" style="color:var(--accent);font-size:18px"></i>
+      Orders
+    </span>
+    <span class="rpt-count-pill" id="countBadge">— orders</span>
+  </div>
+
+  <div class="rpt-table-wrap">
+    <table class="rpt-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total</th>
+          <th>Method</th>
+          <th>Payment</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="orderTableBody">
+        <tr>
+          <td colspan="7">
+            <div class="rpt-empty">
+              <i class="ti ti-hourglass"></i>
+              Loading orders…
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rpt-pagination" id="paginationWrap" style="display:none">
+    <span class="rpt-page-info" id="pageInfo"></span>
+    <div class="rpt-page-btns" id="pageBtns"></div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
 <script>
-  const AJAX_URL  = "{% url 'report_page' %}";
+  const AJAX_URL   = "{% url 'report_page' %}";
   const ORDER_BASE = "{% url 'order_detail' 0 %}".replace('/0/', '/');
 
-  let currentPage = 1;
+  let currentPage   = 1;
   let debounceTimer = null;
 
   function getFilters() {
@@ -586,36 +497,36 @@ tbody td {
       .join('&');
   }
 
-  function showLoading() { document.getElementById('loadingOverlay').classList.add('active'); }
-  function hideLoading() { document.getElementById('loadingOverlay').classList.remove('active'); }
+  function showLoading() { document.getElementById('rptLoading').classList.add('active'); }
+  function hideLoading() { document.getElementById('rptLoading').classList.remove('active'); }
 
   function statusPill(o) {
     if (o.return_approved && o.refund_processed)
-      return '<span class="status-pill s-returned"><i class="bi bi-arrow-return-left"></i> Returned</span>';
+      return '<span class="status-pill s-returned"><i class="ti ti-arrow-back"></i> Returned</span>';
     if (o.return_requested)
-      return '<span class="status-pill s-return-req"><i class="bi bi-exclamation-circle"></i> Return Req.</span>';
+      return '<span class="status-pill s-return-req"><i class="ti ti-alert-circle"></i> Return Req.</span>';
     if (o.is_cancelled)
-      return '<span class="status-pill s-cancelled"><i class="bi bi-x-circle"></i> Cancelled</span>';
+      return '<span class="status-pill s-cancelled"><i class="ti ti-x"></i> Cancelled</span>';
     if (o.is_delivered)
-      return '<span class="status-pill s-completed"><i class="bi bi-check-circle"></i> Delivered</span>';
+      return '<span class="status-pill s-completed"><i class="ti ti-circle-check"></i> Delivered</span>';
     if (o.is_pos_order)
       return o.payment_status
-        ? '<span class="status-pill s-paid"><i class="bi bi-check-circle"></i> Paid</span>'
-        : '<span class="status-pill s-pending"><i class="bi bi-clock"></i> Pending</span>';
-    return '<span class="status-pill s-pending"><i class="bi bi-clock"></i> Pending</span>';
+        ? '<span class="status-pill s-paid"><i class="ti ti-circle-check"></i> Paid</span>'
+        : '<span class="status-pill s-pending"><i class="ti ti-clock"></i> Pending</span>';
+    return '<span class="status-pill s-pending"><i class="ti ti-clock"></i> Pending</span>';
   }
 
   function methodPill(o) {
-    if (o.is_pos_order)             return '<span class="method-pill"><i class="bi bi-shop"></i> Retail</span>';
-    if (o.payment_method==='razorpay') return '<span class="method-pill"><i class="bi bi-credit-card"></i> Razorpay</span>';
-    if (o.payment_method==='cod')      return '<span class="method-pill"><i class="bi bi-cash"></i> COD</span>';
+    if (o.is_pos_order)                return '<span class="method-pill"><i class="ti ti-building-store"></i> Retail</span>';
+    if (o.payment_method === 'razorpay') return '<span class="method-pill"><i class="ti ti-credit-card"></i> Razorpay</span>';
+    if (o.payment_method === 'cod')      return '<span class="method-pill"><i class="ti ti-cash"></i> COD</span>';
     return '<span class="method-pill">' + (o.payment_method || '—') + '</span>';
   }
 
   function posPayment(o) {
     if (o.is_pos_order && o.payment_status && o.pos_payment_type)
       return o.pos_payment_type.charAt(0).toUpperCase() + o.pos_payment_type.slice(1);
-    return '—';
+    return '<span style="color:var(--muted)">—</span>';
   }
 
   function renderTable(data) {
@@ -623,30 +534,29 @@ tbody td {
     const orders = data.orders;
 
     if (!orders.length) {
-      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="bi bi-inbox"></i>No orders match your filters.</div></td></tr>';
+      tbody.innerHTML = `<tr><td colspan="7"><div class="rpt-empty"><i class="ti ti-inbox"></i>No orders match your filters.</div></td></tr>`;
       document.getElementById('paginationWrap').style.display = 'none';
       document.getElementById('countBadge').textContent = '0 orders';
       return;
     }
 
     tbody.innerHTML = orders.map(o => `
-      <tr class="fade-in" onclick="window.location.href='${ORDER_BASE}${o.id}/'">
-        <td><span class="order-id">#${o.id}</span></td>
-        <td><span class="customer-name">${o.first_name}</span></td>
-        <td><span class="amount">₹ ${parseFloat(o.total).toLocaleString('en-IN')}</span></td>
+      <tr class="rpt-fade" onclick="window.location.href='${ORDER_BASE}${o.id}/'">
+        <td><span class="rpt-order-id">#${o.id}</span></td>
+        <td><span class="rpt-cust">${o.first_name}</span></td>
+        <td><span class="rpt-amount">₹ ${parseFloat(o.total).toLocaleString('en-IN')}</span></td>
         <td>${methodPill(o)}</td>
         <td>${posPayment(o)}</td>
         <td>${statusPill(o)}</td>
-        <td><span class="date-cell"><i class="bi bi-calendar3 me-1"></i>${o.created_at}</span></td>
+        <td><span class="rpt-date"><i class="ti ti-calendar" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>${o.created_at}</span></td>
       </tr>`).join('');
 
-    // Stats — revenue uses en-IN locale, plain font via CSS
-    document.getElementById('statTotal').textContent   = data.total_orders;
-    document.getElementById('statRevenue').textContent = '₹ ' + parseFloat(data.total_revenue).toLocaleString('en-IN');
-    document.getElementById('statPaid').textContent    = data.total_paid_orders;
-    document.getElementById('statPending').textContent = data.pending_orders;
-    document.getElementById('statReturned').textContent= data.returned_orders;
-    document.getElementById('countBadge').textContent  = data.total_orders + ' orders';
+    document.getElementById('statTotal').textContent    = data.total_orders;
+    document.getElementById('statRevenue').textContent  = '₹ ' + parseFloat(data.total_revenue).toLocaleString('en-IN');
+    document.getElementById('statPaid').textContent     = data.total_paid_orders;
+    document.getElementById('statPending').textContent  = data.pending_orders;
+    document.getElementById('statReturned').textContent = data.returned_orders;
+    document.getElementById('countBadge').textContent   = data.total_orders + ' orders';
 
     renderPagination(data);
   }
@@ -678,12 +588,12 @@ tbody td {
     }
 
     btns.innerHTML =
-      `<button class="page-btn" ${page === 1 ? 'disabled' : ''} onclick="goPage(${page - 1})"><i class="bi bi-chevron-left"></i></button>` +
+      `<button class="rpt-page-btn" ${page === 1 ? 'disabled' : ''} onclick="goPage(${page - 1})"><i class="ti ti-chevron-left"></i></button>` +
       pages.map(p => p === '…'
-        ? `<button class="page-btn" disabled>…</button>`
-        : `<button class="page-btn ${p === page ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`
+        ? `<button class="rpt-page-btn" disabled>…</button>`
+        : `<button class="rpt-page-btn ${p === page ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`
       ).join('') +
-      `<button class="page-btn" ${page === totalPages ? 'disabled' : ''} onclick="goPage(${page + 1})"><i class="bi bi-chevron-right"></i></button>`;
+      `<button class="rpt-page-btn" ${page === totalPages ? 'disabled' : ''} onclick="goPage(${page + 1})"><i class="ti ti-chevron-right"></i></button>`;
   }
 
   function goPage(p) { currentPage = p; fetchOrders(); }
@@ -706,19 +616,24 @@ tbody td {
 
   ['fFromDate','fToDate','fPayment','fStatus'].forEach(id => {
     document.getElementById(id).addEventListener('change', () => debounce(() => fetchOrders(true), 180));
+    document.getElementById(id).addEventListener('input',  () => debounce(() => fetchOrders(true), 400));
   });
-  document.getElementById('fFromDate').addEventListener('input', () => debounce(() => fetchOrders(true), 400));
-  document.getElementById('fToDate').addEventListener('input',   () => debounce(() => fetchOrders(true), 400));
 
   document.getElementById('resetBtn').addEventListener('click', () => {
-    document.getElementById('fFromDate').value = '';
-    document.getElementById('fToDate').value   = '';
-    document.getElementById('fPayment').value  = '';
-    document.getElementById('fStatus').value   = '';
+    ['fFromDate','fToDate','fPayment','fStatus'].forEach(id => document.getElementById(id).value = '');
     fetchOrders(true);
+  });
+
+  /* auto-open the Reports nav group in the sidebar */
+  document.addEventListener('DOMContentLoaded', function () {
+    const active = document.querySelector('.nav-item[href*="report"], .nav-child[href*="report"]');
+    if (active) {
+      active.classList.add('active');
+      const group = active.closest('.nav-group');
+      if (group) group.classList.add('open');
+    }
   });
 
   fetchOrders(true);
 </script>
-</body>
-</html>
+{% endblock %}

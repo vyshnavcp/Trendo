@@ -1,261 +1,280 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Customers</title>
+{% extends 'main.html' %}
+{% block title %}Customers{% endblock %}
+{% load static %}
 
-    <!-- Bootstrap + Icons + Font -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+{% block css %}
+<style>
+/* ── Avatar ── */
+.cust-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  border: 2px solid rgba(108,99,255,0.15);
+}
 
-    <style>
-        body{
-            background: linear-gradient(135deg,#eef2ff,#f8fafc);
-            font-family:'Poppins', sans-serif;
-            margin:0;
-        }
+/* ── Table card ── */
+.cust-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 16px rgba(0,0,0,.05);
+  overflow: hidden;
+}
 
-        /* ================= NAVBAR ================= */
+.cust-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(to bottom, #fafbff, #fff);
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
-        .header-with-topbar{
-            background:#000;
-            box-shadow:0 4px 20px rgba(0,0,0,0.35);
-        }
+.cust-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-        .dashboard-header{
-            padding:18px 24px;
-        }
+.cust-count-pill {
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(108,99,255,.1);
+  color: var(--accent);
+  padding: 4px 14px;
+  border-radius: 20px;
+}
 
-        .dashboard-header h4,
-        .dashboard-header small,
-        .dashboard-header i{
-            color:#fff;
-        }
+/* ── Search box ── */
+.cust-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--page-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  transition: border-color var(--ease), box-shadow var(--ease);
+  max-width: 240px;
+  flex: 1;
+  min-width: 160px;
+}
+.cust-search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(108,99,255,.1);
+}
+.cust-search i { color: var(--muted); font-size: 16px; flex-shrink: 0; }
+.cust-search input {
+  border: none; background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-size: .83rem; color: var(--text);
+  outline: none; width: 100%;
+}
+.cust-search input::placeholder { color: #aab; }
 
-        .dashboard-header .nav-link{
-            color:#fff !important;
-            font-weight:500;
-            transition:0.3s;
-        }
+/* ── Table ── */
+.cust-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-        .dashboard-header .nav-link:hover{
-            color:#bdbdbd !important;
-        }
+.cust-table { width: 100%; border-collapse: collapse; min-width: 480px; }
 
-        .navbar-toggler{
-            border:0;
-        }
+.cust-table thead th {
+  background: var(--page-bg);
+  padding: 11px 18px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
 
-        .navbar-toggler-icon{
-            filter:invert(1);
-        }
+.cust-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background var(--ease);
+  animation: custRow .3s ease both;
+}
+@keyframes custRow {
+  from { opacity: 0; transform: translateX(-5px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.cust-table tbody tr:nth-child(1) { animation-delay: .04s; }
+.cust-table tbody tr:nth-child(2) { animation-delay: .08s; }
+.cust-table tbody tr:nth-child(3) { animation-delay: .12s; }
+.cust-table tbody tr:nth-child(4) { animation-delay: .16s; }
+.cust-table tbody tr:nth-child(5) { animation-delay: .20s; }
+.cust-table tbody tr:last-child { border-bottom: none; }
+.cust-table tbody tr:hover { background: #f5f6ff; }
 
-        /* ================= PAGE HEADER ================= */
+.cust-table td {
+  padding: 13px 18px;
+  font-size: .85rem;
+  color: var(--text);
+  vertical-align: middle;
+}
 
-        .page-header{
-            background: linear-gradient(135deg,#111827,#1f2937);
-            color:#fff;
-            padding:25px 30px;
-            border-radius:16px;
-            margin-bottom:25px;
-            box-shadow:0 10px 30px rgba(0,0,0,.15);
-        }
+.cust-num {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.cust-name { font-weight: 600; color: var(--text); }
+.cust-email { font-size: .8rem; color: var(--muted); }
+.cust-date  { font-size: .8rem; color: var(--muted); white-space: nowrap; }
 
-        .page-header h4{
-            font-weight:600;
-            margin:0;
-        }
+.cust-empty {
+  text-align: center;
+  padding: 56px 24px;
+  color: var(--muted);
+  font-size: .9rem;
+}
+.cust-empty i { font-size: 2.2rem; display: block; margin-bottom: 10px; opacity: .2; }
 
-        .stats-badge{
-            background:rgba(255,255,255,.15);
-            padding:8px 16px;
-            border-radius:30px;
-            font-weight:500;
-        }
+/* ── Hidden rows (search filter) ── */
+.cust-hidden { display: none; }
+</style>
+{% endblock %}
 
-        /* ================= CARD ================= */
+{% block content %}
 
-        .premium-card{
-            background:rgba(255,255,255,0.75);
-            backdrop-filter: blur(10px);
-            border-radius:20px;
-            box-shadow:0 15px 40px rgba(0,0,0,.08);
-            overflow:hidden;
-        }
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <h4>Customers</h4>
+    <p>All registered store customers</p>
+  </div>
+</div>
 
-        /* ================= TABLE ================= */
+<!-- Table Card -->
+<div class="cust-card">
 
-        .table thead th{
-            background:#f9fafb;
-            font-size:12px;
-            text-transform:uppercase;
-            letter-spacing:.05em;
-            color:#6b7280;
-            border-bottom:1px solid #e5e7eb;
-        }
+  <div class="cust-card-header">
+    <span class="cust-card-title">
+      <i class="ti ti-users" style="color:var(--accent);font-size:18px"></i>
+      Customer List
+    </span>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span class="cust-count-pill">{{ page_obj.paginator.count }} customers</span>
+      <div class="cust-search">
+        <i class="ti ti-search"></i>
+        <input type="text" id="custSearch" placeholder="Search name or email…">
+      </div>
+    </div>
+  </div>
 
-        .table tbody td{
-            vertical-align:middle;
-            font-size:14px;
-            color:#374151;
-        }
-
-        .table tbody tr{
-            transition:0.2s;
-        }
-
-        .table tbody tr:hover{
-            background:#f3f4f6;
-        }
-
-        .avatar{
-            width:42px;
-            height:42px;
-            border-radius:50%;
-            background:linear-gradient(135deg,#6366f1,#4f46e5);
-            color:#fff;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            font-weight:600;
-            margin-right:12px;
-            box-shadow:0 5px 15px rgba(99,102,241,.3);
-        }
-
-        .email-text{
-            color:#6b7280;
-            font-size:13px;
-        }
-
-    </style>
-</head>
-
-<body>
-
-<!-- ================= NAVBAR ================= -->
-
-<header class="header-with-topbar">
-<nav class="navbar dashboard-header navbar-expand-lg">
-    <div class="container-fluid px-0">
-
-        <div class="d-flex align-items-center gap-3">
-            <i class="bi bi-speedometer2 fs-2"></i>
-            <div>
-                <h4 class="mb-0">Admin Dashboard</h4>
-                <small>Manage your store</small>
+  <div class="cust-table-wrap">
+    <table class="cust-table" id="custTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Customer</th>
+          <th>Email</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in customers %}
+        <tr>
+          <td><span class="cust-num">{{ page_obj.start_index|add:forloop.counter0 }}</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="cust-avatar">{{ user.user_name|slice:":1"|upper }}</div>
+              <span class="cust-name">{{ user.user_name }}</span>
             </div>
-        </div>
+          </td>
+          <td><span class="cust-email">{{ user.email }}</span></td>
+          <td><span class="cust-date"><i class="ti ti-calendar" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>{{ user.authuser.date_joined|date:"d M Y" }}</span></td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4">
+            <div class="cust-empty">
+              <i class="ti ti-users-off"></i>
+              No customers found
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-        <button class="navbar-toggler" type="button"
-                data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div class="pagination-wrap">
+    <span class="pagination-info">
+      Showing <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+      of <strong>{{ page_obj.paginator.count }}</strong> customers
+    </span>
+    <div class="pagination-controls">
 
-        <div class="collapse navbar-collapse justify-content-end" id="adminNavbar">
-            <ul class="navbar-nav align-items-lg-center gap-lg-3 mt-3 mt-lg-0">
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="page-btn" title="First"><i class="bi bi-chevron-double-left"></i></a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="page-btn"><i class="bi bi-chevron-left"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-left"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-left"></i></span>
+      {% endif %}
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'dashboard' %}">Home</a>
-                </li>
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="page-btn active">{{ num }}</span>
+        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'order_list' %}">Orders</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'paid_orders' %}">Paid</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'pending_orders' %}">Pending</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'customer_list' %}">Customers</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'user_logout' %}">
-                        Logout
-                    </a>
-                </li>
-
-            </ul>
-        </div>
-
-    </div>
-</nav>
-</header>
-
-<!-- ================= PAGE CONTENT ================= -->
-
-<div class="container-fluid px-4 mt-4">
-
-    <!-- Header -->
-    <div class="page-header d-flex justify-content-between align-items-center">
-        <h4>Customers</h4>
-        <div class="stats-badge">
-            Total Customers: {{ customers|length }}
-        </div>
-    </div>
-
-    <!-- Table Card -->
-    <div class="premium-card p-4">
-
-        <div class="table-responsive">
-            <table class="table align-middle mb-0">
-
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Customer</th>
-                        <th>Email</th>
-                        <th>Joined</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                {% for user in customers %}
-                    <tr>
-
-                        <td class="text-muted">{{ forloop.counter }}</td>
-
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="avatar">
-                                    {{ user.user_name|slice:":1"|upper }}
-                                </div>
-                                <span class="fw-medium">{{ user.user_name }}</span>
-                            </div>
-                        </td>
-
-                        <td class="email-text">
-                            {{ user.email }}
-                        </td>
-
-                        <td>
-                            {{ user.authuser.date_joined|date:"d M Y" }}
-                        </td>
-
-                    </tr>
-
-                {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center py-5 text-muted">
-                            No customers found
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-
-            </table>
-        </div>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="page-btn"><i class="bi bi-chevron-right"></i></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="page-btn" title="Last"><i class="bi bi-chevron-double-right"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-right"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-right"></i></span>
+      {% endif %}
 
     </div>
+  </div>
+  {% endif %}
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% endblock %}
+
+{% block js %}
+<script>
+  /* Live search */
+  document.getElementById('custSearch').addEventListener('input', function () {
+    const q = this.value.toLowerCase().trim();
+    document.querySelectorAll('#custTable tbody tr').forEach(function (row) {
+      const text = row.textContent.toLowerCase();
+      row.classList.toggle('cust-hidden', q !== '' && !text.includes(q));
+    });
+  });
+
+  /* Mark active sidebar link */
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.nav-item, .nav-child').forEach(function (el) {
+      if (el.href && el.href.includes('customer')) el.classList.add('active');
+    });
+  });
+</script>
+{% endblock %}

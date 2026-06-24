@@ -24,6 +24,8 @@ INSTALLED_APPS = [
 
     'myapp.apps.MyappConfig',
     'django_ckeditor_5',
+    
+    
 ]
 
 MIDDLEWARE = [

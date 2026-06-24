@@ -1,0 +1,177 @@
+{% load static %}
+
+<aside class="sidebar" id="sidebar">
+
+  <!-- Logo -->
+  <a href="{% url 'dashboard' %}" class="sidebar-logo">
+    <img src="{% static 'images/logo/trendo-logo.png  ' %}" alt="Logo" class="logo-full">
+    <img src="{% static 'images/logo/trendo-logo.png  ' %}" alt="Logo" class="logo-mini">
+  </a>
+
+  <!-- Toggle -->
+  <div class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="ti ti-chevron-left"></i>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
+    <div class="nav-section-label">Reports</div>
+
+    <a href="{% url 'report_page' %}" class="nav-item" data-tip="Report">
+      <i class="ti ti-chart-bar"></i>
+      <span class="nav-item-label">Report</span>
+    </a>
+
+    <a href="{% url 'customer_list' %}" class="nav-item" data-tip="Customers">
+      <i class="ti ti-users"></i>
+      <span class="nav-item-label">Customers</span>
+    </a>
+    {% endif %}
+
+    <div class="nav-section-label">Orders</div>
+
+    <div class="nav-group" id="group-orders">
+      <div class="nav-group-toggle" onclick="toggleGroup('group-orders')" data-tip="Orders">
+        <i class="ti ti-box group-icon"></i>
+        <span class="nav-group-label">Orders</span>
+        <i class="ti ti-chevron-right nav-group-arrow"></i>
+      </div>
+      <div class="nav-group-children">
+        <a href="{% url 'order_list' %}" class="nav-child"><i class="ti ti-list-details"></i> All Orders</a>
+        <a href="{% url 'paid_orders' %}" class="nav-child"><i class="ti ti-circle-check"></i> Paid Orders</a>
+        <a href="{% url 'pending_orders' %}" class="nav-child"><i class="ti ti-clock"></i> Pending Orders</a>
+        {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
+        <a href="{% url 'shipping_orders' %}" class="nav-child">
+          <i class="ti ti-truck"></i> Shipping Orders
+          {% if shipping_orders_count > 0 %}
+            <span class="nav-badge">{{ shipping_orders_count }}</span>
+          {% endif %}
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="nav-section-label">Catalogue</div>
+
+    {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
+    <div class="nav-group" id="group-categories">
+      <div class="nav-group-toggle" onclick="toggleGroup('group-categories')" data-tip="Categories">
+        <i class="ti ti-category group-icon"></i>
+        <span class="nav-group-label">Categories</span>
+        <i class="ti ti-chevron-right nav-group-arrow"></i>
+      </div>
+      <div class="nav-group-children">
+        <a href="{% url 'add_category' %}" class="nav-child"><i class="ti ti-plus"></i> Add Category</a>
+        <a href="{% url 'category_list' %}" class="nav-child"><i class="ti ti-list"></i> View Category</a>
+        <a href="{% url 'add_subcategory' %}" class="nav-child"><i class="ti ti-folder-plus"></i> Add SubCategory</a>
+        <a href="{% url 'subcategory_list' %}" class="nav-child"><i class="ti ti-folder-open"></i> View SubCategory</a>
+      </div>
+    </div>
+
+    <div class="nav-group" id="group-products">
+      <div class="nav-group-toggle" onclick="toggleGroup('group-products')" data-tip="Products">
+        <i class="ti ti-package group-icon"></i>
+        <span class="nav-group-label">Products</span>
+        <i class="ti ti-chevron-right nav-group-arrow"></i>
+      </div>
+      <div class="nav-group-children">
+        <a href="{% url 'add_product' %}" class="nav-child"><i class="ti ti-plus"></i> Add Product</a>
+        <a href="{% url 'product_list' %}" class="nav-child"><i class="ti ti-list"></i> View Product</a>
+        <a href="{% url 'add_size' %}" class="nav-child"><i class="ti ti-arrows-maximize"></i> Add Size</a>
+        <a href="{% url 'size_list' %}" class="nav-child"><i class="ti ti-list"></i> View Size</a>
+      </div>
+    </div>
+
+    <div class="nav-group" id="group-coupons">
+      <div class="nav-group-toggle" onclick="toggleGroup('group-coupons')" data-tip="Coupons">
+        <i class="ti ti-ticket group-icon"></i>
+        <span class="nav-group-label">Coupons</span>
+        <i class="ti ti-chevron-right nav-group-arrow"></i>
+      </div>
+      <div class="nav-group-children">
+        <a href="{% url 'add_coupon' %}" class="nav-child"><i class="ti ti-plus"></i> Add Coupon</a>
+        <a href="{% url 'coupon_list' %}" class="nav-child"><i class="ti ti-list"></i> View Coupon</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="nav-section-label">Billing</div>
+
+    <a href="{% url 'pos_page' %}" class="nav-item" data-tip="POS Billing">
+      <i class="ti ti-receipt"></i>
+      <span class="nav-item-label">POS Billing</span>
+    </a>
+
+    {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
+
+    <div class="nav-section-label">Management</div>
+
+    <div class="nav-group" id="group-refunds">
+      <div class="nav-group-toggle" onclick="toggleGroup('group-refunds')" data-tip="Refunds">
+        <i class="ti ti-arrow-back group-icon"></i>
+        <span class="nav-group-label">Refunds & Returns</span>
+        <i class="ti ti-chevron-right nav-group-arrow"></i>
+      </div>
+      <div class="nav-group-children">
+        <a href="{% url 'refund_requests' %}" class="nav-child"><i class="ti ti-rotate-clockwise"></i> Refund Requests</a>
+        <a href="{% url 'refund_report' %}" class="nav-child"><i class="ti ti-cash"></i> Refund/Cancel List</a>
+        <a href="{% url 'return_requests' %}" class="nav-child"><i class="ti ti-arrow-left"></i> Return Requests</a>
+        <a href="{% url 'return_report' %}" class="nav-child"><i class="ti ti-repeat"></i> Return Report</a>
+      </div>
+    </div>
+
+    <div class="nav-group" id="group-employees">
+      <div class="nav-group-toggle" onclick="toggleGroup('group-employees')" data-tip="Employees">
+        <i class="ti ti-users group-icon"></i>
+        <span class="nav-group-label">Employees</span>
+        <i class="ti ti-chevron-right nav-group-arrow"></i>
+      </div>
+      <div class="nav-group-children">
+        <a href="{% url 'create_user' %}" class="nav-child"><i class="ti ti-user-plus"></i> Create Employee</a>
+        <a href="{% url 'employee_list' %}" class="nav-child"><i class="ti ti-list"></i> Employee List</a>
+      </div>
+    </div>
+
+    <div class="nav-group" id="group-content">
+      <div class="nav-group-toggle" onclick="toggleGroup('group-content')" data-tip="Content">
+        <i class="ti ti-file-text group-icon"></i>
+        <span class="nav-group-label">Content</span>
+        <i class="ti ti-chevron-right nav-group-arrow"></i>
+      </div>
+      <div class="nav-group-children">
+        <a href="{% url 'review_list' %}" class="nav-child"><i class="ti ti-message"></i> View Reviews</a>
+        <a href="{% url 'add_banner' %}" class="nav-child"><i class="ti ti-photo"></i> Add Banner</a>
+        <a href="{% url 'banner_list' %}" class="nav-child"><i class="ti ti-photos"></i> View Banners</a>
+        <a href="{% url 'contact_list' %}" class="nav-child"><i class="ti ti-mail"></i> Contact List</a>
+        <a href="{% url 'add_article' %}" class="nav-child"><i class="ti ti-news"></i> Add Article</a>
+        <a href="{% url 'article_list' %}" class="nav-child"><i class="ti ti-list"></i> View Articles</a>
+        <a href="{% url 'add_testimonial' %}" class="nav-child"><i class="ti ti-quote"></i> Add Testimonial</a> 
+        <a href="{% url 'testimonial_list' %}" class="nav-child"><i class="ti ti-star"></i> View Testimonials</a>
+        <a href="{% url 'newsletter_list' %}" class="nav-child"><i class="ti ti-mail-forward"></i> Newsletter List</a>
+        <a href="{% url 'add_terms' %}" class="nav-child"><i class="ti ti-file-plus"></i> Add Terms</a>
+        <a href="{% url 'terms_list' %}" class="nav-child"><i class="ti ti-file-text"></i> View Terms</a>
+        <a href="{% url 'add_privacy' %}" class="nav-child"><i class="ti ti-shield-lock"></i> Add Privacy</a>
+        <a href="{% url 'privacy_list' %}" class="nav-child"><i class="ti ti-shield-check"></i> View Privacy</a>
+        <a href="{% url 'add_faq' %}" class="nav-child"><i class="ti ti-help-circle"></i> Add FAQ</a>
+        <a href="{% url 'faq_list' %}" class="nav-child"><i class="ti ti-message-dots"></i> View FAQ</a>
+      </div>
+    </div>
+
+    <a href="{% url 'total_income' %}" class="nav-item" data-tip="Total Income">
+      <i class="ti ti-currency-rupee"></i>
+      <span class="nav-item-label">Total Income</span>
+    </a>
+
+    {% endif %}
+
+  </nav>
+
+  <div class="sidebar-bottom">
+    <a href="{% url 'user_logout' %}" class="logout-side">
+      <i class="ti ti-logout"></i>
+      <span class="logout-label">Logout</span>
+    </a>
+  </div>
+
+</aside>

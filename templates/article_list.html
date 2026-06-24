@@ -1,336 +1,197 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Articles</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'main.html' %}
+{% block title %}Articles{% endblock %}
+{% load static %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+{% block css %}
 <style>
+  .btn-edit-article {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 12px; border-radius: 8px;
+    background: rgba(245,158,11,.1); color: #b45309;
+    border: none; font-size: .75rem; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    transition: background var(--ease), transform .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .btn-edit-article:hover {
+    background: var(--orange); color: #fff;
+    transform: scale(1.05);
+  }
 
-body{
-font-family:'Poppins',sans-serif;
-background:linear-gradient(135deg,#eef2f7,#f8fafc);
-margin:0;
-min-height:100vh;
-}
+  .btn-del-article {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 12px; border-radius: 8px;
+    background: rgba(239,68,68,.1); color: #dc2626;
+    border: none; font-size: .75rem; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    transition: background var(--ease), transform .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .btn-del-article:hover {
+    background: #ef4444; color: #fff;
+    transform: scale(1.05);
+  }
 
+  .slug-text {
+    font-size: .75rem;
+    color: var(--muted);
+    font-family: monospace;
+    background: var(--page-bg);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: middle;
+  }
 
-/* NAVBAR */
-
-.header-with-topbar{
-background:#000;
-box-shadow:0 10px 30px rgba(0,0,0,0.35);
-}
-
-.dashboard-header{
-padding:16px 24px;
-}
-
-.dashboard-header h4{
-font-weight:600;
-}
-
-.dashboard-header small{
-opacity:.8;
-}
-
-.dashboard-header .nav-link{
-color:#fff !important;
-font-weight:500;
-transition:0.25s;
-}
-
-.dashboard-header .nav-link:hover{
-color:#cfcfcf !important;
-}
-
-.navbar-toggler{
-border:0;
-}
-
-.navbar-toggler-icon{
-filter:invert(1);
-}
-
-
-/* PAGE */
-
-.page-wrapper{
-padding:60px 20px;
-}
-
-.container-box{
-max-width:1050px;
-margin:auto;
-}
-
-
-/* TOP BAR */
-
-.top{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:30px;
-}
-
-.top h2{
-font-weight:600;
-}
-
-
-/* BUTTONS */
-
-.btn-black{
-padding:9px 18px;
-background:#000;
-color:#fff;
-text-decoration:none;
-border-radius:8px;
-font-size:14px;
-font-weight:500;
-transition:0.25s;
-display:inline-flex;
-align-items:center;
-gap:6px;
-}
-
-.btn-black:hover{
-background:#333;
-transform:translateY(-1px);
-box-shadow:0 6px 15px rgba(0,0,0,0.25);
-}
-
-.btn-danger-custom{
-background:#e74c3c;
-}
-
-.btn-danger-custom:hover{
-background:#c0392b;
-}
-
-
-/* TABLE CARD */
-
-.table-card{
-background:#fff;
-border-radius:14px;
-box-shadow:0 12px 35px rgba(0,0,0,0.08);
-overflow:hidden;
-}
-
-
-/* TABLE */
-
-table{
-width:100%;
-border-collapse:collapse;
-}
-
-th,td{
-padding:16px 16px;
-vertical-align:middle;
-font-size:14px;
-}
-
-th{
-background:#f3f4f6;
-font-weight:600;
-}
-
-tbody tr{
-border-bottom:1px solid #eee;
-transition:0.2s;
-}
-
-tbody tr:hover{
-background:#fafafa;
-}
-
-
-/* ACTIONS */
-
-.actions{
-display:flex;
-gap:10px;
-}
-
-
-/* EMPTY STATE */
-
-.empty{
-text-align:center;
-padding:40px;
-color:#888;
-}
-
+  .action-cell { display: flex; gap: 6px; align-items: center; }
 </style>
-</head>
+{% endblock %}
 
-<body>
+{% block content %}
 
-
-<!-- NAVBAR -->
-
-<header class="header-with-topbar">
-<nav class="navbar dashboard-header navbar-expand-lg">
-<div class="container-fluid px-0">
-
-<div class="d-flex align-items-center gap-3">
-<i class="bi bi-speedometer2 fs-2 text-white"></i>
-
-<div class="text-white">
-<h4 class="mb-0">Admin Dashboard</h4>
-<small>Overview of store performance</small>
-</div>
-</div>
-
-<button class="navbar-toggler" type="button"
-data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-<span class="navbar-toggler-icon"></span>
-</button>
-
-<div class="collapse navbar-collapse justify-content-end" id="adminNavbar">
-
-<ul class="navbar-nav align-items-lg-center gap-lg-3 mt-3 mt-lg-0">
-
-<li class="nav-item">
-<a class="nav-link" href="{% url 'dashboard' %}">
-<i class="bi bi-house"></i> Home
-</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link" href="{% url 'order_list' %}">
-<i class="bi bi-bag"></i> Orders
-</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link" href="{% url 'paid_orders' %}">
-<i class="bi bi-check-circle"></i> Paid
-</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link" href="{% url 'pending_orders' %}">
-<i class="bi bi-clock"></i> Pending
-</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link" href="{% url 'customer_list' %}">
-<i class="bi bi-people"></i> Customers
-</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link text-danger" href="{% url 'user_logout' %}">
-<i class="bi bi-box-arrow-right"></i> Logout
-</a>
-</li>
-
-</ul>
-
-</div>
-</div>
-</nav>
-</header>
-
-
-<!-- PAGE CONTENT -->
-
-<div class="page-wrapper">
-<div class="container-box">
-
-
-<div class="top">
-
-<h2>Articles</h2>
-
-<a href="{% url 'add_article' %}" class="btn-black">
-<i class="bi bi-plus-lg"></i>
-Add Article
-</a>
-
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <h4>Articles</h4>
+    <p>Manage your published articles</p>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'add_article' %}"
+       style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:10px;background:#000;color:#fff;font-size:.82rem;font-weight:600;text-decoration:none;transition:background var(--ease);"
+       onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">
+      <i class="bi bi-plus-lg"></i> Add Article
+    </a>
+  </div>
 </div>
 
+<!-- TABLE -->
+<div class="orders-wrap mb-4">
 
-<div class="table-card">
+  <div class="orders-header">
+    <span class="orders-header-title">
+      <i class="ti ti-news" style="font-size:17px;color:var(--accent);"></i>
+      All Articles
+      {% if page_obj.paginator.count %}
+        <span class="orders-count-pill">{{ page_obj.paginator.count }} total</span>
+      {% endif %}
+    </span>
+    <div class="search-box">
+      <i class="ti ti-search"></i>
+      <input type="text" id="articleSearch" placeholder="Search by title, slug…">
+    </div>
+  </div>
 
-<table>
+  <div class="table-scroll-wrap">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>Slug</th>
+          <th class="col-date">Date</th>
+          <th style="width:140px;"></th>
+        </tr>
+      </thead>
+      <tbody id="articleTable">
 
-<thead>
-<tr>
-<th>Title</th>
-<th>Slug</th>
-<th>Date</th>
-<th style="width:180px;">Actions</th>
-</tr>
-</thead>
+        {% for article in articles %}
+        <tr>
+          <td><span class="order-id">{{ forloop.counter|add:page_obj.start_index|add:"-1" }}</span></td>
 
-<tbody>
+          <td><span class="customer-name">{{ article.title }}</span></td>
 
-{% for article in articles %}
+          <td><span class="slug-text">{{ article.slug }}</span></td>
 
-<tr>
+          <td class="col-date">
+            <span class="date-text">{{ article.posted_on|date:"d M Y" }}</span>
+          </td>
 
-<td>{{ article.title }}</td>
-<td>{{ article.slug }}</td>
-<td>{{ article.posted_on }}</td>
+          <td>
+            <div class="action-cell">
+              <a href="{% url 'edit_article' article.slug %}" class="btn-edit-article">
+                <i class="bi bi-pencil" style="font-size:11px;"></i> Edit
+              </a>
+              <a href="{% url 'delete_article' article.slug %}" class="btn-del-article"
+                 onclick="return confirm('Delete this article? This cannot be undone.')">
+                <i class="bi bi-trash" style="font-size:11px;"></i> Delete
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr class="empty-row">
+          <td colspan="5">
+            <i class="bi bi-file-earmark-text empty-icon"></i>
+            No articles yet. Start by adding your first one.
+          </td>
+        </tr>
+        {% endfor %}
 
-<td>
+      </tbody>
+    </table>
+  </div>
 
-<div class="actions">
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div class="pagination-wrap">
+    <span class="pagination-info">
+      Showing <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+      of <strong>{{ page_obj.paginator.count }}</strong> articles
+    </span>
+    <div class="pagination-controls">
 
-<a href="{% url 'edit_article' article.slug %}" class="btn-black">
-<i class="bi bi-pencil"></i>
-Edit
-</a>
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="page-btn" title="First"><i class="bi bi-chevron-double-left"></i></a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="page-btn"><i class="bi bi-chevron-left"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-left"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-left"></i></span>
+      {% endif %}
 
-<a href="{% url 'delete_article' article.slug %}"
-class="btn-black btn-danger-custom"
-onclick="return confirm('Delete this article?')">
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="page-btn active">{{ num }}</span>
+        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
 
-<i class="bi bi-trash"></i>
-Delete
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="page-btn"><i class="bi bi-chevron-right"></i></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="page-btn" title="Last"><i class="bi bi-chevron-double-right"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-right"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-right"></i></span>
+      {% endif %}
 
-</a>
+    </div>
+  </div>
+  {% endif %}
 
 </div>
 
-</td>
+{% endblock %}
 
-</tr>
-
-{% empty %}
-
-<tr>
-<td colspan="4">
-<div class="empty">
-<i class="bi bi-file-earmark-text fs-3"></i><br><br>
-No articles found
-</div>
-</td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-</div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+{% block js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('articleSearch');
+    const rows  = document.querySelectorAll('#articleTable tr');
+    input.addEventListener('keyup', function () {
+      const q = input.value.toLowerCase().trim();
+      rows.forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  });
+</script>
+{% endblock %}

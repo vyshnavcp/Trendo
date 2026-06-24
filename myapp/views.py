@@ -45,6 +45,7 @@ import logging
 from django.db import IntegrityError
 from django.middleware.csrf import rotate_token
 
+
 def home(request):
     blogs = Article.objects.order_by('-posted_on')[:4]
     best_seller_products = Product.objects.filter(is_best_seller=True,is_active=True)[:5]
@@ -86,18 +87,22 @@ def newsletter_subscribe(request):
 
 @role_required(["Admin"])
 def newsletter_list(request):
-    subscribers = Newsletter.objects.all().order_by('-created_at')
-    total_count = subscribers.count()
-
+    qs = Newsletter.objects.all().order_by('-created_at')
+    paginator = Paginator(qs, 10)
+    page_obj = paginator.get_page(request.GET.get('page'))
     return render(request, "newsletter_list.html", {
-        "subscribers": subscribers,
-        "total_count": total_count
+        "subscribers": page_obj,
+        "page_obj": page_obj,
+        "total_count": qs.count(),
     })
 
 def testimonial_list(request):
-    testimonials = Testimonial.objects.all().order_by('-id')
+    qs = Testimonial.objects.all().order_by('-id')
+    paginator = Paginator(qs, 10)          # 10 per page — change as needed
+    page_obj = paginator.get_page(request.GET.get('page'))
     return render(request, 'testimonial_list.html', {
-        'testimonials': testimonials
+        'page_obj': page_obj,
+        'testimonials': page_obj,
     })
 
 def add_testimonial(request):
@@ -185,10 +190,19 @@ def contact(request):
         })
     return render(request, "contact.html")
 
+
 @role_required(["Admin"])
 def contact_list(request):
-    contacts = Contact.objects.all().order_by('-id')
-    return render(request, 'contact_list.html', {'contacts': contacts})
+    contact_qs = Contact.objects.all().order_by('-id')
+
+    paginator = Paginator(contact_qs, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'contact_list.html', {
+        'contacts': page_obj,
+        'page_obj': page_obj,
+    })
 
 @role_required(["Admin"])
 def delete_contact(request, contact_id):
@@ -1178,18 +1192,21 @@ def confirm_return(request, order_id):
 
     return redirect("my_orders")
 
-@role_required(["admin", "Accountant"])
+
+@role_required(["Admin", "Accountant"])
 def return_report(request):
+    orders_qs = Order.objects.filter(return_requested=True).order_by("-created_at")
 
-    orders = Order.objects.filter(return_requested=True).order_by("-created_at")
+    total_requests   = orders_qs.count()
+    approved_returns = orders_qs.filter(refund_processed=True).count()
+    pending_returns  = orders_qs.filter(refund_processed=False).count()
 
-    total_requests = orders.count()
-    approved_returns = orders.filter(refund_processed=True).count()
-    pending_returns = orders.filter(refund_processed=False).count()
+    paginator = Paginator(orders_qs, 20)
+    page_obj  = paginator.get_page(request.GET.get("page"))
 
     return render(request, "return_report.html", {
-        "orders": orders,
-        "total_requests": total_requests,
+        "page_obj":        page_obj,
+        "total_requests":  total_requests,
         "approved_returns": approved_returns,
         "pending_returns": pending_returns,
     })
@@ -1275,13 +1292,13 @@ def confirm_cod_cancel(request, order_id):
 @role_required(["admin", "Accountant", "Staff"])
 def dashboard(request):
     today = now().date()
-
+ 
     # ✅ Role-based orders
     if request.user.is_superuser or request.user.groups.filter(name="Accountant").exists():
         orders = Order.objects.all().order_by('-created_at')
     else:
         orders = Order.objects.filter(is_pos_order=True).order_by('-created_at')
-
+ 
     # ✅ Paid orders (clean + strict)
     paid_orders = orders.filter(
         payment_status=True,
@@ -1289,18 +1306,18 @@ def dashboard(request):
         refund_processed=False,
         return_approved=False
     )
-
+ 
     # ✅ Revenue
     total_revenue = paid_orders.aggregate(total=Sum("total"))["total"] or Decimal("0.00")
-
+ 
     today_revenue = paid_orders.filter(
         created_at__date=today
     ).aggregate(total=Sum("total"))["total"] or Decimal("0.00")
-
+ 
     # ✅ Order counts
     total_orders = orders.count()
     total_paid_orders = paid_orders.count()
-
+ 
     # ✅ Pending orders
     pending_orders = orders.filter(
         is_cancelled=False
@@ -1309,99 +1326,107 @@ def dashboard(request):
     ).exclude(
         is_completed=True
     ).count()
-
+ 
     # ✅ POS pending payments
     pos_pending_payment = orders.filter(
         is_pos_order=True,
         payment_status=False,
         is_cancelled=False
     ).count()
-
+ 
     # ✅ Customers & Products
     total_customers = Registration.objects.count()
     total_products = Product.objects.count()
-
+ 
     # ✅ Refund & Return Requests
     pending_refunds = Order.objects.filter(
         cancel_requested=True,
         refund_processed=False
     )
     refund_count = pending_refunds.count()
-
+ 
     new_refunds_count = pending_refunds.filter(
         created_at__gte=now() - timedelta(days=1)
     ).count()
-
+ 
     return_requests = Order.objects.filter(
         return_requested=True,
         refund_processed=False
     )
     return_requests_count = return_requests.count()
-
+ 
     new_return_requests_count = return_requests.filter(
         created_at__gte=now() - timedelta(days=1)
     ).count()
+ 
     shipping_orders_count = orders.filter(
-    is_shipped=True,
-    is_delivered=False,
-    is_cancelled=False
+        is_shipped=True,
+        is_delivered=False,
+        is_cancelled=False
     ).count()
-
+ 
     # ✅ Profit / Income Calculation
     total_income = Decimal("0.00")
-
+ 
     order_items = OrderItem.objects.filter(
         order__payment_status=True,
         order__is_cancelled=False,
         order__refund_processed=False,
         order__return_approved=False
     ).select_related("product", "order")
-
+ 
     for item in order_items:
         if item.product and item.product.cost_price:
-
+ 
             order = item.order
             item_total = item.price * item.quantity
-
+ 
             # ✅ Coupon distribution
             if order.coupon_discount and order.subtotal and order.subtotal > 0:
                 proportion = item_total / order.subtotal
                 item_coupon_discount = (order.coupon_discount * proportion).quantize(Decimal("0.01"))
             else:
                 item_coupon_discount = Decimal("0.00")
-
+ 
             profit_per_item = item.price - item.product.cost_price
-
+ 
             # ✅ FINAL NET PROFIT
             total_profit = (profit_per_item * item.quantity) - item_coupon_discount
-
+ 
             total_income += total_profit
-
+ 
+    # ✅ Pagination — 20 orders per page
+    from django.core.paginator import Paginator
+    paginator  = Paginator(orders, 20)
+    page_number = request.GET.get('page')
+    page_obj   = paginator.get_page(page_number)
+ 
     # ✅ Context
     context = {
         "total_revenue": total_revenue,
         "today_revenue": today_revenue,
         "total_net_income": total_income,
-
+ 
         "total_orders": total_orders,
         "paid_orders": total_paid_orders,
         "pending_orders": pending_orders,
-
+ 
         "pos_pending_payment": pos_pending_payment,
-
+ 
         "total_customers": total_customers,
         "total_products": total_products,
-
+ 
         "refund_count": refund_count if refund_count > 0 else None,
         "new_refunds_count": new_refunds_count if new_refunds_count > 0 else None,
-
+ 
         "return_requests_count": return_requests_count if return_requests_count > 0 else None,
         "new_return_requests_count": new_return_requests_count if new_return_requests_count > 0 else None,
         "shipping_orders_count": shipping_orders_count,
-
-        "orders": orders,
+ 
+        "orders": page_obj,       # ← page_obj used as orders in template loop
+        "page_obj": page_obj,     # ← page_obj used for pagination controls
     }
-
+ 
     return render(request, "dashboard.html", context)
   
 
@@ -1415,9 +1440,16 @@ def add_category(request):
 @staff_member_required
 def category_list(request):
     categories = Category.objects.all().order_by("id")
+    
+    paginator = Paginator(categories, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, "category_list.html", {
-        "categories": categories
+        "categories": page_obj,
+        "page_obj": page_obj,
     })
+    
 @staff_member_required
 def edit_category(request, id):
     category = get_object_or_404(Category, id=id)
@@ -1448,9 +1480,15 @@ def add_subcategory(request):
 
 @staff_member_required
 def subcategory_list(request):
-    subcategories = SubCategory.objects.select_related("category").all()
+    subcategories = SubCategory.objects.select_related("category").order_by("id")
+
+    paginator = Paginator(subcategories, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "subcategory_list.html", {
-        "subcategories": subcategories
+        "subcategories": page_obj,
+        "page_obj": page_obj,
     })
 
 @staff_member_required
@@ -1794,7 +1832,15 @@ def add_coupon(request):
 @staff_member_required
 def coupon_list(request):
     coupons = Coupon.objects.all().order_by("-id")
-    return render(request, "coupon_list.html", {"coupons": coupons})
+
+    paginator = Paginator(coupons, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "coupon_list.html", {
+        "coupons": page_obj,
+        "page_obj": page_obj,
+    })
 
 @staff_member_required
 def edit_coupon(request, id):
@@ -1815,8 +1861,16 @@ def delete_coupon(request, id):
     return redirect("coupon_list")
 
 def article_list(request):
-    articles = Article.objects.all().order_by('-posted_on')
-    return render(request, 'article_list.html', {'articles': articles})
+    article_qs = Article.objects.all().order_by('-posted_on')
+
+    paginator = Paginator(article_qs, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'article_list.html', {
+        'articles': page_obj,
+        'page_obj': page_obj,
+    })
 
 def add_article(request):
     form = ArticleForm(request.POST or None, request.FILES or None)
@@ -1991,16 +2045,19 @@ def report_page(request):
 @login_required(login_url='user_login')
 @user_passes_test(staff_required, login_url='home')
 def order_list(request):
+
     if request.user.is_superuser or request.user.groups.filter(name="Accountant").exists():
         orders = Order.objects.all()
     else:
         orders = Order.objects.filter(is_pos_order=True)
-    orders = orders.order_by('-created_at')
+    orders      = orders.order_by('-created_at')
+    paginator   = Paginator(orders, 20)
+    page_obj    = paginator.get_page(request.GET.get('page'))
     return render(request, 'orders_view.html', {
-        'orders': orders,
-        'title': 'All Orders'
+        'orders'  : page_obj,
+        'page_obj': page_obj,
+        'title'   : 'All Orders'
     })
-
 @role_required(["Accountant","Staff"])
 @login_required(login_url='user_login')
 @user_passes_test(staff_required, login_url='home')
@@ -2111,16 +2168,22 @@ def delivery_page(request, order_id):
         "order": order
     })
 
-@role_required(["Accountant","Staff"])
 @login_required
+@role_required(["Accountant", "Staff"])
 def shipping_orders(request):
     orders = Order.objects.filter(
         is_shipped=True
     ).order_by("-created_at")
 
+    paginator = Paginator(orders, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "shipping_orders.html", {
-        "orders": orders
+        "orders": page_obj,
+        "page_obj": page_obj,
     })
+    
 @role_required(["Accountant","Staff"])
 def cancel_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -2214,10 +2277,16 @@ def cancel_pos_payment(request, order_id):
 @role_required(["Accountant","Staff"])
 @login_required(login_url='user_login')
 def customer_list(request):
-    customers = Registration.objects.all().order_by('-id')
+    from django.core.paginator import Paginator
+    customers_qs = Registration.objects.all().order_by('-id')
+    paginator    = Paginator(customers_qs, 20)
+    page_number  = request.GET.get('page')
+    page_obj     = paginator.get_page(page_number)
     return render(request, 'customers_view.html', {
-        'customers': customers
+        'customers': page_obj,
+        'page_obj' : page_obj,
     })
+ 
 
 @role_required(["Accountant","Staff"])
 def shipping_address_list(request):
@@ -2241,11 +2310,15 @@ def add_terms(request):
         form = TermsForm(instance=terms)
     return render(request, "add_terms.html", {"form": form, "terms": terms})
 
-@role_required(["Accountant"])
+
+
 @login_required(login_url='user_login')
+@role_required(["Accountant"])
 def terms_list(request):
-    terms = TermsCondition.objects.all().order_by("-updated_at")
-    return render(request, "terms_list.html", {"terms": terms})
+    terms_qs = TermsCondition.objects.all().order_by("-updated_at")
+    paginator = Paginator(terms_qs, 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, "terms_list.html", {"page_obj": page_obj})
 
 @role_required(["Accountant"])
 @login_required(login_url='user_login')
@@ -2285,11 +2358,13 @@ def add_privacy(request):
         form = PrivacyForm(instance=privacy)
     return render(request, "add_privacy.html", {"form": form, "privacy": privacy})
 
-@role_required(["Accountant"])
 @login_required(login_url='user_login')
+@role_required(["Accountant"])
 def privacy_list(request):
-    privacy = PrivacyPolicy.objects.all().order_by("-updated_at")
-    return render(request, "privacy_list.html", {"privacy": privacy})
+    privacy_qs = PrivacyPolicy.objects.all().order_by("-updated_at")
+    paginator = Paginator(privacy_qs, 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, "privacy_list.html", {"page_obj": page_obj})
 
 @role_required(["Accountant"])
 @login_required(login_url='user_login')
@@ -2318,9 +2393,18 @@ def privacy_page(request):
 
 @role_required(["Accountant"])
 @staff_member_required
+
 def review_list(request):
-    reviews = Review.objects.select_related('product').order_by('-created_at')
-    return render(request, 'review_list.html', {'reviews': reviews})
+    review_qs = Review.objects.all().order_by('-created_at')
+
+    paginator = Paginator(review_qs, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "review_list.html", {
+        "reviews": page_obj,
+        "page_obj": page_obj,
+    })
 
 @role_required(["Accountant"])
 @staff_member_required
@@ -2331,10 +2415,13 @@ def delete_review(request, id):
         return redirect('review_list')
     return render(request, 'delete_review.html', {'review': review})
 
+@login_required(login_url='user_login')
 @role_required(["Accountant"])
 def faq_list(request):
-    faqs = FAQ.objects.all().order_by("-created_at")
-    return render(request, "faq_list.html", {"faqs": faqs})
+    faq_qs = FAQ.objects.all().order_by("-created_at")
+    paginator = Paginator(faq_qs, 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    return render(request, "faq_list.html", {"page_obj": page_obj})
 
 @role_required(["Accountant"])
 @login_required(login_url='user_login')
@@ -2617,6 +2704,7 @@ def pos_update_order(request, order_id):
         })
     
 
+@login_required(login_url='user_login')
 @role_required(["Accountant"])
 @staff_member_required
 def total_income_page(request):
@@ -2638,7 +2726,6 @@ def total_income_page(request):
             order = item.order
             item_total = item.price * item.quantity
 
-            # Proportional coupon discount for this item
             if order.coupon_discount and order.subtotal and order.subtotal > 0:
                 proportion = item_total / order.subtotal
                 item_coupon_discount = (order.coupon_discount * proportion).quantize(Decimal("0.01"))
@@ -2667,14 +2754,18 @@ def total_income_page(request):
                 "has_coupon": item_coupon_discount > 0,
             })
 
+    paginator = Paginator(product_data, 20)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
     return render(request, "total_income.html", {
         "title": "Total Income Report",
-        "products": product_data,
+        "page_obj": page_obj,
         "total_income": total_income,
         "total_revenue": total_revenue,
         "total_discount": total_discount,
+        "total_products": len(product_data),
     })
-
+    
 @role_required(["Accountant"])
 def create_user(request):
     if request.method == "POST":
@@ -2702,11 +2793,17 @@ def create_user(request):
     return render(request,"create_user.html")
 
 def employee_list(request):
-    employees = User.objects.filter(
+    employee_qs = User.objects.filter(
         groups__name__in=["Accountant", "Staff"]
-    ).distinct()
-    return render(request,"employee_list.html",{
-        "employees":employees
+    ).distinct().order_by('id')
+
+    paginator = Paginator(employee_qs, 15)  # 15 per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "employee_list.html", {
+        "employees": page_obj,
+        "page_obj": page_obj,
     })
 
 
@@ -3109,23 +3206,23 @@ Thank you.
 
     return redirect("refund_requests")
 
-@role_required(["Admin","Accountant"])
+@role_required(["Admin", "Accountant"])
 def refund_report(request):
-    orders = Order.objects.filter(cancel_requested=True).order_by("-created_at")
-    total_requests = Order.objects.filter(cancel_requested=True).count()
-    approved_refunds = Order.objects.filter(
-        cancel_requested=True,
-        refund_processed=True
-    ).count()
-    pending_refunds = Order.objects.filter(
-        cancel_requested=True,
-        refund_processed=False
-    ).count()
-    return render(request,"refund_report.html",{
-        "orders":orders,
-        "total_requests":total_requests,
-        "approved_refunds":approved_refunds,
-        "pending_refunds":pending_refunds
+    orders_qs = Order.objects.filter(cancel_requested=True).order_by("-created_at")
+
+    total_requests  = orders_qs.count()
+    approved_refunds = orders_qs.filter(refund_processed=True).count()
+    pending_refunds  = orders_qs.filter(refund_processed=False).count()
+
+    paginator = Paginator(orders_qs, 20)
+    page_obj  = paginator.get_page(request.GET.get("page"))
+
+    return render(request, "refund_report.html", {
+        "page_obj":        page_obj,
+        "orders":          page_obj,   # keep if anything else uses orders
+        "total_requests":  total_requests,
+        "approved_refunds": approved_refunds,
+        "pending_refunds": pending_refunds,
     })
 
 def banner_list(request):

@@ -1,201 +1,232 @@
+{% extends 'main.html' %}
+{% block title %}Banner List{% endblock %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Banner List</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Bootstrap + Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+{% block css %}
+<style>
+  .banner-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
 
-    <style>
-        body {
-            background: #f5f7fb;
-        }
+  .banner-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+    animation: cardPop .42s cubic-bezier(.34,1.56,.64,1) both;
+  }
 
-        /* NAVBAR (added) */
-        .navbar-premium{
-            background:#000;
-            padding:18px 30px;
-            box-shadow:0 10px 30px rgba(0,0,0,.3);
-        }
+  .banner-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,.1);
+    border-color: rgba(0,0,0,.15);
+  }
 
-        .navbar-brand{
-            color:#fff !important;
-            font-weight:600;
-            font-size:22px;
-        }
+  .banner-img-wrap {
+    position: relative;
+    height: 190px;
+    overflow: hidden;
+    background: var(--page-bg);
+  }
 
-        .nav-link{
-            color:#ddd !important;
-            font-weight:500;
-            margin-left:15px;
-        }
+  .banner-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s ease;
+  }
 
-        .nav-link:hover{
-            color:#fff !important;
-        }
+  .banner-card:hover .banner-img-wrap img {
+    transform: scale(1.04);
+  }
 
-        .header-box {
-            background: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        }
+  .active-pill {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: #000;
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
 
-        .banner-card {
-            border: none;
-            border-radius: 18px;
-            overflow: hidden;
-            transition: 0.3s;
-            background: #fff;
-        }
+  .active-pill::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #10b981;
+    flex-shrink: 0;
+  }
 
-        .banner-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-        }
+  .banner-body {
+    padding: 14px 16px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
 
-        .banner-img {
-            height: 200px;
-            object-fit: cover;
-        }
+  .banner-title {
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-        .badge-active {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #000;
-            color: #fff;
-            font-size: 12px;
-            padding: 5px 10px;
-            border-radius: 20px;
-        }
+  .banner-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
 
-        .btn {
-            border-radius: 10px;
-        }
+  .btn-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: none; font-size: .82rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--ease), transform .2s cubic-bezier(.34,1.56,.64,1);
+  }
 
-        .empty-box {
-            background: #fff;
-            padding: 50px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-        }
-    </style>
-</head>
-<body>
+  .btn-icon-edit {
+    background: rgba(245,158,11,.1);
+    color: #b45309;
+  }
+  .btn-icon-edit:hover {
+    background: var(--orange);
+    color: #fff;
+    transform: scale(1.12) rotate(-4deg);
+  }
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-premium">
-<div class="container">
+  .btn-icon-del {
+    background: rgba(239,68,68,.1);
+    color: #dc2626;
+  }
+  .btn-icon-del:hover {
+    background: #ef4444;
+    color: #fff;
+    transform: scale(1.12);
+  }
 
-<a class="navbar-brand" href="#">
-<i class="bi bi-speedometer2 me-2"></i> Banner
-</a>
+  /* Empty state */
+  .empty-state {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 64px 24px;
+    text-align: center;
+  }
 
-<button class="navbar-toggler bg-light" data-bs-toggle="collapse" data-bs-target="#navMenu">
-<span class="navbar-toggler-icon"></span>
-</button>
+  .empty-state i {
+    font-size: 2.8rem;
+    color: var(--border);
+    display: block;
+    margin-bottom: 14px;
+  }
 
-<div class="collapse navbar-collapse" id="navMenu">
+  .empty-state h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
 
-<ul class="navbar-nav ms-auto">
+  .empty-state p {
+    font-size: .84rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
 
-<li class="nav-item">
-<a class="nav-link" href="{% url 'dashboard' %}">
-<i class="bi bi-house me-1"></i> Dashboard
-</a>
-</li>
+  .btn-black {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 18px; border-radius: 10px;
+    background: #000; color: #fff;
+    font-size: .83rem; font-weight: 600;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    border: none; cursor: pointer;
+    transition: background var(--ease), transform .2s cubic-bezier(.34,1.56,.64,1);
+  }
 
-<li class="nav-item">
-<a class="nav-link" href="{% url 'banner_list' %}">
-<i class="bi bi-images me-1"></i> Banner List
-</a>
-</li>
+  .btn-black:hover {
+    background: #222;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+</style>
+{% endblock %}
 
-</ul>
+{% block content %}
 
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <h4>Banner List</h4>
+    <p>Manage your homepage banners</p>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'add_banner' %}" class="btn-black">
+      <i class="bi bi-plus-circle"></i> Add Banner
+    </a>
+  </div>
 </div>
-</div>
-</nav>
 
-<div class="container mt-4">
+<!-- BANNER GRID -->
+{% if banners %}
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4 header-box">
-        <div>
-            <h4 class="mb-0 fw-bold">Home Banners</h4>
-            <small class="text-muted">Manage homepage banners</small>
-        </div>
+<div class="banner-grid">
+  {% for banner in banners %}
+  <div class="banner-card" style="animation-delay: {{ forloop.counter0 }}00ms;">
 
-        <a href="{% url 'add_banner' %}" class="btn btn-dark">
-            <i class="bi bi-plus-circle"></i> Add Banner
+    <div class="banner-img-wrap">
+      <img src="{{ banner.image.url }}" alt="{{ banner.title }}">
+      {% if banner.is_active %}
+        <span class="active-pill">Active</span>
+      {% endif %}
+    </div>
+
+    <div class="banner-body">
+      <span class="banner-title">{{ banner.title }}</span>
+      <div class="banner-actions">
+        <a href="{% url 'edit_banner' banner.id %}" class="btn-icon btn-icon-edit" title="Edit">
+          <i class="bi bi-pencil"></i>
         </a>
+        <a href="{% url 'delete_banner' banner.id %}" class="btn-icon btn-icon-del" title="Delete"
+           onclick="return confirm('Delete this banner? This cannot be undone.')">
+          <i class="bi bi-trash"></i>
+        </a>
+      </div>
     </div>
 
-    <!-- Banner Grid -->
-    <div class="row">
-
-        {% for banner in banners %}
-        <div class="col-lg-4 col-md-6 mb-4">
-
-            <div class="card banner-card position-relative">
-
-                <!-- Active Badge -->
-                {% if banner.is_active %}
-                <span class="badge-active">Active</span>
-                {% endif %}
-
-                <!-- Image -->
-                <img src="{{ banner.image.url }}" class="card-img-top banner-img">
-
-                <!-- Content -->
-                <div class="card-body text-center">
-
-                    <h6 class="fw-semibold mb-2">{{ banner.title }}</h6>
-
-                    <div class="d-flex justify-content-center gap-2 mt-3">
-
-                        <a href="{% url 'edit_banner' banner.id %}" 
-                           class="btn btn-warning btn-sm">
-                           <i class="bi bi-pencil"></i>
-                        </a>
-
-                        <a href="{% url 'delete_banner' banner.id %}" 
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('Delete this banner?')">
-                           <i class="bi bi-trash"></i>
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        {% empty %}
-        <div class="col-12">
-            <div class="empty-box">
-                <i class="bi bi-image fs-1 text-muted"></i>
-                <h5 class="mt-3">No Banners Yet</h5>
-                <p class="text-muted">Start by adding your first banner</p>
-
-                <a href="{% url 'add_banner' %}" class="btn btn-dark mt-2">
-                    Add Banner
-                </a>
-            </div>
-        </div>
-        {% endfor %}
-
-    </div>
-
+  </div>
+  {% endfor %}
 </div>
 
-</body>
-</html>
+{% else %}
+
+<!-- EMPTY STATE -->
+<div class="empty-state">
+  <i class="bi bi-image"></i>
+  <h5>No Banners Yet</h5>
+  <p>Start by uploading your first homepage banner.</p>
+  <a href="{% url 'add_banner' %}" class="btn-black">
+    <i class="bi bi-plus-circle"></i> Add Banner
+  </a>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block js %}{% endblock %}

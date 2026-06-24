@@ -1,238 +1,286 @@
+{% extends 'main.html' %}
+{% block title %}Review Management{% endblock %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Review Management</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Bootstrap + Icons + Font -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
+{% block css %}
 <style>
-body{
-    font-family:'Poppins', sans-serif;
-    background:#f4f6f9;
-    margin:0;
-}
+  .rating-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: .68rem; font-weight: 700;
+    padding: 3px 9px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  .rating-5 { background: rgba(16,185,129,.12); color: #059669; }
+  .rating-4 { background: rgba(16,185,129,.08); color: #10b981; }
+  .rating-3 { background: rgba(245,158,11,.15); color: #b45309; }
+  .rating-2 { background: rgba(249,115,22,.12); color: #c2410c; }
+  .rating-1 { background: rgba(239,68,68,.1);  color: #dc2626; }
 
-/* NAVBAR */
-.header-with-topbar{
-    background:#000;
-    box-shadow:0 4px 20px rgba(0,0,0,0.35);
-}
-.dashboard-header{
-    padding:18px 24px;
-}
-.dashboard-header h4,
-.dashboard-header small,
-.dashboard-header i{
-    color:#fff;
-}
-.dashboard-header .nav-link{
-    color:#fff !important;
-    font-weight:500;
-}
+  .btn-view-review {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 7px;
+    background: var(--accent-soft); color: var(--accent);
+    border: none; font-size: .72rem; font-weight: 600;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+    transition: background var(--ease), color var(--ease);
+  }
+  .btn-view-review:hover { background: var(--accent); color: #fff; }
 
-/* PAGE */
-.page-wrapper{
-    padding:50px 20px;
-}
-.container-box{
-    max-width:1200px;
-    margin:auto;
-}
+  .btn-del-review {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 7px;
+    background: rgba(239,68,68,.1); color: #dc2626;
+    border: none; font-size: .72rem; font-weight: 600;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+    text-decoration: none;
+    transition: background var(--ease), transform .2s cubic-bezier(.34,1.56,.64,1);
+  }
+  .btn-del-review:hover { background: #ef4444; color: #fff; transform: scale(1.05); }
 
-.table{
-    border-radius:12px;
-    overflow:hidden;
-    background:#fff;
-    box-shadow:0 6px 20px rgba(0,0,0,0.05);
-}
-.table thead th{
-    background:#f0f0f0;
-    font-weight:600;
-}
+  .msg-text {
+    font-size: .8rem; color: var(--muted);
+    max-width: 200px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+    display: inline-block; vertical-align: middle;
+  }
 
-.table-hover tbody tr:hover{
-    background:#f3f4f6;
-}
-
-.badge-rating{
-    padding:5px 10px;
-    border-radius:20px;
-    font-size:13px;
-    font-weight:500;
-}
-.rating-5 { background:#16a34a; color:#fff; }
-.rating-4 { background:#22c55e; color:#fff; }
-.rating-3 { background:#facc15; color:#000; }
-.rating-2 { background:#f97316; color:#fff; }
-.rating-1 { background:#dc2626; color:#fff; }
-
-.btn-delete{
-    background:black;
-    color:#fff;
-    border-radius:8px;
-}
-.btn-delete:hover{
-    background:#c0392b;
-}
-
-.btn-view{
-    background:#111;
-    color:#fff;
-    border-radius:8px;
-}
-.btn-view:hover{
-    background:#333;
-}
-
-.modal-content{
-    border-radius:15px;
-}
+  /* Modal overrides to match design */
+  .modal-content {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 64px rgba(0,0,0,.12);
+  }
+  .modal-header {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+  .modal-title { font-size: .95rem; font-weight: 600; color: var(--text); }
+  .modal-body  { padding: 20px; font-size: .85rem; color: var(--text); line-height: 1.7; }
+  .modal-body strong { color: var(--muted); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; }
+  .modal-body p { margin-bottom: 10px; }
+  .review-full-msg {
+    background: var(--page-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: .85rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-top: 6px;
+  }
+  .modal-meta-row {
+    display: flex; gap: 24px; flex-wrap: wrap;
+    margin-bottom: 14px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .modal-meta-label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+  .modal-meta-value { font-size: .85rem; font-weight: 500; color: var(--text); }
 </style>
-</head>
+{% endblock %}
 
-<body>
+{% block content %}
 
-<!-- NAVBAR -->
-<header class="header-with-topbar">
-<nav class="navbar dashboard-header navbar-expand-lg">
-<div class="container-fluid px-0">
-
-<div class="d-flex align-items-center gap-3">
-<i class="bi bi-speedometer2 fs-2"></i>
-<div>
-<h4 class="mb-0"> Review List</h4>
-<small>Manage customer reviews</small>
-</div>
-</div>
-
-<div class="collapse navbar-collapse justify-content-end">
-<ul class="navbar-nav align-items-lg-center gap-lg-3 mt-3 mt-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'dashboard' %}">Home</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'order_list' %}">Orders</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'paid_orders' %}">Paid</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'pending_orders' %}">Pending</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'customer_list' %}">Customers</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'user_logout' %}">
-                        Logout
-                    </a>
-                </li>
-</ul>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <h4>Customer Reviews</h4>
+    <p>Monitor and manage product feedback</p>
+  </div>
+  <div class="topbar-right">
+    {% if reviews %}
+      <span class="orders-count-pill" style="font-size:.82rem;padding:6px 14px;">
+        {{ reviews|length }} review{{ reviews|length|pluralize }}
+      </span>
+    {% endif %}
+  </div>
 </div>
 
+<!-- REVIEWS TABLE -->
+<div class="orders-wrap mb-4">
+
+  <div class="orders-header">
+    <span class="orders-header-title">
+      <i class="ti ti-star" style="font-size:17px;color:var(--accent);"></i>
+      All Reviews
+      {% if page_obj.paginator.count %}
+        <span class="orders-count-pill">{{ page_obj.paginator.count }} total</span>
+      {% endif %}
+    </span>
+    <div class="search-box">
+      <i class="ti ti-search"></i>
+      <input type="text" id="reviewSearch" placeholder="Search by name, product, email…">
+    </div>
+  </div>
+
+  <div class="table-scroll-wrap">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Product</th>
+          <th>Customer</th>
+          <th class="col-date">Email</th>
+          <th>Rating</th>
+          <th>Message</th>
+          <th class="col-date">Date</th>
+          <th style="width:80px;"></th>
+        </tr>
+      </thead>
+      <tbody id="reviewTable">
+
+        {% for review in reviews %}
+        <tr>
+          <td><span class="order-id">{{ forloop.counter }}</span></td>
+
+          <td><span class="customer-name">{{ review.product }}</span></td>
+
+          <td>
+            <span class="customer-name">{{ review.name }}</span>
+          </td>
+
+          <td class="col-date">
+            <span class="date-text" style="font-size:.8rem;">{{ review.email }}</span>
+          </td>
+
+          <td>
+            <span class="rating-badge rating-{{ review.rating }}">
+              {{ review.rating }} ★
+            </span>
+          </td>
+
+          <td>
+            <span class="msg-text">{{ review.message|truncatechars:40 }}</span>
+            <button class="btn-view-review ms-1"
+              data-bs-toggle="modal"
+              data-bs-target="#reviewModal{{ review.id }}">
+              <i class="bi bi-eye" style="font-size:11px;"></i> View
+            </button>
+          </td>
+
+          <td class="col-date">
+            <span class="date-text">{{ review.created_at|date:"d M Y" }}</span>
+          </td>
+
+          <td>
+            <a href="{% url 'delete_review' review.id %}" class="btn-del-review"
+               onclick="return confirm('Delete this review? This cannot be undone.')">
+              <i class="bi bi-trash" style="font-size:11px;"></i> Delete
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr class="empty-row">
+          <td colspan="8">
+            <i class="bi bi-star empty-icon"></i>
+            No reviews yet. They'll appear here once customers leave feedback.
+          </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div class="pagination-wrap">
+    <span class="pagination-info">
+      Showing <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+      of <strong>{{ page_obj.paginator.count }}</strong> reviews
+    </span>
+    <div class="pagination-controls">
+
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="page-btn" title="First"><i class="bi bi-chevron-double-left"></i></a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="page-btn"><i class="bi bi-chevron-left"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-left"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-left"></i></span>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="page-btn active">{{ num }}</span>
+        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="page-btn"><i class="bi bi-chevron-right"></i></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="page-btn" title="Last"><i class="bi bi-chevron-double-right"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-right"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-right"></i></span>
+      {% endif %}
+
+    </div>
+  </div>
+  {% endif %}
+
 </div>
-</nav>
-</header>
 
-<!-- PAGE CONTENT -->
-<div class="page-wrapper">
-<div class="container-box">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-<h4 class="fw-bold">Customer Reviews</h4>
-<span class="text-muted">{{ reviews.count }} Total Reviews</span>
-</div>
-
-<table class="table table-hover align-middle">
-<thead>
-<tr>
-<th>#</th>
-<th>Product</th>
-<th>Name</th>
-<th>Email</th>
-<th>Rating</th>
-<th>Message</th>
-<th>Date</th>
-<th>Actions</th>
-</tr>
-</thead>
-
-<tbody>
+<!-- MODALS (outside table) -->
 {% for review in reviews %}
-<tr>
-<td>{{ forloop.counter }}</td>
-<td>{{ review.product }}</td>
-<td>{{ review.name }}</td>
-<td>{{ review.email }}</td>
-<td>
-<span class="badge-rating rating-{{ review.rating }}">
-{{ review.rating }} ★
-</span>
-</td>
-
-<!-- FIXED MESSAGE COLUMN -->
-<td>
-{{ review.message|truncatechars:35 }}
-<button class="btn btn-sm btn-view ms-2"
-data-bs-toggle="modal"
-data-bs-target="#reviewModal{{ review.id }}">
-View
-</button>
-</td>
-
-<td>{{ review.created_at|date:"d M Y" }}</td>
-
-<td>
-<a href="{% url 'delete_review' review.id %}" 
-class="btn btn-sm btn-delete">
-<i class="bi bi-trash"></i> Delete
-</a>
-</td>
-</tr>
-
-<!-- MODAL FOR FULL REVIEW -->
-<div class="modal fade" id="reviewModal{{ review.id }}" tabindex="-1">
-<div class="modal-dialog">
-<div class="modal-content">
-<div class="modal-header">
-<h5 class="modal-title">Full Review</h5>
-<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="reviewModal{{ review.id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="ti ti-message-circle" style="color:var(--accent);margin-right:6px;"></i>
+          Full Review
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-meta-row">
+          <div class="modal-meta-item">
+            <span class="modal-meta-label">Product</span>
+            <span class="modal-meta-value">{{ review.product }}</span>
+          </div>
+          <div class="modal-meta-item">
+            <span class="modal-meta-label">Customer</span>
+            <span class="modal-meta-value">{{ review.name }}</span>
+          </div>
+          <div class="modal-meta-item">
+            <span class="modal-meta-label">Email</span>
+            <span class="modal-meta-value">{{ review.email }}</span>
+          </div>
+          <div class="modal-meta-item">
+            <span class="modal-meta-label">Rating</span>
+            <span class="rating-badge rating-{{ review.rating }}" style="margin-top:2px;">{{ review.rating }} ★</span>
+          </div>
+          <div class="modal-meta-item">
+            <span class="modal-meta-label">Date</span>
+            <span class="modal-meta-value">{{ review.created_at|date:"d M Y" }}</span>
+          </div>
+        </div>
+        <strong>Review</strong>
+        <div class="review-full-msg">{{ review.message }}</div>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="modal-body">
-<p><strong>Product:</strong> {{ review.product }}</p>
-<p><strong>Name:</strong> {{ review.name }}</p>
-<p><strong>Email:</strong> {{ review.email }}</p>
-<hr>
-<p>{{ review.message }}</p>
-</div>
-</div>
-</div>
-</div>
-
-{% empty %}
-<tr>
-<td colspan="8" class="text-center text-muted py-4">
-No reviews found
-</td>
-</tr>
 {% endfor %}
-</tbody>
-</table>
 
-</div>
-</div>
+{% endblock %}
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{% block js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('reviewSearch');
+    const rows  = document.querySelectorAll('#reviewTable tr');
+    input.addEventListener('keyup', function () {
+      const q = input.value.toLowerCase().trim();
+      rows.forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  });
+</script>
+{% endblock %}

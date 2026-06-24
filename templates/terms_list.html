@@ -1,132 +1,134 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Terms List</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'main.html' %}
+{% block title %}Terms & Conditions{% endblock %}
+{% load static %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+{% block content %}
 
-    <style>
-        body{
-            background:#f4f6f9;
-        }
-
-        /* NAVBAR */
-        .header-with-topbar{background:#000;box-shadow:0 4px 20px rgba(0,0,0,0.35);}
-        .dashboard-header{padding:18px 24px;}
-        .dashboard-header h4,.dashboard-header small,.dashboard-header i{color:#fff;}
-        .dashboard-header .nav-link{color:#fff !important;font-weight:500;transition:0.3s;}
-        .dashboard-header .nav-link:hover{color:#bdbdbd !important;}
-        .navbar-toggler{border:0;}
-        .navbar-toggler-icon{filter:invert(1);}
-
-        .card{
-            border:0;
-            border-radius:14px;
-            box-shadow:0 6px 24px rgba(0,0,0,.06);
-        }
-        .btn-dark{
-            border-radius:8px;
-            padding:4px 12px;
-            font-size:14px;
-        }
-    </style>
-</head>
-
-<body class="bg-light">
-
-<!-- ===== NAVBAR ===== -->
-<header class="header-with-topbar">
-<nav class="navbar dashboard-header navbar-expand-lg">
-<div class="container-fluid px-0">
-
-<div class="d-flex align-items-center gap-3">
-<i class="bi bi-speedometer2 fs-2"></i>
-<div>
-<h4 class="mb-0">Admin Dashboard</h4>
-<small>Overview of store performance</small>
-</div>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <h4><i class="bi bi-file-text" style="color:var(--accent);"></i> Terms &amp; Conditions</h4>
+    <p>Manage your store terms</p>
+  </div>
+  <div class="topbar-right">
+    <a href="{% url 'add_terms' %}" class="btn btn-sm btn-dark" style="border-radius:9px; font-weight:500;">
+      <i class="bi bi-plus-lg me-1"></i> Add Terms
+    </a>
+  </div>
 </div>
 
-<button class="navbar-toggler" type="button"
-data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-<span class="navbar-toggler-icon"></span>
-</button>
+<!-- TABLE -->
+<div class="orders-wrap mb-4">
 
-<div class="collapse navbar-collapse justify-content-end" id="adminNavbar">
-<ul class="navbar-nav align-items-lg-center gap-lg-3 mt-3 mt-lg-0">
-<li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Home</a></li>
-<li class="nav-item"><a class="nav-link" href="{% url 'order_list' %}">Orders</a></li>
-<li class="nav-item"><a class="nav-link" href="{% url 'paid_orders' %}">Paid</a></li>
-<li class="nav-item"><a class="nav-link" href="{% url 'pending_orders' %}">Pending</a></li>
-<li class="nav-item"><a class="nav-link" href="{% url 'customer_list' %}">Customers</a></li>
-<li class="nav-item"><a class="nav-link text-danger" href="{% url 'user_logout' %}">Logout</a></li>
-</ul>
-</div>
+  <div class="orders-header">
+    <span class="orders-header-title">
+      <i class="ti ti-file-description" style="font-size:17px;color:var(--accent);"></i>
+      All Terms
+      {% if page_obj.paginator.count %}
+        <span class="orders-count-pill">{{ page_obj.paginator.count }} total</span>
+      {% endif %}
+    </span>
+  </div>
 
-</div>
-</nav>
-</header>
-<!-- ===== END NAVBAR ===== -->
+  <div class="table-scroll-wrap">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Content</th>
+          <th>Last Updated</th>
+          <th style="width:120px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in page_obj %}
+        <tr>
+          <td><span class="order-id">#{{ t.id }}</span></td>
 
-<div class="container py-5">
+          <td style="max-width:480px;">
+            <span style="
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              color: var(--muted);
+              font-size: .82rem;
+              line-height: 1.55;
+            ">{{ t.content|striptags|truncatechars:150 }}</span>
+          </td>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-semibold mb-0">Terms & Conditions</h4>
+          <td><span class="date-text">{{ t.updated_at|date:"d M Y, H:i" }}</span></td>
 
-        <a href="{% url 'add_terms' %}" class="btn btn-dark">
-            Add Terms
-        </a>
+          <td>
+            <div class="d-flex gap-2">
+              <a href="{% url 'edit_terms' t.id %}" class="btn-edit" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <a href="{% url 'delete_terms' t.id %}"
+                 class="btn-edit"
+                 style="background:rgba(239,68,68,.1);color:#dc2626;"
+                 onclick="return confirm('Delete this terms entry?')"
+                 title="Delete">
+                <i class="bi bi-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr class="empty-row">
+          <td colspan="4">
+            <i class="bi bi-file-earmark-x empty-icon"></i>
+            No terms added yet.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div class="pagination-wrap">
+    <span class="pagination-info">
+      Showing <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+      of <strong>{{ page_obj.paginator.count }}</strong> entries
+    </span>
+    <div class="pagination-controls">
+
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="page-btn"><i class="bi bi-chevron-double-left"></i></a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="page-btn"><i class="bi bi-chevron-left"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-left"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-left"></i></span>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="page-btn active">{{ num }}</span>
+        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="page-btn"><i class="bi bi-chevron-right"></i></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="page-btn"><i class="bi bi-chevron-double-right"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-right"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-right"></i></span>
+      {% endif %}
+
     </div>
-
-    <div class="card shadow-sm">
-        <div class="card-body">
-
-            <table class="table align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Updated</th>
-                        <th width="220">Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for t in terms %}
-                    <tr>
-                        <td>#{{ t.id }}</td>
-                        <td>{{ t.updated_at|date:"d M Y H:i" }}</td>
-                        <td>
-                            <a href="{% url 'edit_terms' t.id %}" class="btn btn-sm btn-dark me-2">
-                                Edit
-                            </a>
-
-                            <a href="{% url 'delete_terms' t.id %}"
-                               class="btn btn-sm btn-dark"
-                               onclick="return confirm('Delete this terms?')">
-                                Delete
-                            </a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center text-muted py-4">
-                            No Terms Added
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
-
-        </div>
-    </div>
+  </div>
+  {% endif %}
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
 
-</body>
-</html>
+{% block js %}{% endblock %}

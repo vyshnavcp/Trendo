@@ -1,563 +1,312 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Dashboard</title>
+{% extends 'main.html' %}
+{% block title %}Dashboard{% endblock %}
+{% load static %}
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+{% block css %}
 <style>
+  /* ── Live dot ── */
+  .live-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    margin-right: 8px;
+    vertical-align: middle;
+    position: relative; top: -1px;
+    animation: blink 2.2s ease infinite;
+  }
+  @keyframes blink {
+    0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,.5); }
+    60%      { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+  }
 
-body{
-font-family:'Inter',sans-serif;
-background:#f4f6fb;
-color:#111;
-}
-
-/* SIDEBAR */
-
-.sidebar{
-position:fixed;
-top:0;
-left:0;
-height:100%;
-width:240px;
-background:#0b0f19;
-padding:30px 20px;
-color:white;
-overflow-y:auto;
-}
-
-.sidebar-logo{
-font-size:20px;
-font-weight:700;
-margin-bottom:40px;
-}
-
-.sidebar a{
-display:flex;
-align-items:center;
-gap:10px;
-padding:10px 12px;
-border-radius:10px;
-color:#cbd5e1;
-text-decoration:none;
-margin-bottom:8px;
-transition:.25s;
-}
-
-.sidebar a:hover{
-background:#1e293b;
-color:white;
-}
-
-/* MAIN */
-
-.main{
-margin-left:240px;
-padding:30px;
-}
-
-/* HEADER */
-
-.topbar{
-background:white;
-border-radius:14px;
-padding:15px 25px;
-box-shadow:0 6px 20px rgba(0,0,0,.05);
-margin-bottom:30px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-/* STAT CARDS */
-
-.stat-card{
-background:white;
-border-radius:16px;
-padding:25px;
-box-shadow:0 10px 30px rgba(0,0,0,.07);
-transition:.3s;
-}
-
-.stat-card:hover{
-transform:translateY(-6px);
-}
-
-.stat-title{
-font-size:13px;
-color:#6b7280;
-text-transform:uppercase;
-}
-
-.stat-value{
-font-size:24px;
-font-weight:700;
-margin-top:5px;
-}
-
-/* TABLE */
-
-.table{
-background:white;
-border-radius:12px;
-overflow:hidden;
-}
-
-.table thead{
-background:#eef2ff;
-}
-
-.table tbody tr:hover{
-background:#f9fafb;
-cursor:pointer;
-}
-
-/* QUICK ACTION */
-
-.quick-btn{
-display:flex;
-align-items:center;
-gap:10px;
-padding:12px 15px;
-border-radius:10px;
-background:white;
-box-shadow:0 4px 12px rgba(0,0,0,.05);
-text-decoration:none;
-color:#111;
-transition:.25s;
-}
-
-.quick-btn:hover{
-background:#6366f1;
-color:white;
-transform:translateX(5px);
-}
-
-/* CUSTOMER */
-
-.customer-cell{
-display:flex;
-flex-direction:column;
-}
-
-.customer-name{
-font-weight:600;
-}
-
-.ref-pill{
-margin-top:6px;
-background:#f1f5f9;
-padding:4px 10px;
-border-radius:20px;
-font-size:12px;
-width:fit-content;
-}
-
+  /* ── Store badge ── */
+  .store-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(108,99,255,0.08);
+    color: #6c63ff;
+    font-size: 12px; font-weight: 600;
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid rgba(108,99,255,0.15);
+  }
+  .store-badge i { font-size: 15px; }
 </style>
-</head>
+{% endblock %}
 
-<body>
+{% block content %}
 
-<div class="sidebar">
-
-<div class="sidebar-logo">
-<i class="bi bi-speedometer2"></i> Dashboard
-</div>
-
-{% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
-<a href="{% url 'report_page' %}"><i class="bi bi-bar-chart"></i> Report</a>
-<a href="{% url 'customer_list' %}"><i class="bi bi-people"></i> Customers</a>
-{% endif %}
-
-<a href="{% url 'order_list' %}"><i class="bi bi-box"></i> Orders</a>
-<a href="{% url 'paid_orders' %}"><i class="bi bi-check-circle"></i> Paid Orders</a>
-<a href="{% url 'pending_orders' %}"><i class="bi bi-clock"></i> Pending Orders</a>
-
-<hr>
-
-<a href="{% url 'user_logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
-
-</div>
-
-
-<div class="main">
-
-
+<!-- TOPBAR -->
 <div class="topbar">
-
-<div>
-<h5 class="mb-0">Dashboard</h5>
-<small>Overview of store performance</small>
-</div>
-
-</div>
-
-
-<!-- METRICS -->
- 
-<div class="row g-4 mb-4">
-
-{% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
-
-<div class="col-md-3">
-<a href="{% url 'report_page' %}" class="text-decoration-none text-dark d-block">
-<div class="stat-card">
-<div class="stat-title">Total Revenue</div>
-<div class="stat-value">₹ {{ total_revenue }}</div>
-</div>
-</a>
-</div>
-
-<div class="col-md-3">
-<a href="{% url 'report_page' %}?today=1" class="text-decoration-none text-dark d-block">
-<div class="stat-card">
-<div class="stat-title">Today Revenue</div>
-<div class="stat-value">₹ {{ today_revenue }}</div>
-</div>
-</a>
-</div>
-
-<div class="col-md-3">
-<a href="{% url 'total_income' %}" class="text-decoration-none text-dark d-block">
-<div class="stat-card">
-<div class="stat-title">Total Income</div>
-<div class="stat-value">₹ {{ total_net_income }}</div>
-</div>
-</a>
-</div>
-
-{% endif %}
-
-<div class="col-md-3">
-<a href="{% url 'order_list' %}" class="text-decoration-none text-dark d-block">
-<div class="stat-card">
-<div class="stat-title">Total Orders</div>
-<div class="stat-value">
-{{ total_orders }}
-</div>
-</div>
-</a>
-</div>
-
-<div class="col-md-3">
-<a href="{% url 'paid_orders' %}" class="text-decoration-none text-dark d-block">
-<div class="stat-card">
-<div class="stat-title">Paid Orders</div>
-<div class="stat-value">
-{{ paid_orders }}
-</div>
-</div>
-</a>
-</div>
-
-<div class="col-md-3">
-<a href="{% url 'pending_orders' %}" class="text-decoration-none text-dark d-block">
-<div class="stat-card">
-<div class="stat-title">Pending Orders</div>
-<div class="stat-value">
-{{ pending_orders }}
-</div>
-</div>
-</a>
-</div>
-
-{% if refund_requests_count > 0 %}
-<div class="col-md-3">
-<a href="{% url 'refund_requests' %}" class="text-decoration-none text-dark d-block">
-<div class="stat-card border border-danger">
-<div class="stat-title text-danger">Refund/Cancel order Requests</div>
-<div class="stat-value text-danger">
-{{ refund_requests_count }}
-</div>
-</div>
-</a>
-</div>
-{% endif %}
-
-{% if return_requests_count > 0 %}
-<div class="col-md-3">
-<a href="{% url 'return_requests' %}" class="text-decoration-none text-dark d-block">
-<div class="stat-card border border-warning">
-<div class="stat-title text-warning">Return Requests</div>
-<div class="stat-value text-warning">
-{{ return_requests_count }}
-</div>
-</div>
-</a>
-</div>
-{% endif %}
-
-</div>
-
-<div class="row">
-
-<div class="col-lg-8">
-
-<div class="card shadow-sm">
-
-<div class="card-header d-flex justify-content-between align-items-center">
-
-<span>All Orders</span>
-
-<input type="text" 
-id="orderSearch" 
-class="form-control w-25"
-placeholder="Search order..."
->
-
-</div>
-
-<div class="card-body p-0">
-
-<table class="table mb-0 align-middle">
-
-<thead>
-<tr>
-<th>ID</th>
-<th>Customer</th>
-<th>Total</th>
-<th>Payment Method</th>
-<th>Status</th>
-<th>Date</th>
-<th>Edit</th>
-</tr>
-</thead>
-
-<tbody id="orderTable">
-
-{% for order in orders %}
-
-<tr onclick="window.location.href='{% url 'order_detail' order.id %}'">
-
-<td>#{{ order.id }}</td>
-
-<td>
-<div class="customer-cell">
-
-<div class="customer-name">
-{{ order.first_name }}
-</div>
-
-{% if order.reference %}
-<div class="ref-pill">
-Referred by {{ order.reference }}
-</div>
-{% endif %}
-
-</div>
-</td>
-
-<td>₹ {{ order.total }}</td>
-<td>
-
-{% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
-
-{% if order.is_pos_order %}
-<span class="badge bg-dark">
-Retail Shop
-</span>
-
-{% elif order.payment_method == "razorpay" %}
-<span class="badge bg-primary">
-Razorpay
-</span>
-
-{% elif order.payment_method == "cod" %}
-<span class="badge bg-success">
-COD
-</span>
-
-{% endif %}
-
-{% else %}
-
-{% if order.is_pos_order %}
-<span class="badge bg-primary">
-Retail Shop
-</span>
-{% else %}
-<span class="text-muted">Hidden</span>
-{% endif %}
-
-{% endif %}
-
-</td>
-
-<td>
-
-{% if order.is_cancelled %}
-<span class="badge bg-danger">Cancelled</span>
-
-{% elif order.return_requested and not order.return_approved %}
-<span class="badge bg-warning text-dark">Return Requested</span>
-
-{% elif order.return_approved and not order.refund_processed %}
-<span class="badge bg-info text-dark">Return Approved</span>
-
-{% elif order.return_approved and order.refund_processed %}
-<span class="badge bg-success">Returned</span>
-
-{% elif order.is_shipped and not order.is_delivered %}
-<span class="badge bg-primary">Shipping Processing</span>
-
-{% elif order.is_delivered %}
-<span class="badge bg-success">Delivered</span>
-
-{% elif order.is_pos_order %}
-    {% if order.payment_status %}
-        <span class="badge bg-success">Paid</span>
-    {% else %}
-        <span class="badge bg-warning text-dark">Pending Payment</span>
-    {% endif %}
-
-{% elif order.payment_status %}
-    <span class="badge bg-success">Paid</span>
-
-{% else %}
-    <span class="badge bg-secondary">Pending</span>
-{% endif %}
-</td>
-
-<td>{{ order.created_at|date:"d M Y" }}</td>
-
-<td>
-
-{% if order.is_pos_order %}
-<a href="{% url 'pos_edit_page' order.id %}" 
-class="btn btn-sm btn-warning"
-onclick="event.stopPropagation();">
-<i class="bi bi-pencil"></i>
-</a>
-{% else %}
-—
-{% endif %}
-
-</td>
-
-</tr>
-
-{% empty %}
-
-<tr>
-<td colspan="7" class="text-center py-4 text-muted">
-No Orders Yet
-</td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-</div>
-
-</div>
-
-
-<!-- QUICK ACTION -->
-
-<div class="col-lg-4">
-
-<div class="card shadow-sm">
-
-<div class="card-header">
-Quick Actions
-</div>
-
-<div class="card-body d-grid gap-2">
-<a href="{% url 'shipping_orders' %}" class="quick-btn justify-content-between">
-    <span>
-        <i class="bi bi-truck"></i> Shipping Orders
+  <div class="topbar-left">
+    <h4><span class="live-dot"></span>Dashboard</h4>
+    <p>Overview of store performance</p>
+  </div>
+  <div class="topbar-right">
+    <span class="store-badge">
+      <i class="ti ti-building-store"></i>
+      Store Admin
     </span>
+  </div>
+</div>
 
-    {% if shipping_orders_count > 0 %}
-        <span class="badge bg-primary">
-            {{ shipping_orders_count }}
-        </span>
-    {% endif %}
-</a>
-<a href="{% url 'pos_page' %}" class="quick-btn"><i class="bi bi-receipt"></i> POS Billing</a>
-<a href="{% url 'add_category' %}" class="quick-btn"><i class="bi bi-plus-square"></i> Add Category</a>
-<a href="{% url 'category_list' %}" class="quick-btn"><i class="bi bi-card-list"></i> View Category</a>
-<a href="{% url 'add_subcategory' %}" class="quick-btn"><i class="bi bi-folder-plus"></i> Add SubCategory</a>
-<a href="{% url 'subcategory_list' %}" class="quick-btn"><i class="bi bi-folder2-open"></i> View SubCategory</a>
-<a href="{% url 'add_product' %}" class="quick-btn"><i class="bi bi-box-arrow-in-up"></i> Add Product</a>
-<a href="{% url 'product_list' %}" class="quick-btn"><i class="bi bi-box-seam"></i> View Product</a>
-<a href="{% url 'add_size' %}" class="quick-btn"><i class="bi bi-arrows-fullscreen"></i> Add Size</a>
-<a href="{% url 'size_list' %}" class="quick-btn"><i class="bi bi-arrows-angle-expand"></i> View Size</a>
-<a href="{% url 'add_coupon' %}" class="quick-btn"><i class="bi bi-tag-plus"></i> Add Coupon</a>
-<a href="{% url 'coupon_list' %}" class="quick-btn"><i class="bi bi-tags"></i> View Coupon</a>
+<!-- STAT CARDS -->
+<div class="row g-3 mb-4 stats-row row-cols-2 row-cols-sm-3 row-cols-md-4">
 
-{% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
-<a href="{% url 'refund_requests' %}" class="quick-btn"><i class="bi bi-arrow-counterclockwise"></i> Refund Requests</a>
-<a href="{% url 'refund_report' %}" class="quick-btn"><i class="bi bi-cash-coin"></i> Refund/Cancel List</a>
-<a href="{% url 'return_requests' %}" class="quick-btn"><i class="bi bi-box-arrow-in-left"></i> Return Requests</a>
-<a href="{% url 'return_report' %}" class="quick-btn"><i class="bi bi-arrow-repeat"></i> Return Report</a>
-<a href="{% url 'create_user' %}" class="quick-btn"><i class="bi bi-person-plus"></i> Create Employee</a>
-<a href="{% url 'employee_list' %}" class="quick-btn"><i class="bi bi-people"></i> Employee List</a>
-<a href="{% url 'review_list' %}" class="quick-btn"><i class="bi bi-chat-square-text"></i> View Reviews</a>
-<a href="{% url 'add_banner' %}" class="quick-btn"><i class="bi bi-image"></i> Add Banner</a>
-<a href="{% url 'banner_list' %}" class="quick-btn"><i class="bi bi-images"></i> View Banners</a>
-<a href="{% url 'contact_list' %}" class="quick-btn"><i class="bi bi-envelope"></i> Contact List</a>
-<a href="{% url 'add_article' %}" class="quick-btn"><i class="bi bi-newspaper"></i> Add Article</a>
-<a href="{% url 'article_list' %}" class="quick-btn"><i class="bi bi-card-text"></i> View Articles</a>
-<a href="{% url 'add_terms' %}" class="quick-btn"><i class="bi bi-file-earmark-plus"></i> Add Terms</a>
-<a href="{% url 'terms_list' %}" class="quick-btn"><i class="bi bi-file-earmark-text"></i> View Terms</a>
-<a href="{% url 'add_privacy' %}" class="quick-btn"><i class="bi bi-shield-lock"></i> Add Privacy</a>
-<a href="{% url 'privacy_list' %}" class="quick-btn"><i class="bi bi-shield-check"></i> View Privacy</a>
-<a href="{% url 'add_faq' %}" class="quick-btn"><i class="bi bi-question-circle"></i> Add FAQ</a>
-<a href="{% url 'faq_list' %}" class="quick-btn"><i class="bi bi-chat-dots"></i> View FAQ</a>
-<a href="{% url 'total_income' %}" class="quick-btn"><i class="bi bi-currency-rupee"></i> Total Income</a>
+  {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
 
-{% endif %}
+  <div class="col">
+    <a href="{% url 'report_page' %}" class="stat-card">
+      <div class="stat-stripe"></div>
+      <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+      <div class="stat-title">Total Revenue</div>
+      <div class="stat-value">₹{{ total_revenue }}</div>
+    </a>
+  </div>
+
+  <div class="col">
+    <a href="{% url 'report_page' %}?today=1" class="stat-card">
+      <div class="stat-stripe"></div>
+      <div class="stat-icon" style="background:rgba(16,185,129,.1);color:#10b981;"><i class="bi bi-calendar-day"></i></div>
+      <div class="stat-title">Today Revenue</div>
+      <div class="stat-value">₹{{ today_revenue }}</div>
+    </a>
+  </div>
+
+  <div class="col">
+    <a href="{% url 'total_income' %}" class="stat-card">
+      <div class="stat-stripe"></div>
+      <div class="stat-icon" style="background:rgba(139,92,246,.1);color:#8b5cf6;"><i class="bi bi-currency-rupee"></i></div>
+      <div class="stat-title">Total Income</div>
+      <div class="stat-value">₹{{ total_net_income }}</div>
+    </a>
+  </div>
+
+  {% endif %}
+
+  <div class="col">
+    <a href="{% url 'order_list' %}" class="stat-card">
+      <div class="stat-stripe"></div>
+      <div class="stat-icon" style="background:rgba(59,130,246,.1);color:#3b82f6;"><i class="bi bi-bag"></i></div>
+      <div class="stat-title">Total Orders</div>
+      <div class="stat-value">{{ total_orders }}</div>
+    </a>
+  </div>
+
+  <div class="col">
+    <a href="{% url 'paid_orders' %}" class="stat-card">
+      <div class="stat-stripe"></div>
+      <div class="stat-icon" style="background:rgba(16,185,129,.1);color:#10b981;"><i class="bi bi-check-circle"></i></div>
+      <div class="stat-title">Paid Orders</div>
+      <div class="stat-value">{{ paid_orders }}</div>
+    </a>
+  </div>
+
+  <div class="col">
+    <a href="{% url 'pending_orders' %}" class="stat-card">
+      <div class="stat-stripe"></div>
+      <div class="stat-icon" style="background:rgba(245,158,11,.1);color:#f59e0b;"><i class="bi bi-clock"></i></div>
+      <div class="stat-title">Pending Orders</div>
+      <div class="stat-value">{{ pending_orders }}</div>
+    </a>
+  </div>
+
+  {% if refund_count %}
+  <div class="col">
+    <a href="{% url 'refund_requests' %}" class="stat-card is-danger">
+      <div class="stat-stripe"></div>
+      <div class="stat-icon"><i class="bi bi-arrow-counterclockwise"></i></div>
+      <div class="stat-title">Refund / Cancel</div>
+      <div class="stat-value">{{ refund_count }}</div>
+    </a>
+  </div>
+  {% endif %}
+
+  {% if return_requests_count %}
+  <div class="col">
+    <a href="{% url 'return_requests' %}" class="stat-card is-warning">
+      <div class="stat-stripe"></div>
+      <div class="stat-icon"><i class="bi bi-box-arrow-left"></i></div>
+      <div class="stat-title">Return Requests</div>
+      <div class="stat-value">{{ return_requests_count }}</div>
+    </a>
+  </div>
+  {% endif %}
 
 </div>
 
-</div>
+<!-- ORDERS TABLE -->
+<div class="orders-wrap mb-4">
+
+  <div class="orders-header">
+    <span class="orders-header-title">
+      <i class="ti ti-receipt" style="font-size:17px;color:var(--accent);"></i>
+      All Orders
+      {% if page_obj.paginator.count %}
+        <span class="orders-count-pill">{{ page_obj.paginator.count }} total</span>
+      {% endif %}
+    </span>
+    <div class="search-box">
+      <i class="ti ti-search"></i>
+      <input type="text" id="orderSearch" placeholder="Search by name, ID, status…">
+    </div>
+  </div>
+
+  <div class="table-scroll-wrap">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Amount</th>
+          <th class="col-payment">Payment</th>
+          <th>Status</th>
+          <th class="col-date">Date</th>
+          <th class="col-edit" style="width:48px;"></th>
+        </tr>
+      </thead>
+      <tbody id="orderTable">
+
+        {% for order in orders %}
+        <tr onclick="window.location.href='{% url 'order_detail' order.id %}'">
+
+          <td><span class="order-id">#{{ order.id }}</span></td>
+
+          <td>
+            <div class="customer-name">{{ order.first_name }}</div>
+            {% if order.reference %}
+              <span class="ref-pill">via {{ order.reference }}</span>
+            {% endif %}
+          </td>
+
+          <td><span class="amount">₹{{ order.total }}</span></td>
+
+          <td class="col-payment">
+            {% if request.user.is_superuser or request.user.groups.first.name == "Accountant" %}
+              {% if order.is_pos_order %}
+                <span class="pbadge pb-dark">Retail Shop</span>
+              {% elif order.payment_method == "razorpay" %}
+                <span class="pbadge pb-blue">Razorpay</span>
+              {% elif order.payment_method == "cod" %}
+                <span class="pbadge pb-green">COD</span>
+              {% endif %}
+            {% else %}
+              {% if order.is_pos_order %}
+                <span class="pbadge pb-blue">Retail</span>
+              {% else %}
+                <span class="pb-hidden">—</span>
+              {% endif %}
+            {% endif %}
+          </td>
+
+          <td>
+            {% if order.is_cancelled %}
+              <span class="sbadge sb-danger">Cancelled</span>
+            {% elif order.return_requested and not order.return_approved %}
+              <span class="sbadge sb-warning">Return Req.</span>
+            {% elif order.return_approved and not order.refund_processed %}
+              <span class="sbadge sb-info">Approved</span>
+            {% elif order.return_approved and order.refund_processed %}
+              <span class="sbadge sb-success">Returned</span>
+            {% elif order.is_shipped and not order.is_delivered %}
+              <span class="sbadge sb-primary">Shipping</span>
+            {% elif order.is_delivered %}
+              <span class="sbadge sb-success">Delivered</span>
+            {% elif order.is_pos_order %}
+              {% if order.payment_status %}
+                <span class="sbadge sb-success">Paid</span>
+              {% else %}
+                <span class="sbadge sb-warning">Pending</span>
+              {% endif %}
+            {% elif order.payment_status %}
+              <span class="sbadge sb-success">Paid</span>
+            {% else %}
+              <span class="sbadge sb-secondary">Pending</span>
+            {% endif %}
+          </td>
+
+          <td class="col-date">
+            <span class="date-text">{{ order.created_at|date:"d M Y" }}</span>
+          </td>
+
+          <td class="col-edit">
+            {% if order.is_pos_order %}
+            <a href="{% url 'pos_edit_page' order.id %}" class="btn-edit"
+               onclick="event.stopPropagation();" title="Edit">
+              <i class="bi bi-pencil"></i>
+            </a>
+            {% else %}<span class="dash-cell">—</span>{% endif %}
+          </td>
+
+        </tr>
+        {% empty %}
+        <tr class="empty-row">
+          <td colspan="7">
+            <i class="bi bi-bag-x empty-icon"></i>
+            No orders yet. They'll show up here once customers start ordering.
+          </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PAGINATION -->
+  {% if page_obj.has_other_pages %}
+  <div class="pagination-wrap">
+    <span class="pagination-info">
+      Showing <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+      of <strong>{{ page_obj.paginator.count }}</strong> orders
+    </span>
+    <div class="pagination-controls">
+
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="page-btn" title="First"><i class="bi bi-chevron-double-left"></i></a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="page-btn"><i class="bi bi-chevron-left"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-left"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-left"></i></span>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="page-btn active">{{ num }}</span>
+        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="page-btn"><i class="bi bi-chevron-right"></i></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="page-btn" title="Last"><i class="bi bi-chevron-double-right"></i></a>
+      {% else %}
+        <span class="page-btn disabled"><i class="bi bi-chevron-right"></i></span>
+        <span class="page-btn disabled"><i class="bi bi-chevron-double-right"></i></span>
+      {% endif %}
+
+    </div>
+  </div>
+  {% endif %}
 
 </div>
 
-</div>
+{% endblock %}
 
-</div>
-<!-- (rest of your template unchanged) -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+{% block js %}
 <script>
-
-document.addEventListener("DOMContentLoaded", function(){
-
-const searchInput = document.getElementById("orderSearch");
-const tableRows = document.querySelectorAll("#orderTable tr");
-
-searchInput.addEventListener("keyup", function(){
-
-let filter = searchInput.value.toLowerCase().trim();
-
-tableRows.forEach(function(row){
-
-let rowText = row.textContent.toLowerCase();
-
-if(rowText.includes(filter)){
-row.style.display = "";
-}else{
-row.style.display = "none";
-}
-
-});
-
-});
-
-});
-
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('orderSearch');
+    const rows  = document.querySelectorAll('#orderTable tr');
+    input.addEventListener('keyup', function () {
+      const q = input.value.toLowerCase().trim();
+      rows.forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  });
 </script>
-</body>
-</html>
+{% endblock %}
